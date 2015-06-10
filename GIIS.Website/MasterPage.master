@@ -1,0 +1,107 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="MasterPage.master.cs" Inherits="MasterPage" %>
+
+<%@ Register Src="~/UserControls/LogIn.ascx" TagName="LogIn" TagPrefix="giis" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Immunization Information System</title>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Custom styles for this template -->
+    <link href="css/nprogress.css" rel="stylesheet" />
+    <link href="css/ripples.css" rel="stylesheet" />
+    <link href="css/material.css" rel="stylesheet" />
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <ajaxToolkit:ToolkitScriptManager ID="ScriptManager1" runat="server"></ajaxToolkit:ToolkitScriptManager>
+
+        <!-- GIIS start here -->
+        <div class="container">
+             <div class="row">
+                 <div class="col-md-3 col-xs-3 col-sm-3 col-lg-3"></div> 
+                <!--Header Container-->
+                <div class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
+                    <br />
+                    <img src="img/logo_tiis.png" alt="GIIS" />
+                    <br />
+                </div>
+      
+                   <div class="col-md-3 col-xs-3 col-sm-3 col-lg-3"></div> 
+                </div>
+          
+
+            <div class="row">
+                 <div class="col-md-3 col-xs-3 col-sm-3 col-lg-3">
+
+                    <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+                    </asp:ContentPlaceHolder>
+                </div>
+                <div class="col-md-4 col-xs-4 col-sm-4 col-lg-4" style="margin-left:100px">
+                    <giis:LogIn ID="logIn1" runat="server" />
+                </div>
+               <div class="col-md-2 col-xs-2 col-sm-2 col-lg-2">
+               
+                    <asp:ContentPlaceHolder ID="ContentPlaceHolder2" runat="server">
+                    </asp:ContentPlaceHolder>
+                </div>
+            </div>
+
+            <hr />
+            <div class="footer">
+                <!--Footer-->
+                <%--<p>&copy; Immunization Information System 2.0 2014</p>--%>
+            </div>
+            <!--/Footer-->
+
+        </div>
+
+
+
+
+        <!-- GIIS ends -->
+
+
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+        <script src="js/jquery.min.js"></script>
+        <!-- Include all compiled plugins (below), or include individual files as needed -->
+        <script type="text/javascript" src="js/AutoCompletescript.js"></script>
+        <script type="text/javascript" src="js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="js/nprogress.js"></script>
+        <script type="text/javascript" src="js/ripples.js"></script>
+        <script type="text/javascript" src="js/material.js"></script>
+        <script>
+            $('body').show();
+            $('.version').text(NProgress.version);
+            NProgress.start();
+            setTimeout(function () { NProgress.done(); $('.fade').removeClass('out'); }, 1000);
+
+            $("#b-0").click(function () { NProgress.start(); });
+            $("#b-40").click(function () { NProgress.set(0.4); });
+            $("#b-inc").click(function () { NProgress.inc(); });
+            $("#b-100").click(function () { NProgress.done(); });
+        </script>
+    </form>
+</body>
+</html>
+
+
+
+
+
+
+
+

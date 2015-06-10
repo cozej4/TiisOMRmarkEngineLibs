@@ -1,0 +1,202 @@
+
+
+/* main menu styles */
+
+/* tabs section */
+#tabs-container {
+	background-image: url(../img/filter.jpg);
+	font-family: Arial, Helvetica, Sans-Serif;	/* Fonts of main menu items */
+	font-size:13px;	/* Font size of main menu items */
+	font-weight:bold;
+    clear:both;
+    font-size:11px;
+    height:25px;
+    width:952px;
+    margin:0 auto;
+    padding:0;
+	text-decoration:none;
+	border-top:1px solid #6678b1;
+	border-left:1px solid #6678b1;
+	border-right:1px solid #6678b1;
+    border-bottom:1px solid #6678b1;
+    -o-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -moz-border-radius: 5px;/* Gecko browsers */
+    -webkit-border-radius: 5px;/* Safari prototype */
+    border-radius: 5px;/* Everything else - limited support at the moment */
+    cursor:pointer;
+}
+.tabs li {
+	text-decoration:none;
+    float:left;
+    list-style:none;
+    position:relative;
+	
+}
+.tabs li a:first-child {
+    margin-left:10px;
+}
+.tabs li a {
+	font-family: Arial, Helvetica, Sans-Serif;	/* Fonts of main menu items */
+	font-size:13px;	/* Font size of main menu items */
+	font-weight:bold;
+    text-decoration:none;
+    border:none;
+    -moz-border-radius:3px 3px 0 0;
+    -webkit-border-radius:3px 3px 0 0;
+    color:#333;
+    display:block;
+    margin:0 2px 0 0;
+    padding:5px 10px 4px;
+}
+.tabs li.active a {
+	font-family: Arial, Helvetica, Sans-Serif;	/* Fonts of main menu items */
+	font-size:13px;	/* Font size of main menu items */
+	font-weight:bold;
+    -webkit-border-radius:4px 4px 0 0;
+    background-color:#F5F5F5;
+    text-decoration:none;
+    color:#6678b1;
+    display:block;
+    padding:5px 10px 4px;
+}
+.tabs li.child a {
+	text-decoration:none;
+    -webkit-border-radius:0 4px 0 0;	
+    background-color:#F5F5F5;
+    border-radius:0 4px 0 0;
+    color:#333;
+    display:block;
+    margin:0;
+    padding:6px 10px 4px;
+}
+.tabs li a:hover {
+    color:#fff;
+    text-decoration:none;
+}
+
+/* Targeting the first level menu */
+.tabs {
+	text-decoration:none;
+    display:block;
+    margin:0;
+    padding:1px 0 2px;
+    position:absolute;
+    z-index:100;
+}
+.tabs > li > a:hover {
+    background-color:#F5F5F5;
+    color:#6678b1;
+}
+.tabs > li.active > a:hover {
+    -moz-border-radius:3px 3px 0 0;
+    -webkit-border-radius:3px 3px 0 0;
+    background-color:#F5F5F5;
+    border-radius:3px 3px 0 0;
+    color:#6678b1;
+}
+
+/*Middle Drop-Down Navigation*/
+#nav-container {
+	text-decoration:none;
+	background-color:#F5F5F5;
+    clear:both;
+    font-size:11px;
+    height:25px;
+    margin:0 auto;
+    padding:0;
+}
+
+/* Targeting both first and second level menus */
+.nav li {
+    float:left;
+    list-style:none;
+    position:relative;
+	
+}
+.nav li a {
+	font-family: Arial, Helvetica, Sans-Serif;	/* Fonts of main menu items */
+	font-size:13px;	/* Font size of main menu items */
+	cursor:pointer;
+    text-decoration:none;
+    border:none;
+    color:#222;
+    display:block;
+    margin:0 5px 0 0;
+    padding:5px 20px 5px 8px;
+}
+
+/* Targeting the first level menu */
+.nav {
+    display:block;
+    margin:0;
+    padding:2px 0 2px;
+    position:absolute;
+    z-index:100;
+}
+.nav > li > a:hover {
+    -moz-border-radius:3px 3px 0 0;
+    -webkit-border-radius:3px 3px 0 0;
+    border-radius:3px 3px 0 0;
+    color: #009;
+    padding:5px 20px 5px 8px
+}
+
+/* Targeting the second level menu */
+.nav li ul {
+    -moz-border-radius-bottomleft:3px;
+    -moz-border-radius-bottomright:3px;
+    -moz-border-radius-topright:3px;
+    -moz-box-shadow:1px 1px 1px 1px #E3E3E3;
+    -webkit-border-bottom-right-radius:3px;
+    -webkit-box-shadow:1px 1px 1px 1px #E3E3E3;
+    background:#E3E3E3;
+    border-bottom-left-radius:3px;
+    border-bottom-right-radius:3px;
+    border-top-right-radius:3px;
+   box-shadow:0px 0px 1px 1px #E3E3E3;
+    color:#222;
+    display:none;
+    margin:0;
+    padding:2px 0;
+    position:absolute;
+    width:200px;
+}
+.nav li ul li {
+    width:100%
+}
+.nav li ul li a {
+    background:#E3E3E3;
+    border:none;
+    color:black;
+    line-height:25px;
+    margin:0;
+    padding:0 0 0 8px
+}
+.nav li ul li a:hover {
+   background:#F5F5F5;
+   color: #009;
+   
+}
+.nav li ul li.strong-archive a {
+    border-top:1px solid #E3E3E3;
+    font-weight:600;
+}
+
+/* A class of current will be added via jQuery */
+.nav li.current > a {
+    -moz-border-radius:3px 3px 0 0;
+    -moz-box-shadow:1px 1px 1px 1px #E3E3E3;
+    -webkit-border-radius:3px 3px 0 0;
+    -webkit-box-shadow:1px 1px 1px 1px #E3E3E3;
+     background:#E3E3E3;
+    border-radius:3px 3px 0 0;
+    box-shadow:0px 0px 1px 1px #E3E3E3;
+    color:#009;
+}
+
+/* CSS fallback */
+.nav li:hover > ul.child {
+    display:block
+	
+}

@@ -1,0 +1,186 @@
+using GIIS.DataLayer;
+using System;
+using System.Collections.Generic;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+
+public partial class _TransactionType : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!this.Page.IsPostBack)
+        {
+            List<string> actionList = null;
+            string sessionNameAction = "";
+            if (CurrentEnvironment.LoggedUser != null)
+            {
+                sessionNameAction = "__GIS_actionList_" + CurrentEnvironment.LoggedUser.Id;
+                actionList = (List<string>)Session[sessionNameAction];
+            }
+
+            if ((actionList != null) && actionList.Contains("ViewTransactionType") && (CurrentEnvironment.LoggedUser != null))
+            {
+                int userId = CurrentEnvironment.LoggedUser.Id;
+                string language = CurrentEnvironment.Language;
+                int languageId = int.Parse(language);
+                Dictionary<string, string> wtList = (Dictionary<string, string>)HttpContext.Current.Cache["TransactionType-dictionary" + language];
+                if (wtList == null)
+                {
+                    List<WordTranslate> wordTranslateList = WordTranslate.GetWordByLanguage(languageId, "TransactionType");
+                    wtList = new Dictionary<string, string>();
+                    foreach (WordTranslate vwt in wordTranslateList)
+                        wtList.Add(vwt.Code, vwt.Name);
+                    HttpContext.Current.Cache.Insert("TransactionType-dictionary" + language, wtList);
+                }
+
+                //controls
+                this.lblName.Text = wtList["TransactionTypeName"];
+                this.lblNotes.Text = wtList["TransactionTypeNotes"];
+
+                //grid header text
+                gvTransactionType.Columns[1].HeaderText = wtList["TransactionTypeName"];
+                gvTransactionType.Columns[2].HeaderText = wtList["TransactionTypeNotes"];
+
+                //actions
+                this.btnAdd.Visible = actionList.Contains("AddTransactionType");
+                this.btnEdit.Visible = actionList.Contains("EditTransactionType");
+
+                //buttons
+                this.btnAdd.Text = wtList["TransactionTypeAddButton"];
+                this.btnEdit.Text = wtList["TransactionTypeEditButton"];
+
+                //message
+                this.lblSuccess.Text = wtList["TransactionTypeSuccessText"];
+                this.lblWarning.Text = wtList["TransactionTypeWarningText"];
+                this.lblError.Text = wtList["TransactionTypeErrorText"];
+
+                //Page Title
+                this.lblTitle.Text = wtList["TransactionTypePageTitle"];
+
+                //selected object
+                int id = -1;
+                string _id = Request.QueryString["id"];
+                if (!String.IsNullOrEmpty(_id))
+                {
+                    int.TryParse(_id, out id);
+                    TransactionType o = TransactionType.GetTransactionTypeById(id);
+                    txtName.Text = o.Name;
+                    txtNotes.Text = o.Notes;
+                   
+                }
+            }
+            else
+            {
+                Response.Redirect("Default.aspx");
+            }
+        }
+    }
+
+
+    protected void btnAdd_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            if (Page.IsValid)
+            {
+                int userId = CurrentEnvironment.LoggedUser.Id;
+
+                TransactionType o = new TransactionType();
+
+                o.Name = txtName.Text.Replace("'", @"''");
+                o.Notes = txtNotes.Text.Replace("'", @"''");
+
+                int i = TransactionType.Insert(o);
+
+                if (i > 0)
+                {
+                    lblSuccess.Visible = true;
+                    lblWarning.Visible = false;
+                    lblError.Visible = false;
+                    gvTransactionType.DataBind();
+                    ClearControls(this);
+                }
+                else
+                {
+                    lblSuccess.Visible = false;
+                    lblWarning.Visible = true;
+                    lblError.Visible = false;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            lblSuccess.Visible = false;
+            lblWarning.Visible = false;
+            lblError.Visible = true;
+        }
+    }
+
+
+    protected void btnEdit_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            if (Page.IsValid)
+            {
+                int id = -1;
+                string _id = Request.QueryString["id"].ToString();
+                int.TryParse(_id, out id);
+                int userId = CurrentEnvironment.LoggedUser.Id;
+
+                TransactionType o = TransactionType.GetTransactionTypeById(id);
+
+                o.Name = txtName.Text.Replace("'", @"''");
+                o.Notes = txtNotes.Text.Replace("'", @"''");
+
+                int i = TransactionType.Update(o);
+
+                if (i > 0)
+                {
+                    lblSuccess.Visible = true;
+                    lblWarning.Visible = false;
+                    lblError.Visible = false;
+                    gvTransactionType.DataBind();
+                    //ClearControls(this);
+                }
+                else
+                {
+                    lblSuccess.Visible = false;
+                    lblWarning.Visible = true;
+                    lblError.Visible = false;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            lblSuccess.Visible = false;
+            lblWarning.Visible = false;
+            lblError.Visible = true;
+        }
+    }
+
+    protected void gvTransactionType_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+        gvTransactionType.PageIndex = e.NewPageIndex;
+    }
+
+    private void ClearControls(Control parent)
+    {
+        foreach (Control c in parent.Controls)
+        {
+            if (c.Controls.Count > 0)
+                ClearControls(c);
+            else
+            {
+                if (c is TextBox)
+                    (c as TextBox).Text = "";
+                //if (c is CheckBox)
+                //    (c as CheckBox).Checked = false;
+                if (c is DropDownList)
+                    (c as DropDownList).SelectedIndex = 0;
+            }
+        }
+    }
+}

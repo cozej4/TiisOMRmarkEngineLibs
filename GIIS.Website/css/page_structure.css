@@ -1,0 +1,165 @@
+/*==================PAGE STRUCTURE==================*/
+#wrapper
+{
+width: 960px;
+min-height: 400px;
+height: auto;
+position: relative;
+font-size:12px;
+margin-top:3px;
+text-align: left;
+border: 1px solid #DBDBDB;
+background: #FAFAFA;
+
+	
+	background-repeat: no-repeat;
+	background-position:top;
+}
+
+
+#content_left
+{
+max-width: 220px;
+height:auto !important;
+float:left;
+}	
+
+#content_right
+{
+max-width: 720px;
+float:left;
+margin-left: 20px;
+margin-top:0px;
+}
+
+#footer
+{
+clear: both;
+border-top:1px solid #ccc;
+font-size:10px;
+clear: both;
+width:100%;
+margin-top: 0 auto;
+margin-bottom:10px;
+padding: 5px 0px 0px;
+color: black;
+display:inline;
+float: left;
+}
+
+#title{
+	width:100%;
+	
+}
+#title h1{
+	font-size:1.6em;
+	font-family:'Arial';
+	color:#555;
+	line-height:1.6em;
+	border-bottom:2px solid #ccc;
+	width: 720px;
+}
+
+#format{
+	margin:0 auto;
+	width:700px;
+}
+
+
+
+body
+{ 
+margin: 0;
+padding: 0;
+background-image: url(../img/bg8.png);
+background-repeat: repeat;
+}
+
+/*==================HEADER STRUCTURE==================*/
+.main_logo
+{
+float: left;
+width: 230px;
+height: 120px;
+position: relative;
+top: 5px;
+left: 5px;
+margin-bottom:10px;
+background: url(../img/logoiis.jpg) no-repeat;
+}
+
+.main_banner
+{
+
+float: left;
+position: relative;
+min-width: 500px;
+min-height:100px;
+top: 5px;
+left: 10px;
+margin-bottom:10px;
+
+}
+
+.main_language
+{
+float: right;
+position: relative;
+min-width: 150px;
+min-height:100px;
+top: 30px;
+left: 0px;
+margin-bottom:10px;
+
+}
+
+/*==================CONTENT LEFT STRUCTURE==================*/
+.log_in
+{
+border: 1px solid #ccc;
+padding:5px;
+    -moz-border-radius: 6px 6px 6px 6px;
+    -webkit-border-radius: 6px 6px 6px 6px;
+    border-radius: 6px 6px 6px 6px;
+    
+    position:relative;   
+    height:auto;
+     -moz-box-shadow: 0 5px 4px rgba(0, 0, 0, 0.2);
+    -webkit-box-shadow: 0 5px 3px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 3px rgba(0, 0, 0, 0.2);
+
+max-width:190px;
+margin-top: 0px;
+margin-left: 3px;
+
+margin-bottom:50px;
+
+}
+.user
+{
+position: relative;
+width: 210px;
+min-height:150px;
+top: 0px;
+left: 5px;
+margin-bottom:10px;
+}
+
+.content_help
+{
+top: 10px;
+left: 10px;
+margin-bottom:20px
+}
+
+/*==================CONTENT RIGHT STRUCTURE==================*/
+
+
+.main_content
+{
+height:100%;
+margin-top:-20px;
+left:10px;
+margin-bottom:20px;
+}
+

@@ -1,0 +1,252 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="MasterPage.master.cs" Inherits="Pages_MasterPage" %>
+
+<%@ Register Src="~/UserControls/LoggedUser.ascx" TagName="LoggedUser" TagPrefix="giis" %>
+<%@ Register Src="~/UserControls/LogIn.ascx" TagName="LogIn" TagPrefix="giis" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="Head1" runat="server">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Immunization Information System</title>
+    <!-- Bootstrap -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Custom styles for this template -->
+    <link href="../css/material-wfont.min.css" rel="stylesheet" />
+    <link href="../css/nprogress.css" rel="stylesheet" />
+    <link href="../css/ripples.css" rel="stylesheet" />
+    <link href="../css/material.css" rel="stylesheet" />
+
+    <script type="text/javascript" src="../js/AutoCompletescript.js"></script>
+
+    <%-- <script type="text/javascript" src="../js/AutoCompleteCheck.js"></script>--%>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <ajaxToolkit:ToolkitScriptManager ID="ScriptManager1" runat="server"></ajaxToolkit:ToolkitScriptManager>
+        <!-- container -->
+        <div class="container">
+            <div class="row">
+                <!--Header Container-->
+                <div class="col-md-12 col-xs-12 col-sm-12 col-lg-12">
+                    <br />
+                    <a runat="server" href="Default.aspx">
+                        <img src="../img/logo_tiis_.png" alt="Home" title="Home" /></a> 
+                    <br />
+                </div>
+            </div>
+            <!--/Header Container-->
+
+            <!--Menu Container-->
+            <div class="col-">
+                <nav class="navbar navbar-default" style="background-color:green" role="navigation">
+                    <div class="container-fluid">
+                        <!-- Brand and toggle get grouped for better mobile display -->
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                                <span class="sr-only">Toggle navigation</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+
+                        </div>
+
+                        <!-- Collect the nav links, forms, and other content for toggling -->
+                        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                            <ul class="nav navbar-nav">
+                                <%--  <li><a href="Default.aspx"><span class="glyphicon glyphicon-home"></span> Home</a></li>--%>
+                                <li class="dropdown">
+                                    <a runat="server" id="aChild" href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="mChild" runat="server">Child</span><b class="caret"></b></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a runat="server" id="aSearchChildren" href="ChildListNew.aspx"><span id="mSearchChildren" runat="server">Search Children</span></a></li>
+                                        <li><a runat="server" id="aRegisterChild" href="Child.aspx"><span id="mRegisterChild" runat="server">Register Child</span></a></li>
+                                        <li><a runat="server" id="aFindDuplications" href="FindDuplications.aspx"><span id="mFindDuplications" runat="server">Find Duplications</span></a></li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown">
+                                    <a runat="server" id="aImmunization" href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="mImmunization" runat="server">Immunization</span><b class="caret"></b></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a runat="server" id="aMonthlyPlan" href="MonthlyPlan.aspx"><span id="mMonthlyPlan" runat="server">Monthly Plan</span></a></li>
+                                        <li><a runat="server" id="aRegister" href="HealthFacilityListForRegister.aspx"><span id="mRegister" runat="server">Vaccination Register</span></a></li>
+                                        <li><a runat="server" id="aImmunizationCard" href="SearchImmunizationCard.aspx"><span id="mImmunizationCard" runat="server">Immunization Card</span></a></li>
+                                        <li><a runat="server" id="aHealthFacilityCohort" href="HealthFacilityListForBalance.aspx"><span id="mHealthFacilityCohort" runat="server">Enter Population Data</span></a></li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown">
+                                    <a runat="server" id="aOrder" href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="mOrder" runat="server">Transfer Orders</span><b class="caret"></b></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a runat="server" id="aIncomingOrders" href="TransferOrder.aspx" ><span id="mIncomingOrders" runat="server">Transfer Orders</span></a></li>
+                                        <li><a runat="server" id="aMakeanOrder" href="TransferOrderHeader.aspx"><span id="mMakeanOrder" runat="server">New Transfer Order</span></a></li>
+                                    </ul>
+                                </li>
+
+                                <li class="dropdown">
+                                    <a runat="server" id="aStock" href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="mStock" runat="server">Stock</span><b class="caret"></b></a>
+                                    <ul class="dropdown-menu">
+                                         <li><a runat="server" id="aCurrentStockByLot" href="HealthFacilityListForBalanceByLot.aspx" ><span id="mCurrentStockByLot" runat="server">Current Stock</span></a></li>
+                                         <li><a runat="server" id="aStockCount" href="StockCount.aspx"><span id="mStockCount" runat="server">Stock Count</span></a></li>
+                                        <li><a runat="server" id="aAdjustment" href="Adjustment.aspx"><span id="mAdjustment" runat="server" >Make an Adjustment</span></a></li>
+                                        <li><a runat="server" id="aItemLot" href="ItemLotListNew.aspx"><span id="mItemLot" runat="server">Item Lots</span></a></li>
+                                         <li><a runat="server" id="aItemManufacturer" href="ItemManufacturerList.aspx"><span id="mItemManufacturer" runat="server">GTINs</span></a></li>
+                                        <li><a runat="server" id="aGtinHFStockPolicy" href="GtinHFStockPolicy.aspx"><span id="mGtinHFStockPolicy" runat="server">Stock Policy</span></a></li>
+                                         <li><a runat="server" id="aRivoReceipt" href="RivoReceipt.aspx" ><span id="mRivoReceipt" runat="server">Receive Stock</span></a></li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown">
+                                    <a runat="server" id="aReports" href="Report.aspx"><span id="mReports" runat="server">Reports</span></a>
+                                </li>
+                                <li class="dropdown">
+                                    <a runat="server" id="aForms" href="Forms.aspx"><span id="mForms" runat="server">Forms</span></a>
+                                    <%--  <ul class="dropdown-menu">
+                                        <li><a runat="server" id="aImmunizationReports" href="ImmunizationReports.aspx"><span runat="server" id="mImmunizationReports">Immunization Reports</span></a></li>
+                                        <%--                                                <li><a runat="server" id="aCohortCoverageReport" href="HealthFacilityListForCohort.aspx" tabindex="-1"><span id="mCohortCoverageReport" runat="server">Cohort Coverage Report</span></a></li>
+                                                <li><a runat="server" id="aActivityReport" href="HealthFacilityListForActivity.aspx" tabindex="-1"><span id="mActivityReport" runat="server">Vaccination Activity Report</span></a></li>
+                                        <li><a runat="server" id="aStockBalanceReports" href="StockBalanceReports.aspx" tabindex="-1"><span runat="server" id="mStockBalanceReports">Stock Balance Reports</span></a></li>
+                                        <li><a runat="server" id="aStockReports" href="StockReports.aspx" tabindex="-1"><span runat="server" id="mStockReports">Stock Reports</span></a></li>
+                                    </ul>
+
+                                    <%--                                           <ul class="dropdown-menu">
+                                                <li><a runat="server" id="aRunningBalance" href="HealthFacilityListForRunningBalance.aspx" tabindex="-1"><span id="mRunningBalance" runat="server">Running Balance</span></a></li>
+                                                <li><a runat="server" id="aItemInHealthFacility" href="ItemBalanceInHealthFacilities.aspx"><span id="mItemInHealthFacility" runat="server">Item Balance in H.Facilities</span></a></li>
+                                                <li><a runat="server" id="aItemLotInHealthFacility" href="ItemLotBalanceInHealthFacilities.aspx"><span id="mItemLotInHealthFacility" runat="server">Item Lot Balance in H.Facilities</span></a></li>
+                                                <li><a runat="server" id="aStockCountList" href="HealthFacilityListForStockCount.aspx"><span id="mStockCountList" runat="server">View Stock Counts</span></a></li>
+                                                <li><a runat="server" id="aAdjustmentsList" href="HealtFacilityListForAdjustments.aspx"><span id="mAdjustmentsList" runat="server">View Adjustments</span></a></li>
+                                            </ul>--%>
+                                </li>
+                                <li class="dropdown">
+                                    <a runat="server" id="aTally" href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="mTally" runat="server">Tally Sheets</span><b class="caret"></b></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a runat="server" id="weighTallyLink" href="WeightTally.aspx"><span id="mWeighTally" runat="server">Weigh Tally</span></a></li>
+                                        <li><a runat="server" id="stockTallyLink" href="StockTally.aspx"><span id="mStockTally" runat="server">Stock Tally</span></a></li>
+                                    </ul>
+                                </li>
+
+                                <li class="dropdown">
+                                    <a runat="server" id="aCustomization" href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="mCustomization" runat="server">Setup</span><b class="caret"></b></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a runat="server" id="aHealthFacilities" href="HealthFacilityList.aspx"><span id="mHealthFacilities" runat="server">Health Facilities</span></a></li>
+                                        <li><a runat="server" id="aPlaces" href="PlaceList.aspx"><span id="mPlaces" runat="server">Places</span></a></li>
+                                        <li><a runat="server" id="aBirthPlace" href="Birthplace.aspx"><span id="mBirthplace" runat="server">Birthplaces</span></a></li>
+                                        <li><a runat="server" id="aCommunities" href="CommunityList.aspx"><span id="mCommunities" runat="server">Communities</span></a></li>
+                                       <li><a runat="server" id="aHealthFacilityType" href="HealthFacilityType.aspx"><span id="mHealthFacilityType" runat="server">Health Facility Type</span></a></li>
+                                         <li class="divider"></li>
+                                        <li><a runat="server" id="aItems" href="ItemList.aspx"><span id="mItems" runat="server">Items</span></a></li>
+                                        <li><a runat="server" id="aManufacturers" href="ManufacturerList.aspx"><span id="mManufacturers" runat="server">Manufacturers</span></a></li>
+                                        <li><a runat="server" id="aAdjustmentReasons" href="AdjustmentReason.aspx"><span id="mAdjustmentReasons" runat="server">Adjustment Reasons</span></a></li>
+                                         <li><a runat="server" id="aUom" href="Uom.aspx"><span id="mUom" runat="server">Units of Measure</span></a></li>
+                                        <li class="divider"></li>
+                                        <li><a runat="server" id="aUsers" href="UserList.aspx"><span id="mUsers" runat="server">Users</span></a></li>
+                                        <li><a runat="server" id="aRoles" href="Role.aspx"><span id="mRoles" runat="server">Roles</span></a></li>
+                                        <li><a runat="server" id="aAssignActionstoRole" href="RoleAction.aspx"><span id="mAssignActionstoRole" runat="server">Assign Actions to Role</span></a>
+                                        </li>
+                                        <%-- <li><a runat="server" id="aUserManagement" href="#"><span id="mUserManagement" runat="server">User Management</span></a></li>--%>
+                                        <%--                                            <a runat="server" id="aAssignRoletoUser" href="UserRole.aspx"><span id="mAssignRoletoUser" runat="server">Assign Role to User</span></a>--%>
+                                    </ul>
+                                </li>
+
+                                <li class="dropdown">
+                                    <a runat="server" id="aVaccineManagement" href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="mVaccineManagement" runat="server">Vaccination Schedule</span><b class="caret"></b></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a runat="server" id="aScheduledVaccinations" href="ScheduledVaccinationList.aspx"><span id="mScheduledVaccinations" runat="server">Scheduled Vaccinations</span></a></li>
+                                        <li><a runat="server" id="aAgeDefinitions" href="AgeDefinitions.aspx"><span id="mAgeDefinitions" runat="server">Age Definitions</span></a></li>
+                                        <li><a runat="server" id="aDoses" href="DoseList.aspx"><span id="mDoses" runat="server">Doses</span></a></li>
+                                        <li><a runat="server" id="aNonVaccinationReasons" href="NonvaccinationReason.aspx"><span id="mNonVaccinationReasons" runat="server">Non Vaccination Reasons</span></a></li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown">
+                                    <a runat="server" id="aConfiguration" href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="mConfiguration" runat="server">Configuration</span><b class="caret"></b></a>
+                                    <ul class="dropdown-menu">
+
+                                        <li><a runat="server" id="aGlobalConfigurations" href="Configuration.aspx"><span id="mGlobalConfigurations" runat="server">Global Configurations</span></a></li>
+                                        <li><a runat="server" id="aChildConfiguration" href="ChildConfiguration.aspx"><span id="mChildConfiguration" runat="server">Child Configuration</span></a></li>
+                                        <li><a runat="server" id="aHelp" href="Help.aspx"><span id="mHelp" runat="server">Help</span></a></li>
+                                        <li class="divider"></li>
+                                        <li><a runat="server" id="aLanguages" href="Language.aspx"><span id="mLanguages" runat="server">Languages</span></a></li>
+                                        <li><a runat="server" id="aTranslation" href="WordTranslate.aspx"><span id="mTranslation" runat="server">Translation</span></a></li>
+                                        <li class="divider"></li>
+                                        <li><a runat="server" id="aItemCategories" href="ItemCategory.aspx"><span id="mItemCategories" runat="server">Item Categories</span></a></li>
+                                        <li><a runat="server" id="aSystemModules" href="SystemModule.aspx"><span id="mSystemModules" runat="server">System Modules</span></a></li>
+                                    </ul>
+                                </li>
+
+                            </ul>
+
+                        </div>
+                        <!-- /.navbar-collapse -->
+                    </div>
+                    <!-- /.container-fluid -->
+                </nav>
+            </div>
+            <!--/Menu Container-->
+
+            <div class="row">
+                <div class="col-md-9 col-xs-9 col-sm-9 col-lg-9">
+                    <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+                    </asp:ContentPlaceHolder>
+                </div>
+                <div class="col-md-3 col-xs-3 col-sm-3 col-lg-3">
+                    <giis:LoggedUser ID="LoggedUser1" runat="server" />
+                   <%-- <giis:LogIn ID="LogIn1" runat="server" />--%>
+                    <br />
+
+                    <div class="content_help" id="div1">
+                        <div class="box-help">
+                            <div class="content-help">
+                                <asp:Literal ID="helpTips" runat="server"></asp:Literal>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <hr />
+            <div class="footer">
+                <!--Footer-->
+               <%-- <p>&copy; Immunization Information System 2.0 2014</p>--%>
+            </div>
+            <!--/Footer-->
+
+        </div>
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+        <script src="../js/jquery.min.js"></script>
+        <!-- Include all compiled plugins (below), or include individual files as needed -->
+        <%--  <script type="text/javascript" src="../js/AutoCompletescript.js"></script>--%>
+        <script type="text/javascript" src="../js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="../js/nprogress.js"></script>
+        <script type="text/javascript" src="../js/ripples.js"></script>
+        <script type="text/javascript" src="../js/material.js"></script>
+        <script>
+            $('body').show();
+            $('.version').text(NProgress.version);
+            NProgress.start();
+            setTimeout(function () { NProgress.done(); $('.fade').removeClass('out'); }, 1000);
+
+            $("#b-0").click(function () { NProgress.start(); });
+            $("#b-40").click(function () { NProgress.set(0.4); });
+            $("#b-inc").click(function () { NProgress.inc(); });
+            $("#b-100").click(function () { NProgress.done(); });
+        </script>
+        <script>var HN = []; HN.factory = function (e) { return function () { HN.push([e].concat(Array.prototype.slice.call(arguments, 0))) }; }, HN.on = HN.factory("on"), HN.once = HN.factory("once"), HN.off = HN.factory("off"), HN.emit = HN.factory("emit"), HN.load = function () { var e = "hn-button.js"; if (document.getElementById(e)) return; var t = document.createElement("script"); t.id = e, t.src = "//hn-button.herokuapp.com/hn-button.js"; var n = document.getElementsByTagName("script")[0]; n.parentNode.insertBefore(t, n) }, HN.load();</script>
+    </form>
+</body>
+</html>
+
+
+
+
+
+
+
+

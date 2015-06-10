@@ -1,0 +1,102 @@
+
+	#mainMenu{
+		background-image: url(../img/filter.jpg);
+		background-color: #FAFAFA;	/* Background color of main menu */
+		font-family: Arial, Helvetica, Sans-Serif;	/* Fonts of main menu items */
+		font-size:13px;	/* Font size of main menu items */
+		height:25px;	/* Height of main menu */
+		
+		position:relative; /* Don't change this position attribute */
+		border-bottom:1px solid #6678b1;	/* Bottom border of main menu */
+		border-top:1px solid #6678b1;
+		border-left:1px solid #6678b1;
+		border-right:1px solid #6678b1;
+        -o-border-radius: 5px;
+        -ms-border-radius: 5px;
+        -moz-border-radius: 5px;/* Gecko browsers */
+        -webkit-border-radius: 5px;/* Safari prototype */
+        border-radius: 5px;/* Everything else - limited support at the moment */
+	    cursor:pointer;
+		
+	
+	
+		
+	}
+	#mainMenu a{
+		
+		padding-left:5px;	/* Spaces at the left of main menu items */
+		padding-right:5px;	/* Spaces at the right of main menu items */
+		padding-bottom:2px;
+		font-weight:bold;
+		/* Don't change these two options */
+		position:absolute;
+		bottom:-1px;	/* Change this value to -2px if you're not using a strict doctype */
+		
+	}
+	#submenu{		
+		font-family: Arial, Helvetica, Sans-Serif;	/* Font  of sub menu items */
+		background-color: #F5F5F5;	/* Background color of sub menu items */
+		padding-top:5px;
+		padding-bottom:5px;
+		
+	
+       
+		
+	}	
+	#submenu div{
+		white-space:nowrap;	/* Don't change this option */
+		
+	}
+	/*
+	Style attributes of active menu item 
+	*/
+	#mainMenu .activeMenuItem{
+		/* Border options */
+		-webkit-border-radius: 2px; /* Safari prototype */
+        -moz-border-radius: 2px; /* Gecko browsers */
+        border-radius: 2px; /* Everything else - limited support at the moment */
+		border-left:1px solid #6678b1;
+		border-top:1px solid #6678b1;
+		border-right:1px solid #6678b1;		
+		background-color: #F5F5F5;	/* Background color */
+		cursor:pointer;	/* Cursor like a hand when the user moves the mouse over the menu item */
+		color:#6678b1;
+        text-decoration:none;
+	}
+	
+	#mainMenu .activeMenuItem img{
+		position:absolute;
+		bottom:0px;
+		right:0px;
+        text-decoration:none;
+	}
+		
+	/*
+	Style attributes of inactive menu items
+	*/
+	#mainMenu .inactiveMenuItem{		
+		color: #000;	/* Text color */
+		cursor:pointer;	/* Cursor like a hand when the user moves the mouse over the menu item */
+	text-decoration:none;
+        }
+	
+	#submenu a{	
+	
+		text-decoration:none;	/* No underline on sub menu items - use text-decoration:underline; if you want the links to be underlined */
+		padding-left:10px;	/* Space at the left of each sub menu item */
+		padding-right:10px;	/* Space at the right of each sub menu item */
+		color: #000;	/* Text color */
+		font-size:13px; 
+		border-right:1px solid #6678b1;
+		-o-border-shadow: 0px 0px 4px #6678b1;
+        -ms-border-shadow: 0px 0px 4px #6678b1;
+        -moz-border-shadow: 0px 0px 4px #6678b1;
+        -webkit-border-shadow: 0px 0px 4px #6678b1;
+      
+	
+	}
+	
+	#submenu a:hover{
+		color: #009;	/* color when the user moves the mouse over sub menu items */
+	}
+	
