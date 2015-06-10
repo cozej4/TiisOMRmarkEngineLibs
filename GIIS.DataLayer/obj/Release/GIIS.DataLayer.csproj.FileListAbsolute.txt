@@ -1,0 +1,14 @@
+C:\Users\Doriana\Documents\Visual Studio 2012\Projects\GIIS\GIIS.DataLayer\bin\Release\GIIS.DataLayer.dll
+C:\Users\Doriana\Documents\Visual Studio 2012\Projects\GIIS\GIIS.DataLayer\bin\Release\GIIS.DataLayer.pdb
+C:\Users\Doriana\Documents\Visual Studio 2012\Projects\GIIS\GIIS.DataLayer\bin\Release\Mono.Security.dll
+C:\Users\Doriana\Documents\Visual Studio 2012\Projects\GIIS\GIIS.DataLayer\bin\Release\Npgsql.dll
+C:\Users\Doriana\Documents\Visual Studio 2012\Projects\GIIS\GIIS.DataLayer\obj\Release\GIIS.DataLayer.dll
+C:\Users\Doriana\Documents\Visual Studio 2012\Projects\GIIS\GIIS.DataLayer\obj\Release\GIIS.DataLayer.pdb
+C:\Users\Doriana\Documents\Visual Studio 2012\Projects\GIIS\GIIS.DataLayer\obj\Release\GIIS.DataLayer.csprojResolveAssemblyReference.cache
+C:\Users\Doriana\Documents\Visual Studio 2012\Projects\GIIS_new\GIIS\GIIS.DataLayer\bin\Release\GIIS.DataLayer.dll
+C:\Users\Doriana\Documents\Visual Studio 2012\Projects\GIIS_new\GIIS\GIIS.DataLayer\bin\Release\GIIS.DataLayer.pdb
+C:\Users\Doriana\Documents\Visual Studio 2012\Projects\GIIS_new\GIIS\GIIS.DataLayer\bin\Release\Mono.Security.dll
+C:\Users\Doriana\Documents\Visual Studio 2012\Projects\GIIS_new\GIIS\GIIS.DataLayer\bin\Release\Npgsql.dll
+C:\Users\Doriana\Documents\Visual Studio 2012\Projects\GIIS_new\GIIS\GIIS.DataLayer\obj\Release\GIIS.DataLayer.dll
+C:\Users\Doriana\Documents\Visual Studio 2012\Projects\GIIS_new\GIIS\GIIS.DataLayer\obj\Release\GIIS.DataLayer.pdb
+C:\Users\Doriana\Documents\Visual Studio 2012\Projects\GIIS_new\GIIS\GIIS.DataLayer\obj\Release\GIIS.DataLayer.csprojResolveAssemblyReference.cache

@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="giisperfModelStoreContainer" CdmEntityContainer="drpEntities">
+    <EntitySetMapping Name="drp_facility">
+      <EntityTypeMapping TypeName="giisperfModel.drp_facility">
+        <MappingFragment StoreEntitySet="drp_facility">
+          <ScalarProperty Name="gln" ColumnName="gln" />
+          <ScalarProperty Name="gln_description" ColumnName="gln_description" />
+          <ScalarProperty Name="gln_type" ColumnName="gln_type" />
+          <ScalarProperty Name="gln_capacity_litres" ColumnName="gln_capacity_litres" />
+          <ScalarProperty Name="gln_parent" ColumnName="gln_parent" />
+          <ScalarProperty Name="planning_transfer_time_days" ColumnName="planning_transfer_time_days" />
+          <ScalarProperty Name="planning_replenish_cycle_days" ColumnName="planning_replenish_cycle_days" />
+          <ScalarProperty Name="planning_next_replenishment" ColumnName="planning_next_replenishment" />
+          <ScalarProperty Name="gln_lowcode" ColumnName="gln_lowcode" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="drp_gtin">
+      <EntityTypeMapping TypeName="giisperfModel.drp_gtin">
+        <MappingFragment StoreEntitySet="drp_gtin">
+          <ScalarProperty Name="gtin" ColumnName="gtin" />
+          <ScalarProperty Name="gtin_description" ColumnName="gtin_description" />
+          <ScalarProperty Name="gtin_type" ColumnName="gtin_type" />
+          <ScalarProperty Name="base_uom" ColumnName="base_uom" />
+          <ScalarProperty Name="pack_uom_1" ColumnName="pack_uom_1" />
+          <ScalarProperty Name="base_uom_per_pack_1" ColumnName="base_uom_per_pack_1" />
+          <ScalarProperty Name="pack_uom_2" ColumnName="pack_uom_2" />
+          <ScalarProperty Name="base_uom_per_pack_2" ColumnName="base_uom_per_pack_2" />
+          <ScalarProperty Name="litres_storage_per_base_uom" ColumnName="litres_storage_per_base_uom" />
+          <ScalarProperty Name="planning_lead_time_days" ColumnName="planning_lead_time_days" />
+          <ScalarProperty Name="gtin_parent" ColumnName="gtin_parent" />
+          <ScalarProperty Name="base_uom_child_per_base_uom_parent" ColumnName="base_uom_child_per_base_uom_parent" />
+          <ScalarProperty Name="gtin_lowcode" ColumnName="gtin_lowcode" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="drp_gtin_gln_attributes">
+      <EntityTypeMapping TypeName="giisperfModel.drp_gtin_gln_attributes">
+        <MappingFragment StoreEntitySet="drp_gtin_gln_attributes">
+          <ScalarProperty Name="gtin" ColumnName="gtin" />
+          <ScalarProperty Name="gln" ColumnName="gln" />
+          <ScalarProperty Name="as_of_date" ColumnName="as_of_date" />
+          <ScalarProperty Name="replenish_pack_qty" ColumnName="replenish_pack_qty" />
+          <ScalarProperty Name="safety_stock_qty" ColumnName="safety_stock_qty" />
+          <ScalarProperty Name="planning_daily_demand" ColumnName="planning_daily_demand" />
+          <ScalarProperty Name="on_hand_balance" ColumnName="on_hand_balance" />
+          <ScalarProperty Name="allocated_balance" ColumnName="allocated_balance" />
+          <ScalarProperty Name="on_hold_balance" ColumnName="on_hold_balance" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="drp_plan">
+      <EntityTypeMapping TypeName="giisperfModel.drp_plan">
+        <MappingFragment StoreEntitySet="drp_plan">
+          <ScalarProperty Name="gtin" ColumnName="gtin" />
+          <ScalarProperty Name="gln" ColumnName="gln" />
+          <ScalarProperty Name="plan_date" ColumnName="plan_date" />
+          <ScalarProperty Name="estimated_on_hand" ColumnName="estimated_on_hand" />
+          <ScalarProperty Name="planned_demand" ColumnName="planned_demand" />
+          <ScalarProperty Name="sched_demand" ColumnName="sched_demand" />
+          <ScalarProperty Name="sched_replenish" ColumnName="sched_replenish" />
+          <ScalarProperty Name="sched_on_hand" ColumnName="sched_on_hand" />
+          <ScalarProperty Name="planned_order_release_date" ColumnName="planned_order_release_date" />
+          <ScalarProperty Name="planned_order_receipt" ColumnName="planned_order_receipt" />
+          <ScalarProperty Name="planned_on_hand" ColumnName="planned_on_hand" />
+          <ScalarProperty Name="regen_time" ColumnName="regen_time" />
+          <ScalarProperty Name="drp_id" ColumnName="drp_id" />
+          <ScalarProperty Name="period" ColumnName="period" />
+          <ScalarProperty Name="gtin_lowcode" ColumnName="gtin_lowcode" />
+          <ScalarProperty Name="gln_lowcode" ColumnName="gln_lowcode" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="drp_sched_demand">
+      <EntityTypeMapping TypeName="giisperfModel.drp_sched_demand">
+        <MappingFragment StoreEntitySet="drp_sched_demand">
+          <ScalarProperty Name="gtin" ColumnName="gtin" />
+          <ScalarProperty Name="gln" ColumnName="gln" />
+          <ScalarProperty Name="doc_id" ColumnName="doc_id" />
+          <ScalarProperty Name="sched_demand_date" ColumnName="sched_demand_date" />
+          <ScalarProperty Name="sched_demand_qty" ColumnName="sched_demand_qty" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="drp_sched_replenish">
+      <EntityTypeMapping TypeName="giisperfModel.drp_sched_replenish">
+        <MappingFragment StoreEntitySet="drp_sched_replenish">
+          <ScalarProperty Name="gtin" ColumnName="gtin" />
+          <ScalarProperty Name="gln" ColumnName="gln" />
+          <ScalarProperty Name="doc_id" ColumnName="doc_id" />
+          <ScalarProperty Name="sched_replenish_date" ColumnName="sched_replenish_date" />
+          <ScalarProperty Name="sched_replenish_qty" ColumnName="sched_replenish_qty" />
+          <ScalarProperty Name="from_gln" ColumnName="from_gln" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>

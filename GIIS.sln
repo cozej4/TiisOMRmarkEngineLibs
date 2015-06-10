@@ -36,32 +36,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GIIS.BusinessLogic", "GIIS.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GIIS.BusinessLogic.Test", "GIIS.BusinessLogic.Test\GIIS.BusinessLogic.Test.csproj", "{9E218A66-1608-437C-AA39-891C6C276A8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GIIS.DivoDashboard", "GIIS.DivoDashboard\GIIS.DivoDashboard.csproj", "{BDF1638E-8F9B-4FE5-A1FE-E5135968E135}"
-EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 6
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://dorianadelija.visualstudio.com/defaultcollection
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = GIIS.DataLayer\\GIIS.DataLayer.csproj
-		SccProjectName1 = GIIS.DataLayer
-		SccLocalPath1 = GIIS.DataLayer
-		SccProjectUniqueName2 = GIIS.BusinessLogic\\GIIS.BusinessLogic.csproj
-		SccProjectName2 = GIIS.BusinessLogic
-		SccLocalPath2 = GIIS.BusinessLogic
-		SccProjectUniqueName3 = GIIS.BusinessLogic.Test\\GIIS.BusinessLogic.Test.csproj
-		SccProjectName3 = GIIS.BusinessLogic.Test
-		SccLocalPath3 = GIIS.BusinessLogic.Test
-		SccWebProject4 = true
-		SccProjectUniqueName4 = http://localhost:15043
-		SccProjectName4 = GIIS.Website
-		SccLocalPath4 = GIIS.Website
-		SccProjectEnlistmentChoice4 = 2
-		SccProjectUniqueName5 = GIIS.DivoDashboard\\GIIS.DivoDashboard.csproj
-		SccProjectName5 = GIIS.DivoDashboard
-		SccLocalPath5 = GIIS.DivoDashboard
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -83,10 +58,6 @@ Global
 		{9E218A66-1608-437C-AA39-891C6C276A8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E218A66-1608-437C-AA39-891C6C276A8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E218A66-1608-437C-AA39-891C6C276A8C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BDF1638E-8F9B-4FE5-A1FE-E5135968E135}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BDF1638E-8F9B-4FE5-A1FE-E5135968E135}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BDF1638E-8F9B-4FE5-A1FE-E5135968E135}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BDF1638E-8F9B-4FE5-A1FE-E5135968E135}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

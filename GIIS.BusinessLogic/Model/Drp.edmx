@@ -1,0 +1,338 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <!--<Schema Namespace="giisperfModel.Store" Provider="Npgsql" ProviderManifestToken="9.4.0" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="drp_facility">
+          <Key>
+            <PropertyRef Name="gln" />
+          </Key>
+          <Property Name="gln" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="gln_description" Type="varchar" MaxLength="255" />
+          <Property Name="gln_type" Type="int4" />
+          <Property Name="gln_capacity_litres" Type="float8" />
+          <Property Name="gln_parent" Type="varchar" MaxLength="255" />
+          <Property Name="planning_transfer_time_days" Type="int4" />
+          <Property Name="planning_replenish_cycle_days" Type="int4" />
+          <Property Name="planning_next_replenishment" Type="date" />
+          <Property Name="gln_lowcode" Type="int4" />
+        </EntityType>
+        <EntityType Name="drp_gtin">
+          <Key>
+            <PropertyRef Name="gtin" />
+          </Key>
+          <Property Name="gtin" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="gtin_description" Type="varchar" MaxLength="255" />
+          <Property Name="gtin_type" Type="int4" Nullable="false" />
+          <Property Name="base_uom" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="pack_uom_1" Type="varchar" MaxLength="255" />
+          <Property Name="base_uom_per_pack_1" Type="float8" />
+          <Property Name="pack_uom_2" Type="varchar" MaxLength="255" />
+          <Property Name="base_uom_per_pack_2" Type="float8" />
+          <Property Name="litres_storage_per_base_uom" Type="float8" />
+          <Property Name="planning_lead_time_days" Type="int4" Nullable="false" />
+          <Property Name="gtin_parent" Type="varchar" MaxLength="255" />
+          <Property Name="base_uom_child_per_base_uom_parent" Type="float8" />
+          <Property Name="gtin_lowcode" Type="int4" />
+        </EntityType>
+        <EntityType Name="drp_gtin_gln_attributes">
+          <Key>
+            <PropertyRef Name="gtin" />
+            <PropertyRef Name="gln" />
+          </Key>
+          <Property Name="gtin" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="gln" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="as_of_date" Type="date" />
+          <Property Name="replenish_pack_qty" Type="float8" />
+          <Property Name="safety_stock_qty" Type="float8" />
+          <Property Name="planning_daily_demand" Type="float8" />
+          <Property Name="on_hand_balance" Type="float8" />
+          <Property Name="allocated_balance" Type="float8" />
+          <Property Name="on_hold_balance" Type="float8" />
+        </EntityType>
+        <EntityType Name="drp_plan">
+          <Key>
+            <PropertyRef Name="drp_id" />
+          </Key>
+          <Property Name="gtin" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="gln" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="plan_date" Type="date" />
+          <Property Name="estimated_on_hand" Type="float8" />
+          <Property Name="planned_demand" Type="float8" />
+          <Property Name="sched_demand" Type="float8" />
+          <Property Name="sched_replenish" Type="float8" />
+          <Property Name="sched_on_hand" Type="float8" />
+          <Property Name="planned_order_release_date" Type="date" />
+          <Property Name="planned_order_receipt" Type="float8" />
+          <Property Name="planned_on_hand" Type="float8" />
+          <Property Name="regen_time" Type="timestamp" />
+          <Property Name="drp_id" Type="numeric" Precision="20" Scale="0" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="period" Type="int4" />
+          <Property Name="gtin_lowcode" Type="int4" />
+          <Property Name="gln_lowcode" Type="int4" />
+        </EntityType>
+        <EntityType Name="drp_sched_demand">
+          <Key>
+            <PropertyRef Name="gtin" />
+            <PropertyRef Name="gln" />
+            <PropertyRef Name="doc_id" />
+          </Key>
+          <Property Name="gtin" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="gln" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="doc_id" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="sched_demand_date" Type="date" />
+          <Property Name="sched_demand_qty" Type="float8" />
+        </EntityType>
+        <EntityType Name="drp_sched_replenish">
+          <Key>
+            <PropertyRef Name="gtin" />
+            <PropertyRef Name="gln" />
+            <PropertyRef Name="doc_id" />
+          </Key>
+          <Property Name="gtin" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="gln" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="doc_id" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="sched_replenish_date" Type="date" />
+          <Property Name="sched_replenish_qty" Type="float8" />
+          <Property Name="from_gln" Type="varchar" MaxLength="255" />
+        </EntityType>
+        <EntityContainer Name="giisperfModelStoreContainer">
+          <EntitySet Name="drp_facility" EntityType="Self.drp_facility" Schema="public" store:Type="Tables" />
+          <EntitySet Name="drp_gtin" EntityType="Self.drp_gtin" Schema="public" store:Type="Tables" />
+          <EntitySet Name="drp_gtin_gln_attributes" EntityType="Self.drp_gtin_gln_attributes" Schema="public" store:Type="Tables" />
+          <EntitySet Name="drp_plan" EntityType="Self.drp_plan" Schema="public" store:Type="Tables" />
+          <EntitySet Name="drp_sched_demand" EntityType="Self.drp_sched_demand" Schema="public" store:Type="Tables" />
+          <EntitySet Name="drp_sched_replenish" EntityType="Self.drp_sched_replenish" Schema="public" store:Type="Tables" />
+        </EntityContainer>
+      </Schema>-->
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="giisperfModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="drp_facility">
+          <Key>
+            <PropertyRef Name="gln" />
+          </Key>
+          <Property Name="gln" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="gln_description" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="gln_type" Type="Int32" />
+          <Property Name="gln_capacity_litres" Type="Double" />
+          <Property Name="gln_parent" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="planning_transfer_time_days" Type="Int32" />
+          <Property Name="planning_replenish_cycle_days" Type="Int32" />
+          <Property Name="planning_next_replenishment" Type="DateTime" Precision="0" />
+          <Property Name="gln_lowcode" Type="Int32" />
+        </EntityType>
+        <EntityType Name="drp_gtin">
+          <Key>
+            <PropertyRef Name="gtin" />
+          </Key>
+          <Property Name="gtin" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="gtin_description" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="gtin_type" Type="Int32" Nullable="false" />
+          <Property Name="base_uom" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="pack_uom_1" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="base_uom_per_pack_1" Type="Double" />
+          <Property Name="pack_uom_2" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="base_uom_per_pack_2" Type="Double" />
+          <Property Name="litres_storage_per_base_uom" Type="Double" />
+          <Property Name="planning_lead_time_days" Type="Int32" Nullable="false" />
+          <Property Name="gtin_parent" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="base_uom_child_per_base_uom_parent" Type="Double" />
+          <Property Name="gtin_lowcode" Type="Int32" />
+        </EntityType>
+        <EntityType Name="drp_gtin_gln_attributes">
+          <Key>
+            <PropertyRef Name="gtin" />
+            <PropertyRef Name="gln" />
+          </Key>
+          <Property Name="gtin" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="gln" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="as_of_date" Type="DateTime" Precision="0" />
+          <Property Name="replenish_pack_qty" Type="Double" />
+          <Property Name="safety_stock_qty" Type="Double" />
+          <Property Name="planning_daily_demand" Type="Double" />
+          <Property Name="on_hand_balance" Type="Double" />
+          <Property Name="allocated_balance" Type="Double" />
+          <Property Name="on_hold_balance" Type="Double" />
+        </EntityType>
+        <EntityType Name="drp_plan">
+          <Key>
+            <PropertyRef Name="drp_id" />
+          </Key>
+          <Property Name="gtin" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="gln" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="plan_date" Type="DateTime" Precision="0" />
+          <Property Name="estimated_on_hand" Type="Double" />
+          <Property Name="planned_demand" Type="Double" />
+          <Property Name="sched_demand" Type="Double" />
+          <Property Name="sched_replenish" Type="Double" />
+          <Property Name="sched_on_hand" Type="Double" />
+          <Property Name="planned_order_release_date" Type="DateTime" Precision="0" />
+          <Property Name="planned_order_receipt" Type="Double" />
+          <Property Name="planned_on_hand" Type="Double" />
+          <Property Name="regen_time" Type="DateTime" Precision="6" />
+          <Property Name="drp_id" Type="Decimal" Precision="20" Scale="0" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="period" Type="Int32" />
+          <Property Name="gtin_lowcode" Type="Int32" />
+          <Property Name="gln_lowcode" Type="Int32" />
+        </EntityType>
+        <EntityType Name="drp_sched_demand">
+          <Key>
+            <PropertyRef Name="gtin" />
+            <PropertyRef Name="gln" />
+            <PropertyRef Name="doc_id" />
+          </Key>
+          <Property Name="gtin" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="gln" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="doc_id" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="sched_demand_date" Type="DateTime" Precision="0" />
+          <Property Name="sched_demand_qty" Type="Double" />
+        </EntityType>
+        <EntityType Name="drp_sched_replenish">
+          <Key>
+            <PropertyRef Name="gtin" />
+            <PropertyRef Name="gln" />
+            <PropertyRef Name="doc_id" />
+          </Key>
+          <Property Name="gtin" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="gln" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="doc_id" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="sched_replenish_date" Type="DateTime" Precision="0" />
+          <Property Name="sched_replenish_qty" Type="Double" />
+          <Property Name="from_gln" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityContainer Name="drpEntities" annotation:LazyLoadingEnabled="true" a:TypeAccess="Internal" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration">
+          <EntitySet Name="drp_facility" EntityType="Self.drp_facility" />
+          <EntitySet Name="drp_gtin" EntityType="Self.drp_gtin" />
+          <EntitySet Name="drp_gtin_gln_attributes" EntityType="Self.drp_gtin_gln_attributes" />
+          <EntitySet Name="drp_plan" EntityType="Self.drp_plan" />
+          <EntitySet Name="drp_sched_demand" EntityType="Self.drp_sched_demand" />
+          <EntitySet Name="drp_sched_replenish" EntityType="Self.drp_sched_replenish" />
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="giisperfModelStoreContainer" CdmEntityContainer="drpEntities">
+          <EntitySetMapping Name="drp_facility">
+            <EntityTypeMapping TypeName="giisperfModel.drp_facility">
+              <MappingFragment StoreEntitySet="drp_facility">
+                <ScalarProperty Name="gln" ColumnName="gln" />
+                <ScalarProperty Name="gln_description" ColumnName="gln_description" />
+                <ScalarProperty Name="gln_type" ColumnName="gln_type" />
+                <ScalarProperty Name="gln_capacity_litres" ColumnName="gln_capacity_litres" />
+                <ScalarProperty Name="gln_parent" ColumnName="gln_parent" />
+                <ScalarProperty Name="planning_transfer_time_days" ColumnName="planning_transfer_time_days" />
+                <ScalarProperty Name="planning_replenish_cycle_days" ColumnName="planning_replenish_cycle_days" />
+                <ScalarProperty Name="planning_next_replenishment" ColumnName="planning_next_replenishment" />
+                <ScalarProperty Name="gln_lowcode" ColumnName="gln_lowcode" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="drp_gtin">
+            <EntityTypeMapping TypeName="giisperfModel.drp_gtin">
+              <MappingFragment StoreEntitySet="drp_gtin">
+                <ScalarProperty Name="gtin" ColumnName="gtin" />
+                <ScalarProperty Name="gtin_description" ColumnName="gtin_description" />
+                <ScalarProperty Name="gtin_type" ColumnName="gtin_type" />
+                <ScalarProperty Name="base_uom" ColumnName="base_uom" />
+                <ScalarProperty Name="pack_uom_1" ColumnName="pack_uom_1" />
+                <ScalarProperty Name="base_uom_per_pack_1" ColumnName="base_uom_per_pack_1" />
+                <ScalarProperty Name="pack_uom_2" ColumnName="pack_uom_2" />
+                <ScalarProperty Name="base_uom_per_pack_2" ColumnName="base_uom_per_pack_2" />
+                <ScalarProperty Name="litres_storage_per_base_uom" ColumnName="litres_storage_per_base_uom" />
+                <ScalarProperty Name="planning_lead_time_days" ColumnName="planning_lead_time_days" />
+                <ScalarProperty Name="gtin_parent" ColumnName="gtin_parent" />
+                <ScalarProperty Name="base_uom_child_per_base_uom_parent" ColumnName="base_uom_child_per_base_uom_parent" />
+                <ScalarProperty Name="gtin_lowcode" ColumnName="gtin_lowcode" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="drp_gtin_gln_attributes">
+            <EntityTypeMapping TypeName="giisperfModel.drp_gtin_gln_attributes">
+              <MappingFragment StoreEntitySet="drp_gtin_gln_attributes">
+                <ScalarProperty Name="gtin" ColumnName="gtin" />
+                <ScalarProperty Name="gln" ColumnName="gln" />
+                <ScalarProperty Name="as_of_date" ColumnName="as_of_date" />
+                <ScalarProperty Name="replenish_pack_qty" ColumnName="replenish_pack_qty" />
+                <ScalarProperty Name="safety_stock_qty" ColumnName="safety_stock_qty" />
+                <ScalarProperty Name="planning_daily_demand" ColumnName="planning_daily_demand" />
+                <ScalarProperty Name="on_hand_balance" ColumnName="on_hand_balance" />
+                <ScalarProperty Name="allocated_balance" ColumnName="allocated_balance" />
+                <ScalarProperty Name="on_hold_balance" ColumnName="on_hold_balance" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="drp_plan">
+            <EntityTypeMapping TypeName="giisperfModel.drp_plan">
+              <MappingFragment StoreEntitySet="drp_plan">
+                <ScalarProperty Name="gtin" ColumnName="gtin" />
+                <ScalarProperty Name="gln" ColumnName="gln" />
+                <ScalarProperty Name="plan_date" ColumnName="plan_date" />
+                <ScalarProperty Name="estimated_on_hand" ColumnName="estimated_on_hand" />
+                <ScalarProperty Name="planned_demand" ColumnName="planned_demand" />
+                <ScalarProperty Name="sched_demand" ColumnName="sched_demand" />
+                <ScalarProperty Name="sched_replenish" ColumnName="sched_replenish" />
+                <ScalarProperty Name="sched_on_hand" ColumnName="sched_on_hand" />
+                <ScalarProperty Name="planned_order_release_date" ColumnName="planned_order_release_date" />
+                <ScalarProperty Name="planned_order_receipt" ColumnName="planned_order_receipt" />
+                <ScalarProperty Name="planned_on_hand" ColumnName="planned_on_hand" />
+                <ScalarProperty Name="regen_time" ColumnName="regen_time" />
+                <ScalarProperty Name="drp_id" ColumnName="drp_id" />
+                <ScalarProperty Name="period" ColumnName="period" />
+                <ScalarProperty Name="gtin_lowcode" ColumnName="gtin_lowcode" />
+                <ScalarProperty Name="gln_lowcode" ColumnName="gln_lowcode" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="drp_sched_demand">
+            <EntityTypeMapping TypeName="giisperfModel.drp_sched_demand">
+              <MappingFragment StoreEntitySet="drp_sched_demand">
+                <ScalarProperty Name="gtin" ColumnName="gtin" />
+                <ScalarProperty Name="gln" ColumnName="gln" />
+                <ScalarProperty Name="doc_id" ColumnName="doc_id" />
+                <ScalarProperty Name="sched_demand_date" ColumnName="sched_demand_date" />
+                <ScalarProperty Name="sched_demand_qty" ColumnName="sched_demand_qty" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="drp_sched_replenish">
+            <EntityTypeMapping TypeName="giisperfModel.drp_sched_replenish">
+              <MappingFragment StoreEntitySet="drp_sched_replenish">
+                <ScalarProperty Name="gtin" ColumnName="gtin" />
+                <ScalarProperty Name="gln" ColumnName="gln" />
+                <ScalarProperty Name="doc_id" ColumnName="doc_id" />
+                <ScalarProperty Name="sched_replenish_date" ColumnName="sched_replenish_date" />
+                <ScalarProperty Name="sched_replenish_qty" ColumnName="sched_replenish_qty" />
+                <ScalarProperty Name="from_gln" ColumnName="from_gln" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
