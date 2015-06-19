@@ -13,7 +13,9 @@ public partial class Pages_Default : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-        if (!Page.IsPostBack)
+        if (CurrentEnvironment.LoggedUser == null)
+            Response.Redirect("../Default.aspx", false);
+        else if (!Page.IsPostBack)
         {
             GetStockStatusinDosesChart();
 
