@@ -312,6 +312,7 @@ public partial class Pages_RegisterVaccination : System.Web.UI.Page
             su.Vita = chkVitA.Checked;
             su.Mebendezol = chkMebendezol.Checked;
             su.Date = DateTime.Now;
+
             // or 
             // DateTime date = DateTime.ParseExact(lblVitADate.Text, ConfigurationDate.GetConfigurationDateById(int.Parse(Configuration.GetConfigurationByName("DateFormat").Value)).DateFormat.ToString(), CultureInfo.CurrentCulture);
             // su.Date = date;
