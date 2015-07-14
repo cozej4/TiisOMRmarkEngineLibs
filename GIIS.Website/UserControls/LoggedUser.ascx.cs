@@ -41,6 +41,7 @@ public partial class UserControls_LoggedUser : System.Web.UI.UserControl
 
         // Clear the output cache cookie...by expiring it
         HttpContext.Current.Response.Cookies["UserId"].Expires = DateTime.Now.AddDays(-1);
+        HttpContext.Current.Session.Abandon();
 
         Response.Redirect(this.ResolveUrl("~/Default.aspx"), false);
     }
