@@ -185,10 +185,10 @@ public partial class Pages_HealthFacilityBalanceByLot : System.Web.UI.Page
             if (lot != null)
                 lblExpireDate.Text = lot.ExpireDate.ToString("dd-MMM-yyyy");
             int days = int.Parse(Configuration.GetConfigurationByName("LimitNumberOfDaysBeforeExpire").Value);
-            if (lot.ExpireDate < DateTime.Today.Date.AddDays(days))
-            {
+            if (lot.ExpireDate < DateTime.Today.Date)
+                e.Row.Cells[4].BackColor = System.Drawing.Color.OrangeRed;
+            else if (lot.ExpireDate < DateTime.Today.Date.AddDays(days))
                 e.Row.Cells[4].BackColor = System.Drawing.Color.Yellow;
-            }
         }
     }
 

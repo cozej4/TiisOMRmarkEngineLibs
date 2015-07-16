@@ -518,6 +518,8 @@ public partial class _Child : System.Web.UI.Page
                         btnImmunizationCard.Visible = false;
                         btnEdit.Visible = true;
                         //btnRemove.Visible = true;
+                        lblWarningBarcode.Visible = false;
+                        lnbContinue.Visible = false;
 
                         HttpContext.Current.Session["_successChild"] = "1";
                         HttpContext.Current.Session["_lastChildId"] = i;

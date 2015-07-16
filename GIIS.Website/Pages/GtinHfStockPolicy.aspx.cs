@@ -48,8 +48,8 @@ public partial class Pages_GtinHfStockPolicy : System.Web.UI.Page
                 //grid header text
                 gvGtinHfStockPolicy.Columns[0].HeaderText = wtList["GtinHfStockPolicyGTIN"];
                 gvGtinHfStockPolicy.Columns[1].HeaderText = wtList["GtinHfStockPolicyHealthFacility"];
-                gvGtinHfStockPolicy.Columns[2].HeaderText = wtList["GtinHfStockPolicyReorderQty"];
-                gvGtinHfStockPolicy.Columns[3].HeaderText = wtList["GtinHfStockPolicyLeadTime"];
+                gvGtinHfStockPolicy.Columns[3].HeaderText = wtList["GtinHfStockPolicyReorderQty"];
+                gvGtinHfStockPolicy.Columns[2].HeaderText = wtList["GtinHfStockPolicyLeadTime"];
                 gvGtinHfStockPolicy.Columns[5].HeaderText = wtList["GtinHfStockPolicyConsumptionLogic"];
                 // gvGtinHfStockPolicy.Columns[4].HeaderText = wtList["GtinHfStockPolicySafetyStock"];
 
@@ -72,8 +72,10 @@ public partial class Pages_GtinHfStockPolicy : System.Web.UI.Page
                 {
                     GtinHfStockPolicy o = GtinHfStockPolicy.GetGtinHfStockPolicyByHealthFacilityCodeAndGtin(_hf, _gtin);
                     ddlGtin.SelectedValue = o.Gtin;
+                    ddlGtin.DataBind();
 
                     ddlHealthFacility.SelectedValue = o.HealthFacilityCode;
+                    LoadReorderQuantity();
                     if (!string.IsNullOrEmpty(o.ReorderQty.ToString()))
                         ddlReorderQty.SelectedValue = o.ReorderQty.ToString();
 
@@ -84,6 +86,8 @@ public partial class Pages_GtinHfStockPolicy : System.Web.UI.Page
                     gvGtinHfStockPolicy.DataBind();
 
                     btnEdit.Visible = true;
+                    ddlGtin.Enabled = false;
+                    ddlHealthFacility.Enabled = false;
                 }
 
                 LoadReorderQuantity();
@@ -286,6 +290,12 @@ public partial class Pages_GtinHfStockPolicy : System.Web.UI.Page
 
             if (o.SafetyStock != null)
                 txtSafetyStock.Text = o.SafetyStock.ToString();
+            else
+                txtSafetyStock.Text = string.Empty;
+            if (o.LeadTime != null)
+                txtLeadTime.Text = o.LeadTime.ToString();
+            else
+                txtLeadTime.Text = string.Empty;
         }
     }
 

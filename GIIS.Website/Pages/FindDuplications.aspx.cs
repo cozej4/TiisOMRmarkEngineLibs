@@ -161,6 +161,7 @@ public partial class Pages_FindDuplications : System.Web.UI.Page
 
                 gvChild.DataSource = odsChild;
                 gvChild.DataBind();
+                lblWarning.Visible = false;
             }
             else
                 lblWarning.Visible = true;
@@ -185,6 +186,7 @@ public partial class Pages_FindDuplications : System.Web.UI.Page
         {
             btnExcel.Visible = false;
             lblWarningText.Visible = false;
+            lblWarning.Visible = false;
         }
     }
 

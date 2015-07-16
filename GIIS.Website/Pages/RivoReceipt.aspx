@@ -25,6 +25,16 @@
             args.IsValid = true;
         }
     </script>
+       <script type="text/javaScript">
+           function isNumber(evt) {
+               evt = (evt) ? evt : window.event;
+               var charCode = (evt.which) ? evt.which : evt.keyCode;
+               if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                   return false;
+               }
+               return true;
+           }
+    </script>
     <style type="text/css">
         .ajax__calendar_container {
             z-index: 1000;
@@ -139,7 +149,7 @@
         </div>
         <div class="col-md-3 col-xs-3 col-sm-3 col-lg-3 clearfix">
             <div class="form-group">
-                <asp:TextBox ID="txtQuantity" runat="server" CssClass="form-control" />
+                <asp:TextBox ID="txtQuantity" runat="server" CssClass="form-control" onkeypress="return isNumber(event)" />
             </div>
         </div>
         <div class="col-md-3 col-xs-3 col-sm-3 col-lg-3 clearfix"></div>

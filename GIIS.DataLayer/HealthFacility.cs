@@ -33,7 +33,7 @@ namespace GIIS.DataLayer
             get
             {
                 if (this.TypeId > 0)
-                    return null;//return HealthFacilityType.GetHealthFacilityTypeById(this.TypeId);
+                    return HealthFacilityType.GetHealthFacilityTypeById(this.TypeId);
                 else
                     return null;
             }

@@ -2,43 +2,25 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
     <script type="text/javascript">
-        var isresult = "test";
-        function pageLoad(sender, args) {
-
-            $find('autocomplteextender1')._onMethodComplete = function (result, context) {
-
-                $find('autocomplteextender1')._update(context, result, /* cacheResults */false);
-                webservice_callback1(result, context);
-            };
-        }
-        function webservice_callback1(result, context) {
-
-            if (result == "") {
-                $find("autocomplteextender1").get_element().style.backgroundColor = "red";
-                isresult = "";
-            }
-            else {
-                $find("autocomplteextender1").get_element().style.backgroundColor = "white";
-                isresult = "test";
-            }
-        }
-        function checkHFacility() {
-            if (isresult == "") {
-                alert("Please choose a health facility from the list!");
-                // alert(text);
-                return false;
-            }
-            return true;
-        }
-
+      
         function cvStockPolicy_Validate(sender, args) {
-            var text = (document.getElementById('<%=ddlReorderQty.ClientID%>').value == '') || (document.getElementById('<%=txtSafetyStock.ClientID%>').value == '');
+            var text = (document.getElementById('<%=ddlReorderQty.ClientID%>').value == '') || (document.getElementById('<%=txtSafetyStock.ClientID%>').value == '') || (document.getElementById('<%=ddlHealthFacility.ClientID%>').value == '-1') || (document.getElementById('<%=ddlGtin.ClientID%>').value == '-1');
             if (text) {
                 args.IsValid = false;
                 return;
             }
             args.IsValid = true;
         }
+    </script>
+      <script type="text/javaScript">
+          function isNumber(evt) {
+              evt = (evt) ? evt : window.event;
+              var charCode = (evt.which) ? evt.which : evt.keyCode;
+              if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                  return false;
+              }
+              return true;
+          }
     </script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
@@ -107,7 +89,7 @@
         </div>
         <div class="col-md-3 col-xs-3 col-sm-3 col-lg-3 clearfix">
             <div class="form-group">
-                <asp:TextBox ID="txtSafetyStock" runat="server" CssClass="form-control" />
+                <asp:TextBox ID="txtSafetyStock" runat="server" CssClass="form-control" onkeypress="return isNumber(event)" />
             </div>
         </div>
 
@@ -119,7 +101,7 @@
         </div>
         <div class="col-md-3 col-xs-3 col-sm-3 col-lg-3 clearfix">
             <div class="form-group">
-                <asp:TextBox ID="txtLeadTime" runat="server" CssClass="form-control" />
+                <asp:TextBox ID="txtLeadTime" runat="server" CssClass="form-control" onkeypress="return isNumber(event)" />
             </div>
         </div>
         <div class="col-md-1 col-xs-1 col-sm-1 col-lg-1 clearfix"></div>

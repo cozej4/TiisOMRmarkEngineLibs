@@ -14,7 +14,7 @@ namespace GIIS.DataLayer
         {
             try
             {
-                string query = @"SELECT ""GTIN"" || ' - ' || ""ITEM"".""CODE"" as ""GTIN"", ""GTIN"" AS ""ID"", ""ITEM"".""CODE"" as ""CODE""  FROM ""ITEM_MANUFACTURER"" join ""ITEM"" on ""ITEM_MANUFACTURER"".""ITEM_ID"" = ""ITEM"".""ID"" WHERE  ""ITEM_MANUFACTURER"".""IS_ACTIVE"" = true ORDER BY ""CODE"" ;";
+                string query = @"Select '-------' as ""GTIN"", '-1' as ""ID"", '-------' as ""CODE"" union SELECT ""GTIN"" || ' - ' || ""ITEM"".""CODE"" as ""GTIN"", ""GTIN"" AS ""ID"", ""ITEM"".""CODE"" as ""CODE""  FROM ""ITEM_MANUFACTURER"" join ""ITEM"" on ""ITEM_MANUFACTURER"".""ITEM_ID"" = ""ITEM"".""ID"" WHERE  ""ITEM_MANUFACTURER"".""IS_ACTIVE"" = true ORDER BY ""CODE"" ;";
                 DataTable dt = DBManager.ExecuteReaderCommand(query, CommandType.Text, null);
                 return dt;
             }
@@ -153,7 +153,7 @@ new NpgsqlParameter("@ParamValue", DbType.Int32) { Value = itemId }
         {
             try
             {
-                string query = @"SELECT * FROM ""ITEM_KIT"" WHERE ""PARENT_GTIN"" = @ParamValue ORDER BY ""GTIN"";";
+                string query = @"SELECT * FROM ""ITEM_KIT"" WHERE ""PARENT_GTIN"" = @ParamValue ORDER BY ""CHILD_GTIN"";";
                 List<NpgsqlParameter> parameters = new List<NpgsqlParameter>()
                 {
                 new NpgsqlParameter("@ParamValue", DbType.String) { Value = s }

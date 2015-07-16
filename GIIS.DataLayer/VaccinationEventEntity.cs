@@ -278,7 +278,7 @@ namespace GIIS.DataLayer
             {
                 if (hfId != 0)
                 {
-                    string query = string.Format(@"SELECT ""APPOINTMENT_ID"", monthly_plan.""ID"", ""NAME"", " +
+                    string query = string.Format(@"SELECT DISTINCT (""APPOINTMENT_ID""), monthly_plan.""ID"", ""NAME"", " +
                                                  @"array_to_string(ARRAY(SELECT ""DOSE_1"".""FULLNAME"" " +
                                                                 @"FROM ""VACCINATION_EVENT"" " +
                                                                 @"INNER JOIN ""DOSE"" ""DOSE_1"" ON ""VACCINATION_EVENT"".""DOSE_ID"" = ""DOSE_1"".""ID"" left join ""AGE_DEFINITIONS"" on ""DOSE_1"".""TO_AGE_DEFINITION_ID"" = ""AGE_DEFINITIONS"".""ID"" " +
@@ -310,8 +310,9 @@ namespace GIIS.DataLayer
                 if (hfId != 0)
                 {
                     string query = string.Format(@"SELECT Count (DISTINCT(""APPOINTMENT_ID"")) " +
-                                                  @" FROM monthly_plan " +
-                                                  @" WHERE  ""HEALTH_FACILITY_ID"" = {0} AND ""SCHEDULED_DATE"" <= '{1}' ", hfId, scheduledDate.ToString("yyyy-MM-dd"));
+                                                  @" FROM monthly_plan join ""DOSE"" on ""DOSE_ID"" = ""DOSE"".""ID"" " +
+                                                  @" WHERE ""HEALTH_FACILITY_ID"" = {0} AND ""SCHEDULED_DATE"" <= '{1}' AND ( (Select ""DAYS"" from ""AGE_DEFINITIONS"" WHERE ""ID"" = ""DOSE"".""TO_AGE_DEFINITION_ID"" ) IS NULL OR (""SCHEDULED_DATE""  + interval  '1' day * (Select ""DAYS"" from ""AGE_DEFINITIONS"" WHERE ""ID"" = ""DOSE"".""TO_AGE_DEFINITION_ID"" )  > 'now'::text::date))  " +
+                                                  @" ", hfId, scheduledDate.ToString("yyyy-MM-dd"));
                     object i = DBManager.ExecuteScalarCommand(query, CommandType.Text, null);
                     return int.Parse(i.ToString());
                 }
