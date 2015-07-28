@@ -96,6 +96,7 @@ public partial class Pages_ItemLotNew : System.Web.UI.Page
                         txtLotNumber.Text = o.LotNumber;
                         txtExpireDate.Text = o.ExpireDate.ToString(ConfigurationDate.GetConfigurationDateById(int.Parse(Configuration.GetConfigurationByName("DateFormat").Value)).DateFormat);
                         txtNotes.Text = o.Notes;
+                        rblIsActive.SelectedValue = o.IsActive.ToString();
 
                         gvItemLotNew.Visible = true;
                         odsItemLotNew.SelectParameters.Clear();
@@ -147,6 +148,7 @@ public partial class Pages_ItemLotNew : System.Web.UI.Page
                         o.ExpireDate = DateTime.ParseExact(txtExpireDate.Text, ConfigurationDate.GetConfigurationDateById(int.Parse(Configuration.GetConfigurationByName("DateFormat").Value)).DateFormat.ToString(), CultureInfo.CurrentCulture);
                     if (!String.IsNullOrEmpty(txtNotes.Text))
                         o.Notes = txtNotes.Text;
+                    o.IsActive = bool.Parse(rblIsActive.SelectedValue);
 
                     i = ItemLot.Update(o);
                 }

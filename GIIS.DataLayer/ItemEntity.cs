@@ -106,7 +106,7 @@ namespace GIIS.DataLayer
         {
             try
             {
-                string query = String.Format(@"SELECT -1 as ""ID"", '-----' as ""CODE"" UNION SELECT ""ID"",""CODE"" FROM ""ITEM"" WHERE ""ITEM_CATEGORY_ID"" = {0} AND (""EXIT_DATE"" = '0001-01-01' OR ""EXIT_DATE"" is Null) AND ""IS_ACTIVE"" = true ORDER BY ""CODE"" ", i);
+                string query = String.Format(@"SELECT -1 as ""ID"", '-----' as ""CODE"" UNION SELECT ""ID"",""CODE"" FROM ""ITEM"" WHERE ""ITEM_CATEGORY_ID"" = {0}  ORDER BY ""CODE"" ", i); //AND (""EXIT_DATE"" = '0001-01-01' OR ""EXIT_DATE"" is Null) AND ""IS_ACTIVE"" = true
                 DataTable dt = DBManager.ExecuteReaderCommand(query, CommandType.Text, null);
                 return dt;
             }

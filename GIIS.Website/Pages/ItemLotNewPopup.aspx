@@ -178,7 +178,7 @@
                                 </asp:TemplateField>
                                 <asp:TemplateField HeaderText="Item">
                                     <ItemTemplate>
-                                        <%#Eval("ItemObject.Name")%>
+                                        <%#Eval("ItemObject.Code")%>
                                     </ItemTemplate>
                                 </asp:TemplateField>
                                 <asp:BoundField DataField="ExpireDate" HeaderText="ExpireDate" SortExpression="ExpireDate" DataFormatString="{0:dd-MMM-yyyy}" />

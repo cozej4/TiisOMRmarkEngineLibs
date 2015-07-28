@@ -50,6 +50,7 @@ public partial class Pages_ItemManufacturer : System.Web.UI.Page
                 //this.lblBaseUOMChild.Text = wtList["ItemManufacturerBaseUOMChild"];
                 this.lblStorageSpace.Text = wtList["ItemManufacturerStorageSpace"];
                 this.lblNotes.Text = wtList["ItemManufacturerNotes"];
+                this.lblIsActive.Text = wtList["ItemManufacturerIsActive"];
 
                 //grid header text
                 gvItemManufacturer.Columns[0].HeaderText = wtList["ItemManufacturerGTIN"];
@@ -102,8 +103,7 @@ public partial class Pages_ItemManufacturer : System.Web.UI.Page
                     {ddlAlt2UOM.SelectedValue = o.Alt2Uom;
                     txtAlt2Qty.Text = o.Alt2QtyPer.ToString();
                     }
-
-                  
+                    rblIsActive.SelectedValue = o.IsActive.ToString();
                     txtStorageSpace.Text = o.StorageSpace.ToString();
                     txtNotes.Text = o.Notes;
                     gridview_Databind(gtin);
@@ -172,6 +172,7 @@ public partial class Pages_ItemManufacturer : System.Web.UI.Page
 
                     o.ModifiedBy = CurrentEnvironment.LoggedUser.Id;
                     o.ModifiedOn = DateTime.Now;
+                    o.IsActive = bool.Parse(rblIsActive.SelectedValue);
 
                     i = ItemManufacturer.Update(o);
                 }

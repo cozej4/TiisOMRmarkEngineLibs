@@ -95,6 +95,28 @@ namespace GIIS.DataLayer
                 throw ex;
             }
         }
+        public static List<VaccinationAppointment> GetVaccinationAppointmentsByChildDayFirstLogin(int childId, DateTime modifiedOn)
+        {
+            try
+            {
+                string query = @"SELECT VA.* FROM ""VACCINATION_APPOINTMENT"" VA WHERE VA.""CHILD_ID"" = @ChildId AND VA.""MODIFIEDON""::date = @ModifiedOn::date  ;";
+
+                List<NpgsqlParameter> parameters = new List<NpgsqlParameter>()
+                {
+                    new NpgsqlParameter("@ChildId", DbType.Int32) { Value = childId },
+                    new NpgsqlParameter("@ModifiedOn", DbType.DateTime) { Value = modifiedOn }
+                };
+
+                DataTable dt = DBManager.ExecuteReaderCommand(query, CommandType.Text, parameters);
+                return GetVaccinationAppointmentAsList(dt);
+            }
+            catch (Exception ex)
+            {
+                Log.InsertEntity("VaccinationAppointment", "GetVaccinationAppointmentsByChild", 4, ex.StackTrace.Replace("'", ""), ex.Message.Replace("'", ""));
+                throw ex;
+            }
+        }
+
         public static int DeleteByChild(int id)
         {
             try

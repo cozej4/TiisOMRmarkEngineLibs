@@ -365,7 +365,33 @@ namespace GIIS.DataLayer
             }
         }
 
+        public static List<Child> GetChildByHealthFacilityIdDayFirstLogin(int userId)
+        {
 
+            try
+            {
+                User user = User.GetUserById(userId);
+                string query = string.Format(@"select distinct C.* from ""CHILD"" C join ""VACCINATION_EVENT"" V on V.""CHILD_ID"" = C.""ID""
+                                                WHERE C.""HEALTHCENTER_ID"" = @hfId 
+                                                AND (C.""MODIFIED_ON""::date = @lastlogin::date OR ""MODIFIEDON""::date = @lastlogin::date) ");
+
+                List<NpgsqlParameter> parameters = new List<NpgsqlParameter>()
+                {
+                    
+                     new NpgsqlParameter("@hfId", DbType.Int32) { Value = user.HealthFacilityId.ToString()},
+                     new NpgsqlParameter("@lastlogin", DbType.DateTime) { Value = user.Lastlogin.AddDays(-1)}
+                    
+                };
+
+                DataTable dt = DBManager.ExecuteReaderCommand(query, CommandType.Text, parameters);
+                return GetChildAsList(dt);
+            }
+            catch (Exception ex)
+            {
+                Log.InsertEntity("Child", "GetChildByHealthFacilityIdBeforeLastLogin", 4, ex.StackTrace.Replace("'", ""), ex.Message.Replace("'", ""));
+                throw ex;
+            }
+        }
         public static List<Child> GetPagedChildList(int statusId, DateTime birthdateFrom, DateTime birthdateTo, string firstname1, string lastname1,
             string idFields, string healthFacilityId, int birthplaceId, int communityId, int domicileId,
             string motherFirstname, string motherLastname, string systemId, string barcodeId, string tempId,

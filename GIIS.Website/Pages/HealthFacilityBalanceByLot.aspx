@@ -52,7 +52,7 @@
                     <asp:BoundField DataField="Gtin" HeaderText="GTIN" SortExpression="Gtin" />
                     <asp:TemplateField HeaderText="Item">
                         <ItemTemplate>
-                            <%#Eval("GtinObject.ItemObject.Name")%>
+                            <%#Eval("GtinObject.ItemObject.Code")%>
                         </ItemTemplate>
                     </asp:TemplateField>
                     <asp:BoundField DataField="LotNumber" HeaderText="Lot Number" SortExpression="LotNumber" />

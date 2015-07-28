@@ -140,6 +140,7 @@ public partial class _Manufacturer : System.Web.UI.Page
                     lblSuccess.Visible = true;
                     lblWarning.Visible = false;
                     lblError.Visible = false;
+                    lblWarningRemove.Visible = false;
                     gridview_Databind(i);
                     ClearControls(this);
                 }
@@ -148,6 +149,7 @@ public partial class _Manufacturer : System.Web.UI.Page
                     lblSuccess.Visible = false;
                     lblWarning.Visible = false;
                     lblError.Visible = true;
+                    lblWarningRemove.Visible = false;
                 }
             }
         }
@@ -156,6 +158,7 @@ public partial class _Manufacturer : System.Web.UI.Page
             lblSuccess.Visible = false;
             lblWarning.Visible = false;
             lblError.Visible = true;
+            lblWarningRemove.Visible = false;
         }
     }
 
@@ -191,6 +194,7 @@ public partial class _Manufacturer : System.Web.UI.Page
                     lblSuccess.Visible = true;
                     lblWarning.Visible = false;
                     lblError.Visible = false;
+                    lblWarningRemove.Visible = false;
                     gridview_Databind(id);
                     ClearControls(this);
                 }
@@ -199,6 +203,7 @@ public partial class _Manufacturer : System.Web.UI.Page
                     lblSuccess.Visible = false;
                     lblWarning.Visible = false;
                     lblError.Visible = true;
+                    lblWarningRemove.Visible = false;
                 }
             }
         }
@@ -207,6 +212,7 @@ public partial class _Manufacturer : System.Web.UI.Page
             lblSuccess.Visible = false;
             lblWarning.Visible = false;
             lblError.Visible = true;
+            lblWarningRemove.Visible = false;
         }
     }
 
@@ -220,21 +226,34 @@ public partial class _Manufacturer : System.Web.UI.Page
             int.TryParse(_id, out id);
             int userId = CurrentEnvironment.LoggedUser.Id;
 
-            int i = Manufacturer.Remove(id);
-
-            if (i > 0)
+            int count = ItemManufacturer.GetCountManufacturer(id);
+            if (count > 0)
             {
-                lblSuccess.Visible = true;
+                lblWarningRemove.Visible = true;
                 lblWarning.Visible = false;
+                lblSuccess.Visible = false;
                 lblError.Visible = false;
-                gvManufacturer.DataBind();
-                ClearControls(this);
             }
             else
             {
-                lblSuccess.Visible = false;
-                lblWarning.Visible = true;
-                lblError.Visible = false;
+                int i = Manufacturer.Remove(id);
+
+                if (i > 0)
+                {
+                    lblSuccess.Visible = true;
+                    lblWarning.Visible = false;
+                    lblError.Visible = false;
+                    lblWarningRemove.Visible = false;
+                    gvManufacturer.DataBind();
+                    ClearControls(this);
+                }
+                else
+                {
+                    lblSuccess.Visible = false;
+                    lblWarning.Visible = true;
+                    lblError.Visible = false;
+                    lblWarningRemove.Visible = false;
+                }
             }
         }
         catch (Exception ex)

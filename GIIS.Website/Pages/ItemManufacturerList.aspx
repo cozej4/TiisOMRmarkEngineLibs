@@ -74,7 +74,7 @@
                     <asp:BoundField DataField="Alt2QtyPer" HeaderText="Alt2QtyPer" SortExpression="Alt2QtyPer" />
                     <asp:TemplateField HeaderText="KitItems">
                         <ItemTemplate>
-                                <%# (int)Eval("KitItems.Count") > 0 ? "<ul style=\"margin:0px 0px 0px 7px; padding:0px\">" + ((List<GIIS.DataLayer.ItemManufacturer>)Eval("KitItems")).Select(o=>o.ItemObject.Name).Aggregate((a,b)=>String.Format("<li>{0}</li><li>{1}</li>", a, b)) + "</ul>" : ""%>
+                                <%# (int)Eval("KitItems.Count") > 0 ? "<ul style=\"margin:0px 0px 0px 7px; padding:0px\">" + ((List<GIIS.DataLayer.ItemManufacturer>)Eval("KitItems")).Select(o=>o.ItemObject.Code).Aggregate((a,b)=>String.Format("<li>{0}</li><li>{1}</li>", a, b)) + "</ul>" : ""%>
                         </ItemTemplate>
                     </asp:TemplateField>
                     <asp:BoundField DataField="Notes" HeaderText="Notes" SortExpression="Notes" Visible="false" />
@@ -111,7 +111,7 @@
                 </asp:TemplateField>
                 <asp:TemplateField HeaderText="Item">
                     <ItemTemplate>
-                        <%#Eval("ItemObject.Name")%>
+                        <%#Eval("ItemObject.Code")%>
                     </ItemTemplate>
                 </asp:TemplateField>
                 <asp:TemplateField HeaderText="Manufacturer">

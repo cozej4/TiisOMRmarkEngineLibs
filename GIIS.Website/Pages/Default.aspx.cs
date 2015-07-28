@@ -27,6 +27,7 @@ public partial class Pages_Default : System.Web.UI.Page
 
             GetVaccinationCoverageChart(dt);
         }
+       
     }
 
     private void GetStockStatusinDosesChart()

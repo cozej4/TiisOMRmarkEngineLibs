@@ -175,7 +175,20 @@
             </div>
         </div>
     </div>
-
+     <div class="row">
+        <div class="col-md-1 col-xs-1 col-sm-1 col-lg-1 clearfix"></div>
+        <div class="col-md-2 col-xs-2 col-sm-2 col-lg-2 clearfix">
+            <asp:Label ID="lblIsActive" runat="server" Text="Is Active" />
+        </div>
+        <div class="col-md-3 col-xs-3 col-sm-3 col-lg-3 clearfix">
+            <div class="form-group">
+                <asp:RadioButtonList ID="rblIsActive" runat="server" RepeatDirection="Horizontal">
+                    <asp:ListItem Selected="True" Value="True" Text="Yes"></asp:ListItem>
+                    <asp:ListItem Value="False" Text="No"></asp:ListItem>
+                </asp:RadioButtonList>
+            </div>
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-4 col-xs-4 col-sm-4 col-lg-4 clearfix">&nbsp;</div>
         <div class="col-md-8 col-xs-8 col-sm-8 col-lg-8 clearfix">
@@ -240,7 +253,7 @@
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Item">
                         <ItemTemplate>
-                            <%#Eval("ItemObject.Name")%>
+                            <%#Eval("ItemObject.Code")%>
                         </ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Manufacturer">

@@ -229,13 +229,14 @@ public partial class _Item : System.Web.UI.Page
                 {
                     DateTime exitdate = DateTime.ParseExact(txtExitDate.Text, ConfigurationDate.GetConfigurationDateById(int.Parse(Configuration.GetConfigurationByName("DateFormat").Value)).DateFormat.ToString(), CultureInfo.CurrentCulture);
                     o.ExitDate = exitdate;
+                    if (o.ExitDate < DateTime.Today.Date)
+                        o.IsActive = false;
                 }
                 else
+                {
                     o.ExitDate = DateTime.Parse("0001-01-01");
-
-                o.IsActive = true;// bool.Parse(rblIsActive.SelectedValue);
-                if (o.ExitDate < DateTime.Today.Date)
-                    o.IsActive = false;
+                    o.IsActive = true;
+                }
 
                 o.Notes = txtNotes.Text;
                 o.ModifiedOn = DateTime.Now;

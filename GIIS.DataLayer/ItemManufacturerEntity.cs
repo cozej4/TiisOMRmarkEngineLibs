@@ -134,7 +134,7 @@ new NpgsqlParameter("@ParamValue", DbType.Int32) { Value = itemId }
                 string query = @"Select ""NAME"" from ""UOM"" join ""ITEM_MANUFACTURER"" on ""ITEM_MANUFACTURER"".""BASE_UOM"" = ""UOM"".""NAME"" WHERE ""GTIN"" = @ParamValue " +
                     @" UNION Select ""NAME"" from ""UOM"" join ""ITEM_MANUFACTURER"" on ""ITEM_MANUFACTURER"".""ALT_1_UOM"" = ""UOM"".""NAME"" WHERE ""GTIN"" = @ParamValue " +
                     @" UNION Select ""NAME"" from ""UOM"" join ""ITEM_MANUFACTURER"" on ""ITEM_MANUFACTURER"".""ALT_2_UOM"" = ""UOM"".""NAME"" WHERE ""GTIN"" = @ParamValue ";
-                
+
                 List<NpgsqlParameter> parameters = new List<NpgsqlParameter>() { 
                     new NpgsqlParameter("@ParamValue", DbType.String) { Value = gtin }
                 };
@@ -149,7 +149,7 @@ new NpgsqlParameter("@ParamValue", DbType.Int32) { Value = itemId }
             }
         }
 
-        public static List< ItemManufacturer> GetItemManufacturerByParentGtin(string s)
+        public static List<ItemManufacturer> GetItemManufacturerByParentGtin(string s)
         {
             try
             {
@@ -159,12 +159,31 @@ new NpgsqlParameter("@ParamValue", DbType.Int32) { Value = itemId }
                 new NpgsqlParameter("@ParamValue", DbType.String) { Value = s }
                 };
                 DataTable dt = DBManager.ExecuteReaderCommand(query, CommandType.Text, parameters);
-              
+
                 return GetItemManufacturerAsList(dt);
             }
             catch (Exception ex)
             {
                 Log.InsertEntity("ItemManufacturer", "GetItemManufacturerByParentGtin", 4, ex.StackTrace.Replace("'", ""), ex.Message.Replace("'", ""));
+                throw ex;
+            }
+        }
+
+        public static int GetCountManufacturer(int manufacturerId)
+        {
+            try
+            {
+                string query = @"SELECT count(*) FROM ""ITEM_MANUFACTURER"" WHERE ""MANUFACTURER_ID"" = @ParamValue;";
+                List<NpgsqlParameter> parameters = new List<NpgsqlParameter>()
+                    {
+                    new NpgsqlParameter("@ParamValue", DbType.Int32) { Value = manufacturerId }
+                    };
+                object count = DBManager.ExecuteScalarCommand(query, CommandType.Text, parameters);
+                return int.Parse(count.ToString());
+            }
+            catch (Exception ex)
+            {
+                Log.InsertEntity("ItemManufacturer", "GetCountManufacturer", 4, ex.StackTrace.Replace("'", ""), ex.Message.Replace("'", ""));
                 throw ex;
             }
         }
