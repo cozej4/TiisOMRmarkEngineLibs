@@ -97,9 +97,9 @@ public partial class _Community : System.Web.UI.Page
     protected void gridview_Databind(int id)
     {
         //gridview databind
-        string where = @" ""ID"" = " + id;
+       // string where = @" ""ID"" = " + id;
         odsCommunity.SelectParameters.Clear();
-        odsCommunity.SelectParameters.Add("where", where);
+        odsCommunity.SelectParameters.Add("i", id.ToString());
         odsCommunity.DataBind();
         gvCommunity.DataSource = odsCommunity;
         gvCommunity.DataBind();

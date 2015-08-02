@@ -108,9 +108,9 @@
                     <asp:BoundField DataField="ModifiedBy" HeaderText="ModifiedBy" SortExpression="ModifiedBy" Visible="False" />
                 </Columns>
             </asp:GridView>
-            <asp:ObjectDataSource ID="odsCommunity" runat="server" EnablePaging="true" SelectMethod="GetPagedCommunityList" TypeName="GIIS.DataLayer.Community" SelectCountMethod="GetCountCommunityList">
+            <asp:ObjectDataSource ID="odsCommunity" runat="server" SelectMethod="GetCommunityById" TypeName="GIIS.DataLayer.Community" >
                 <SelectParameters>
-                    <asp:Parameter DefaultValue="1 = 1" Name="where" Type="String" />
+                    <asp:Parameter  Name="i" Type="Int32" />
                 </SelectParameters>
             </asp:ObjectDataSource>
         </div>

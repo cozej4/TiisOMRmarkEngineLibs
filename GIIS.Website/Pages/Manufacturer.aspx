@@ -105,7 +105,7 @@
         <div class="col-md-7 col-xs-7 col-sm-7 col-lg-7 clearfix">
             <asp:Label ID="lblSuccess" runat="server" Text="Success" CssClass="label label-success" Font-Size="Small" Visible="false" />
             <asp:Label ID="lblWarning" runat="server" Text="Warning" CssClass="label label-warning" Font-Size="Small" Visible="false" />
-              <asp:Label ID="lblWarningRemove" runat="server" Text="This manufacturer can not be removed as there are GTINs associated with it!" CssClass="label label-warning" Font-Size="Small" Visible="false" />
+             <asp:Label ID="lblWarningRemove" runat="server" Text="This manufacturer can not be removed as there are GTINs associated with it!" CssClass="label label-warning" Font-Size="Small" Visible="false" />
             <asp:Label ID="lblError" runat="server" Text="Error" CssClass="label label-danger" Font-Size="Small" Visible="false" />
         </div>
     </div>
