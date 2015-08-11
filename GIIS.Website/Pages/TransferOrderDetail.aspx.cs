@@ -426,7 +426,7 @@ public partial class Pages_TransferOrderDetail : System.Web.UI.Page
 
             TransferOrderDetail tod = TransferOrderDetail.GetTransferOrderDetailByOrderNumAndOrderDetail(int.Parse(id), id2);
 
-            lblFromStock.Text = GIIS.DataLayer.HealthFacilityBalance.GetHealthFacilityBalanceByHealthFacilityCode(toh.OrderFacilityFrom).Find(o=>o.Gtin == tod.OrderGtin).Balance.ToString();
+           // lblFromStock.Text = GIIS.DataLayer.HealthFacilityBalance.GetHealthFacilityBalanceByHealthFacilityCode(toh.OrderFacilityFrom).Find(o=>o.Gtin == tod.OrderGtin).Balance.ToString();
             lblFromStock.Text += " " + tod.OrderUom;
 
             if (tod != null)

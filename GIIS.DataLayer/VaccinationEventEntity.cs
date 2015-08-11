@@ -167,7 +167,7 @@ namespace GIIS.DataLayer
             {
                 string query = string.Format(@"Select v.""APPOINTMENT_ID"",  array_to_string(ARRAY( SELECT ""DOSE"".""FULLNAME"" FROM  ""VACCINATION_EVENT"" VE INNER JOIN ""DOSE"" ON VE.""DOSE_ID"" = ""DOSE"".""ID""  " +
                                             @"inner join ""VACCINATION_APPOINTMENT"" VA on VE.""APPOINTMENT_ID"" = VA.""ID"" WHERE  VE.""CHILD_ID"" = {0} AND  v.""APPOINTMENT_ID"" = VE.""APPOINTMENT_ID"" AND ""VACCINATION_STATUS"" = 'TRUE' " +
-                                            @"AND (VA.""AEFI"" = 'FALSE' OR VA.""AEFI"" IS NULL) ), ', '::text) AS ""VACCINES"", " +
+                                            @"AND (VA.""AEFI"" = 'FALSE' OR VA.""AEFI"" IS NULL) ORDER BY ""DOSE"".""FULLNAME"" ), ', '::text) AS ""VACCINES"", " +
                                             @" ""VACCINATION_DATE"", ""HEALTH_FACILITY"".""NAME"" as ""HEALTH_FACILITY"", ""VACCINATION_STATUS"" As ""DONE"" " +
                                             @" from ""VACCINATION_EVENT"" v inner join ""HEALTH_FACILITY"" on v.""HEALTH_FACILITY_ID"" = ""HEALTH_FACILITY"".""ID"" " +
                                             @"  inner join ""VACCINATION_APPOINTMENT"" vap on v.""APPOINTMENT_ID"" = vap.""ID"" " +
@@ -189,7 +189,7 @@ namespace GIIS.DataLayer
             try
             {
                 string query = string.Format(@"Select v.""APPOINTMENT_ID"",  array_to_string(ARRAY( SELECT ""DOSE"".""FULLNAME"" FROM  ""VACCINATION_EVENT"" VE INNER JOIN ""DOSE"" ON VE.""DOSE_ID"" = ""DOSE"".""ID""  " +
-                                            @" WHERE VE.""CHILD_ID"" = {0} AND  v.""APPOINTMENT_ID"" = VE.""APPOINTMENT_ID"" ), ', '::text) AS ""VACCINES"", " +
+                                            @" WHERE VE.""CHILD_ID"" = {0} AND  v.""APPOINTMENT_ID"" = VE.""APPOINTMENT_ID""  ORDER BY ""DOSE"".""FULLNAME"" ), ', '::text) AS ""VACCINES"", " +
                                             @" ""VACCINATION_DATE"", ""HEALTH_FACILITY"".""NAME"" as ""HEALTH_FACILITY"", ""VACCINATION_STATUS"" As ""DONE"", ""AEFI"", ""AEFI_DATE"", vap.""NOTES"" " +
                                             @" from ""VACCINATION_EVENT"" v inner join ""HEALTH_FACILITY"" on v.""HEALTH_FACILITY_ID"" = ""HEALTH_FACILITY"".""ID"" " +
                                             @"  inner join ""VACCINATION_APPOINTMENT"" vap on v.""APPOINTMENT_ID"" = vap.""ID"" " +
@@ -306,7 +306,7 @@ namespace GIIS.DataLayer
                                                                 @"INNER JOIN ""DOSE"" ""DOSE_1"" ON ""VACCINATION_EVENT"".""DOSE_ID"" = ""DOSE_1"".""ID"" left join ""AGE_DEFINITIONS"" on ""DOSE_1"".""TO_AGE_DEFINITION_ID"" = ""AGE_DEFINITIONS"".""ID"" " +
 		                                                        @" WHERE  monthly_plan.""ID"" = ""VACCINATION_EVENT"".""CHILD_ID"" AND monthly_plan.""APPOINTMENT_ID"" = ""VACCINATION_EVENT"".""APPOINTMENT_ID"" " + 
 		                                                        @" AND ""VACCINATION_EVENT"".""SCHEDULED_DATE"" <= '{1}' AND ""VACCINATION_EVENT"".""IS_ACTIVE"" = true " +
-                                                                @" AND ""VACCINATION_EVENT"".""VACCINATION_STATUS"" = false AND (""VACCINATION_EVENT"".""NONVACCINATION_REASON_ID"" = 0 OR ""NONVACCINATION_REASON_ID"" in (Select ""ID"" from ""NONVACCINATION_REASON"" where ""KEEP_CHILD_DUE"" = true)) and (""DAYS"" is null  or  (""VACCINATION_EVENT"".""SCHEDULED_DATE""  + interval  '1' day * ""DAYS"" > 'now'::text::date)) ), ', '::text) AS ""VACCINES"", " +
+                                                                @" AND ""VACCINATION_EVENT"".""VACCINATION_STATUS"" = false AND (""VACCINATION_EVENT"".""NONVACCINATION_REASON_ID"" = 0 OR ""NONVACCINATION_REASON_ID"" in (Select ""ID"" from ""NONVACCINATION_REASON"" where ""KEEP_CHILD_DUE"" = true)) and (""DAYS"" is null  or  (""VACCINATION_EVENT"".""SCHEDULED_DATE""  + interval  '1' day * ""DAYS"" > 'now'::text::date)) ORDER BY ""DOSE_1"".""FULLNAME""  ), ', '::text) AS ""VACCINES"", " +
                                                   @" ""SCHEDULE"", ""SCHEDULED_DATE"", ""DOMICILE"" " +
                                                   @" FROM monthly_plan join ""DOSE"" on ""DOSE_ID"" = ""DOSE"".""ID"" " +
                                                   @" WHERE  ""HEALTH_FACILITY_ID"" = {0} AND ""SCHEDULED_DATE"" <= '{1}' " +
@@ -417,7 +417,7 @@ namespace GIIS.DataLayer
                                              @" ""VACCINATION_EVENT"" INNER JOIN ""DOSE"" ON ""VACCINATION_EVENT"".""DOSE_ID"" = ""DOSE"".""ID"" left join ""AGE_DEFINITIONS"" on ""DOSE"".""TO_AGE_DEFINITION_ID"" = ""AGE_DEFINITIONS"".""ID"" " +
                                              @"  WHERE ""CHILD_ID"" = {0} AND  v.""APPOINTMENT_ID"" = ""VACCINATION_EVENT"".""APPOINTMENT_ID""  " +
                                              @" AND (""VACCINATION_EVENT"".""SCHEDULED_DATE"" <= 'now' OR ""VACCINATION_EVENT"".""SCHEDULED_DATE"" <= ('now'::text::date + '2 mon'::interval)) AND ""VACCINATION_EVENT"".""IS_ACTIVE"" = true " +
-                                             @" AND ""VACCINATION_EVENT"".""VACCINATION_STATUS"" = false AND ""VACCINATION_EVENT"".""NONVACCINATION_REASON_ID"" = 0 and (""DAYS"" is null  or  (""VACCINATION_EVENT"".""SCHEDULED_DATE""  + interval  '1' day * ""DAYS"" > 'now'::text::date)) ), ', '::text) AS ""VACCINES"", " +
+                                             @" AND ""VACCINATION_EVENT"".""VACCINATION_STATUS"" = false AND ""VACCINATION_EVENT"".""NONVACCINATION_REASON_ID"" = 0 and (""DAYS"" is null  or  (""VACCINATION_EVENT"".""SCHEDULED_DATE""  + interval  '1' day * ""DAYS"" > 'now'::text::date))  ORDER BY ""DOSE"".""FULLNAME"" ), ', '::text) AS ""VACCINES"", " +
                                              @" v.""SCHEDULED_DATE"" " +
                                              @" FROM ""VACCINATION_EVENT"" v " +
                                              @" WHERE v.""CHILD_ID"" = {0} AND (v.""SCHEDULED_DATE"" >= 'now' or v.""SCHEDULED_DATE"" < 'now')  AND v.""IS_ACTIVE"" = true AND  v.""VACCINATION_STATUS"" = false AND v.""NONVACCINATION_REASON_ID"" = 0 " +
@@ -445,7 +445,7 @@ namespace GIIS.DataLayer
                                              @" ""VACCINATION_EVENT"" INNER JOIN ""DOSE"" ON ""VACCINATION_EVENT"".""DOSE_ID"" = ""DOSE"".""ID"" left join ""AGE_DEFINITIONS"" on ""DOSE"".""TO_AGE_DEFINITION_ID"" = ""AGE_DEFINITIONS"".""ID"" " +
                                              @"  WHERE ""CHILD_ID"" = {0} AND  v.""APPOINTMENT_ID"" = ""VACCINATION_EVENT"".""APPOINTMENT_ID""  " +
                                              @" AND (""VACCINATION_EVENT"".""SCHEDULED_DATE"" <= 'now' OR ""VACCINATION_EVENT"".""SCHEDULED_DATE"" <= ('now'::text::date + '2 mon'::interval)) AND ""VACCINATION_EVENT"".""IS_ACTIVE"" = true " +
-                                             @" AND ""VACCINATION_EVENT"".""VACCINATION_STATUS"" = false AND (""VACCINATION_EVENT"".""NONVACCINATION_REASON_ID"" = 0  OR ""NONVACCINATION_REASON_ID"" in (Select ""ID"" from ""NONVACCINATION_REASON"" where ""KEEP_CHILD_DUE"" = true)) and (""DAYS"" is null  or  (""VACCINATION_EVENT"".""SCHEDULED_DATE""  + interval  '1' day * ""DAYS"" > 'now'::text::date)) ), ', '::text) AS ""VACCINES"", " +
+                                             @" AND ""VACCINATION_EVENT"".""VACCINATION_STATUS"" = false AND (""VACCINATION_EVENT"".""NONVACCINATION_REASON_ID"" = 0  OR ""NONVACCINATION_REASON_ID"" in (Select ""ID"" from ""NONVACCINATION_REASON"" where ""KEEP_CHILD_DUE"" = true)) and (""DAYS"" is null  or  (""VACCINATION_EVENT"".""SCHEDULED_DATE""  + interval  '1' day * ""DAYS"" > 'now'::text::date))  ORDER BY ""DOSE"".""FULLNAME"" ), ', '::text) AS ""VACCINES"", " +
                                              @" a.""NAME"" as ""SCHEDULE"", v.""SCHEDULED_DATE"" " +
                                              @" FROM ""VACCINATION_EVENT"" v " +
                                              @" INNER JOIN ""DOSE"" on v.""DOSE_ID"" = ""DOSE"".""ID"" " +
@@ -477,7 +477,7 @@ namespace GIIS.DataLayer
                                              @" ""VACCINATION_EVENT"" INNER JOIN ""DOSE"" ON ""VACCINATION_EVENT"".""DOSE_ID"" = ""DOSE"".""ID"" " +
                                              @"  WHERE ""CHILD_ID"" = {0} AND  v.""APPOINTMENT_ID"" = ""VACCINATION_EVENT"".""APPOINTMENT_ID""  " +
                                              @" AND (""VACCINATION_EVENT"".""SCHEDULED_DATE"" <= @ScheduledDate OR ""VACCINATION_EVENT"".""SCHEDULED_DATE"" <= (@ScheduledDate::text::date + '{1} day'::interval)) AND ""VACCINATION_EVENT"".""IS_ACTIVE"" = true " +
-                                             @" AND ""VACCINATION_EVENT"".""VACCINATION_STATUS"" = false AND ""VACCINATION_EVENT"".""NONVACCINATION_REASON_ID"" = 0 ), ', '::text) AS ""VACCINES"", " +
+                                             @" AND ""VACCINATION_EVENT"".""VACCINATION_STATUS"" = false AND ""VACCINATION_EVENT"".""NONVACCINATION_REASON_ID"" = 0  ORDER BY ""DOSE"".""FULLNAME""), ', '::text) AS ""VACCINES"", " +
                                              @" a.""NAME"" as ""SCHEDULE"", v.""SCHEDULED_DATE"" " +
                                              @" FROM ""VACCINATION_EVENT"" v " +
                                              @" INNER JOIN ""DOSE"" on v.""DOSE_ID"" = ""DOSE"".""ID"" " +
@@ -512,7 +512,7 @@ namespace GIIS.DataLayer
                                                @" array_to_string(ARRAY( SELECT ""DOSE"".""FULLNAME"" " +
                                                @" FROM ""VACCINATION_EVENT"" INNER JOIN ""DOSE"" ON ""VACCINATION_EVENT"".""DOSE_ID"" = ""DOSE"".""ID"" " +
                                                @" WHERE  monthly_plan.""ID"" = ""VACCINATION_EVENT"".""CHILD_ID"" AND ""VACCINATION_EVENT"".""SCHEDULED_DATE"" <= ('now'::text::date - '{0} day'::interval)  AND ""VACCINATION_EVENT"".""IS_ACTIVE"" = true " +
-                                               @" AND ""VACCINATION_EVENT"".""VACCINATION_STATUS"" = false AND ""VACCINATION_EVENT"".""NONVACCINATION_REASON_ID"" = 0 ORDER BY ""SCHEDULED_DATE"" ), ', '::text) AS ""VACCINES"", " +
+                                               @" AND ""VACCINATION_EVENT"".""VACCINATION_STATUS"" = false AND ""VACCINATION_EVENT"".""NONVACCINATION_REASON_ID"" = 0 ORDER BY ""SCHEDULED_DATE"", ""DOSE"".""FULLNAME"" ), ', '::text) AS ""VACCINES"", " +
                                                @" ""SCHEDULED_DATE"" " +
                                                @" FROM monthly_plan " +
                                                @" WHERE ""SCHEDULED_DATE"" <= ('now'::text::date - '{0} day'::interval) " +
@@ -561,7 +561,7 @@ namespace GIIS.DataLayer
                                                 @" array_to_string(ARRAY( SELECT ""DOSE"".""FULLNAME"" " +
                                                 @" FROM ""VACCINATION_EVENT""  INNER JOIN ""DOSE"" ON ""VACCINATION_EVENT"".""DOSE_ID"" = ""DOSE"".""ID"" left join ""AGE_DEFINITIONS"" on ""DOSE"".""TO_AGE_DEFINITION_ID"" = ""AGE_DEFINITIONS"".""ID"" " +
                                                 @" WHERE monthly_plan.""ID"" = ""VACCINATION_EVENT"".""CHILD_ID"" AND ""VACCINATION_EVENT"".""SCHEDULED_DATE"" <= ('now'::text::date - '{1} day'::interval)  AND ""VACCINATION_EVENT"".""IS_ACTIVE"" = true " +
-                                                @" AND ""VACCINATION_EVENT"".""VACCINATION_STATUS"" = false AND ""VACCINATION_EVENT"".""NONVACCINATION_REASON_ID"" = 0 and (""DAYS"" is null  or  (""VACCINATION_EVENT"".""SCHEDULED_DATE""  + interval  '1' day * ""DAYS"" > 'now'::text::date)) ORDER BY ""SCHEDULED_DATE"" ), ', '::text) AS ""VACCINES"", " +
+                                                @" AND ""VACCINATION_EVENT"".""VACCINATION_STATUS"" = false AND ""VACCINATION_EVENT"".""NONVACCINATION_REASON_ID"" = 0 and (""DAYS"" is null  or  (""VACCINATION_EVENT"".""SCHEDULED_DATE""  + interval  '1' day * ""DAYS"" > 'now'::text::date)) ORDER BY ""SCHEDULED_DATE"",""DOSE"".""FULLNAME"" ), ', '::text) AS ""VACCINES"", " +
                                                 @" ""SCHEDULED_DATE"",""DOMICILE"", ""DOMICILE_ID"" " +
                                                 @" FROM monthly_plan join ""DOSE"" on ""DOSE_ID"" = ""DOSE"".""ID"" " +
                                                 @" WHERE ""HEALTH_FACILITY_ID"" in ({0}) AND ""SCHEDULED_DATE"" <= ('now'::text::date - '{1} day'::interval) " +
@@ -573,7 +573,7 @@ namespace GIIS.DataLayer
                                                 @" array_to_string(ARRAY( SELECT ""DOSE"".""FULLNAME"" " +
                                                 @" FROM ""VACCINATION_EVENT"" INNER JOIN ""DOSE"" ON ""VACCINATION_EVENT"".""DOSE_ID"" = ""DOSE"".""ID"" left join ""AGE_DEFINITIONS"" on ""DOSE"".""TO_AGE_DEFINITION_ID"" = ""AGE_DEFINITIONS"".""ID"" " +
                                                 @" WHERE  monthly_plan.""ID"" = ""VACCINATION_EVENT"".""CHILD_ID"" AND ""VACCINATION_EVENT"".""SCHEDULED_DATE"" <= ('now'::text::date - '{2} day'::interval)  AND ""VACCINATION_EVENT"".""IS_ACTIVE"" = true " +
-                                                @" AND ""VACCINATION_EVENT"".""VACCINATION_STATUS"" = false AND ""VACCINATION_EVENT"".""NONVACCINATION_REASON_ID"" = 0 and (""DAYS"" is null  or  (""VACCINATION_EVENT"".""SCHEDULED_DATE""  + interval  '1' day * ""DAYS"" > 'now'::text::date)) ORDER BY ""SCHEDULED_DATE"" ), ', '::text) AS ""VACCINES"", " +
+                                                @" AND ""VACCINATION_EVENT"".""VACCINATION_STATUS"" = false AND ""VACCINATION_EVENT"".""NONVACCINATION_REASON_ID"" = 0 and (""DAYS"" is null  or  (""VACCINATION_EVENT"".""SCHEDULED_DATE""  + interval  '1' day * ""DAYS"" > 'now'::text::date)) ORDER BY ""SCHEDULED_DATE"", ""DOSE"".""FULLNAME"" ), ', '::text) AS ""VACCINES"", " +
                                                 @" ""SCHEDULED_DATE"",""DOMICILE"", ""DOMICILE_ID"" " +
                                                 @" FROM monthly_plan join ""DOSE"" on ""DOSE_ID"" = ""DOSE"".""ID"" " +
                                                 @" WHERE ""HEALTH_FACILITY_ID"" in ({0}) AND ""DOMICILE_ID"" = {1} AND ""SCHEDULED_DATE"" <= ('now'::text::date - '{2} day'::interval) " +

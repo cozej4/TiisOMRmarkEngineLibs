@@ -13,7 +13,7 @@ namespace GIIS.DataLayer
        {
            try
            {
-               string query = @"SELECT -1 as ""ID"", '-----' as ""CODE"" UNION SELECT ""ID"", ""CODE"" FROM ""SCHEDULED_VACCINATION"" WHERE ""IS_ACTIVE"" = 'true' ORDER BY ""CODE"" ";
+               string query = @"SELECT -1 as ""ID"", '-----' as ""CODE"" UNION SELECT ""ID"", ""CODE"" FROM ""SCHEDULED_VACCINATION"" ORDER BY ""CODE"" ";
                DataTable dt = DBManager.ExecuteReaderCommand(query, CommandType.Text, null);
                return dt;
            }
