@@ -668,12 +668,7 @@ public partial class _Child : System.Web.UI.Page
                     o.IdentificationNo3 = txtIdentificationNo3.Text;
                 if (!String.IsNullOrEmpty(txtBarcodeId.Text))
                 {
-                    //if (!o.BarcodeId.Equals(txtBarcodeId.Text.Trim())
-                    //{
-                    //    // This child already has a barcode are you sure you want to assign another one
-                    //}
                     o.BarcodeId = txtBarcodeId.Text.Trim();
-
                     if (Child.GetChildByBarcode(o.BarcodeId) != null && Child.GetChildByBarcode(o.BarcodeId).Id != id)
                     {
                         lblWarningBarcode.Visible = true;

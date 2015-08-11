@@ -153,7 +153,7 @@ new NpgsqlParameter("@ParamValue", DbType.Int32) { Value = itemId }
         {
             try
             {
-                string query = @"SELECT * FROM ""ITEM_KIT"" WHERE ""PARENT_GTIN"" = @ParamValue ORDER BY ""CHILD_GTIN"";";
+                string query = @"SELECT ""ITEM_MANUFACTURER"".* FROM ""ITEM_MANUFACTURER"" join ""ITEM_KIT"" on ""ITEM_MANUFACTURER"".""GTIN"" = ""ITEM_KIT"".""CHILD_GTIN"" WHERE ""PARENT_GTIN"" = @ParamValue ORDER BY ""GTIN"";";
                 List<NpgsqlParameter> parameters = new List<NpgsqlParameter>()
                 {
                 new NpgsqlParameter("@ParamValue", DbType.String) { Value = s }
