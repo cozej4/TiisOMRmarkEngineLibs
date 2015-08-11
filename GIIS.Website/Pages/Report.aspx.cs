@@ -38,7 +38,7 @@ public partial class _Report : System.Web.UI.Page
                 }
 
                 //controls
-                //this.lblTitle.Text = wtList["ReportsPageTitle"];
+                this.lblTitle.Text = wtList["ReportsPageTitle"];
 
                 //this.lblImmunizationReports.Text = wtList["ReportsImmunization"];
                 //this.mCohortCoverageReport.InnerText = wtList["ReportsCohortCoverage"];

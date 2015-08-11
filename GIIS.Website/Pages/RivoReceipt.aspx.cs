@@ -37,6 +37,8 @@ public partial class Pages_Adjustment : System.Web.UI.Page
                     HttpContext.Current.Cache.Insert("ItemTransaction-dictionary" + language, wtList);
                 }
 
+                lblTitle.Text = wtList["RivoReceiptsTitle"];
+
                 //controls
                 lblHealthFacilityId.Text = wtList["ItemTransactionHealthFacility"];
                 lblItemCategoryId.Text = wtList["ItemTransactionItemCategory"];
@@ -71,7 +73,6 @@ public partial class Pages_Adjustment : System.Web.UI.Page
                 this.lblError.Text = wtList["ItemTransactionErrorText"];
 
                 //Page Title
-                this.lblTitle.Text = wtList["ReportWastedItemsPageTitle"];
 
                 //validators
                 cvAdjustment.ErrorMessage = wtList["ItemTransactionMandatory"];
