@@ -45,6 +45,7 @@ namespace GIIS.BusinessLogic
                     {
                         VaccinationEvent.UpdateIsActive(vid, false);
                         VaccinationEvent.UpdateEvent(vid, ve.ScheduledDate.AddDays(daysdiff));
+                      
                     }
                     else
                     {
@@ -59,10 +60,11 @@ namespace GIIS.BusinessLogic
                             {
                                 if (v.VaccinationStatus || v.NonvaccinationReasonId != 0)
                                 {
-                                    if (ve.VaccinationDate < v.VaccinationDate)
+                                    if (ve.VaccinationDate > v.VaccinationDate)
                                     {
-                                        VaccinationEvent nv = VaccinationEvent.GetVaccinationEventById(VaccinationEvent.NextDose(ve.Dose.ScheduledVaccinationId, ve.ChildId, dosenum));
+                                        VaccinationEvent nv = VaccinationEvent.GetVaccinationEventById(VaccinationEvent.NextDose(v.Dose.ScheduledVaccinationId, v.ChildId, dosenum));
                                         VaccinationEvent vn = VaccinationEvent.GetVaccinationEventById(vid);
+                                        if (!nv.VaccinationStatus)
                                         VaccinationEvent.UpdateEvent(nv.Id, vn.ScheduledDate);
                                     }
 
