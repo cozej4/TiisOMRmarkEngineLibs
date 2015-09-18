@@ -63,10 +63,10 @@ public partial class UserControls_LogIn : System.Web.UI.UserControl
     {
         Session["__language"] = ddlLanguage.SelectedValue;
     }
-    protected void btnForgotPassword_Click(object sender, EventArgs e)
-    {
-        string url = string.Format("ResetUserPassword.aspx");
-        Response.Redirect(url, false);
-        Context.ApplicationInstance.CompleteRequest();
-    }
+    //protected void btnForgotPassword_Click(object sender, EventArgs e)
+    //{
+    //    string url = string.Format("ResetUserPassword.aspx");
+    //    Response.Redirect(url, false);
+    //    Context.ApplicationInstance.CompleteRequest();
+    //}
 }

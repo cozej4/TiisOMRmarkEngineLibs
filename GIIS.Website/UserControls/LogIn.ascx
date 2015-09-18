@@ -71,12 +71,12 @@
         <div class="row">
                <div class="col-md-1 col-xs-1 col-sm-1 col-lg-1 clearfix">
             </div>
-            <div class="col-md-4 col-xs-4 col-sm-4 col-lg-4 clearfix">
+            <div class="col-md-10 col-xs-10 col-sm-10 col-lg-10 clearfix">
                 <asp:Button ID="btnLogIn" runat="server" Text="Log In" CssClass="btn btn-block btn-sm btn-primary" ValidationGroup="login" OnClick="LoginButton_Click" />
             </div>
          
             <div class="col-md-6 col-xs-6 col-sm-6 col-lg-6 clearfix">
-                <asp:Button ID="btnForgotPassword" runat="server" Text="Forgot Password" CssClass="btn btn-block btn-sm btn-info" OnClick="btnForgotPassword_Click" />
+               <%-- <asp:Button ID="btnForgotPassword" runat="server" Text="Forgot Password" CssClass="btn btn-block btn-sm btn-info" OnClick="btnForgotPassword_Click" />--%>
 
             </div>
                <div class="col-md-1 col-xs-1 col-sm-1 col-lg-1 clearfix">
