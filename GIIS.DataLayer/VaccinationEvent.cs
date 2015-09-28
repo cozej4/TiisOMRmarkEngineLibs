@@ -25,6 +25,7 @@ namespace GIIS.DataLayer
         public bool IsActive { get; set; }
         public DateTime ModifiedOn { get; set; }
         public Int32 ModifiedBy { get; set; }
+        public DateTime Timestamp { get; set; }
         public VaccinationAppointment Appointment
         {
             get
@@ -152,7 +153,7 @@ new NpgsqlParameter("@ParamValue", DbType.Int32) { Value = i }
         {
             try
             {
-                string query = @"INSERT INTO ""VACCINATION_EVENT"" (""APPOINTMENT_ID"", ""CHILD_ID"", ""DOSE_ID"", ""VACCINE_LOT_ID"", ""VACCINE_LOT_TEXT"", ""HEALTH_FACILITY_ID"", ""SCHEDULED_DATE"", ""VACCINATION_DATE"", ""NOTES"", ""VACCINATION_STATUS"", ""NONVACCINATION_REASON_ID"", ""IS_ACTIVE"", ""MODIFIED_ON"", ""MODIFIED_BY"") VALUES (@AppointmentId, @ChildId, @DoseId, @VaccineLotId, @VaccineLotText, @HealthFacilityId, @ScheduledDate, @VaccinationDate, @Notes, @VaccinationStatus, @NonvaccinationReasonId, @IsActive, @ModifiedOn, @ModifiedBy) returning ""ID"" ";
+                string query = @"INSERT INTO ""VACCINATION_EVENT"" (""APPOINTMENT_ID"", ""CHILD_ID"", ""DOSE_ID"", ""VACCINE_LOT_ID"", ""VACCINE_LOT_TEXT"", ""HEALTH_FACILITY_ID"", ""SCHEDULED_DATE"", ""VACCINATION_DATE"", ""NOTES"", ""VACCINATION_STATUS"", ""NONVACCINATION_REASON_ID"", ""IS_ACTIVE"", ""MODIFIED_ON"", ""MODIFIED_BY"", ""MODIFIEDON"") VALUES (@AppointmentId, @ChildId, @DoseId, @VaccineLotId, @VaccineLotText, @HealthFacilityId, @ScheduledDate, @VaccinationDate, @Notes, @VaccinationStatus, @NonvaccinationReasonId, @IsActive, @ModifiedOn, @ModifiedBy,@ModifiedOn) returning ""ID"" ";
                 List<Npgsql.NpgsqlParameter> parameters = new List<NpgsqlParameter>()
 {
 new NpgsqlParameter("@AppointmentId", DbType.Int32)  { Value = o.AppointmentId },
@@ -184,7 +185,7 @@ new NpgsqlParameter("@ModifiedBy", DbType.Int32)  { Value = o.ModifiedBy }};
         {
             try
             {
-                string query = @"UPDATE ""VACCINATION_EVENT"" SET ""ID"" = @Id, ""APPOINTMENT_ID"" = @AppointmentId, ""CHILD_ID"" = @ChildId, ""DOSE_ID"" = @DoseId, ""VACCINE_LOT_ID"" = @VaccineLotId, ""VACCINE_LOT_TEXT"" = @VaccineLotText, ""HEALTH_FACILITY_ID"" = @HealthFacilityId, ""SCHEDULED_DATE"" = @ScheduledDate, ""VACCINATION_DATE"" = @VaccinationDate, ""NOTES"" = @Notes, ""VACCINATION_STATUS"" = @VaccinationStatus, ""NONVACCINATION_REASON_ID"" = @NonvaccinationReasonId, ""IS_ACTIVE"" = @IsActive, ""MODIFIED_ON"" = @ModifiedOn, ""MODIFIED_BY"" = @ModifiedBy WHERE ""ID"" = @Id ";
+                string query = @"UPDATE ""VACCINATION_EVENT"" SET ""ID"" = @Id, ""APPOINTMENT_ID"" = @AppointmentId, ""CHILD_ID"" = @ChildId, ""DOSE_ID"" = @DoseId, ""VACCINE_LOT_ID"" = @VaccineLotId, ""VACCINE_LOT_TEXT"" = @VaccineLotText, ""HEALTH_FACILITY_ID"" = @HealthFacilityId, ""SCHEDULED_DATE"" = @ScheduledDate, ""VACCINATION_DATE"" = @VaccinationDate, ""NOTES"" = @Notes, ""VACCINATION_STATUS"" = @VaccinationStatus, ""NONVACCINATION_REASON_ID"" = @NonvaccinationReasonId, ""IS_ACTIVE"" = @IsActive, ""MODIFIED_ON"" = @ModifiedOn, ""MODIFIED_BY"" = @ModifiedBy, ""MODIFIEDON"" = @ModifiedOn WHERE ""ID"" = @Id ";
                 List<Npgsql.NpgsqlParameter> parameters = new List<NpgsqlParameter>()
 {
 new NpgsqlParameter("@AppointmentId", DbType.Int32)  { Value = o.AppointmentId },
@@ -278,6 +279,7 @@ new NpgsqlParameter("@Id", DbType.Int32) { Value = id }
                     o.IsActive = Helper.ConvertToBoolean(row["IS_ACTIVE"]);
                     o.ModifiedOn = Helper.ConvertToDate(row["MODIFIED_ON"]);
                     o.ModifiedBy = Helper.ConvertToInt(row["MODIFIED_BY"]);
+                    o.Timestamp = Helper.ConvertToDate(row["MODIFIEDON"]);
                     return o;
                 }
                 catch (Exception ex)
@@ -312,6 +314,7 @@ new NpgsqlParameter("@Id", DbType.Int32) { Value = id }
                     o.IsActive = Helper.ConvertToBoolean(row["IS_ACTIVE"]);
                     o.ModifiedOn = Helper.ConvertToDate(row["MODIFIED_ON"]);
                     o.ModifiedBy = Helper.ConvertToInt(row["MODIFIED_BY"]);
+                    o.Timestamp = Helper.ConvertToDate(row["MODIFIEDON"]);
                     oList.Add(o);
                 }
                 catch (Exception ex)

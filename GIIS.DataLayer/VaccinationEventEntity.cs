@@ -225,7 +225,7 @@ namespace GIIS.DataLayer
         {
             try
             {
-                string query = @"UPDATE ""VACCINATION_EVENT"" SET ""HEALTH_FACILITY_ID"" = " + healthcenterId + @" WHERE ""APPOINTMENT_ID"" = " + appId;
+                string query = @"UPDATE ""VACCINATION_EVENT"" SET ""HEALTH_FACILITY_ID"" = " + healthcenterId + @", ""MODIFIED_ON"" = " + DateTime.Now + @", ""MODIFIEDON"" = " + DateTime.Now + @" WHERE ""APPOINTMENT_ID"" = " + appId;
                 int rowAffected = DBManager.ExecuteNonQueryCommand(query, CommandType.Text, null);
                 return rowAffected;
             }
@@ -239,7 +239,9 @@ namespace GIIS.DataLayer
         {
             try
             {
-                string query = @"UPDATE ""VACCINATION_EVENT"" SET ""SCHEDULED_DATE"" = '" + date.ToString("yyyy-MM-dd") + @"', ""VACCINATION_DATE"" = '" + date.ToString("yyyy-MM-dd") + @"' WHERE ""APPOINTMENT_ID"" = " + appId;
+               // string query = @"UPDATE ""VACCINATION_EVENT"" SET ""SCHEDULED_DATE"" = '" + date.ToString("yyyy-MM-dd") + @"', ""VACCINATION_DATE"" = '" + date.ToString("yyyy-MM-dd") + @"', ""MODIFIED_ON"" = '" + DateTime.Now + @"', ""MODIFIEDON"" = '" + DateTime.Now + @"' WHERE ""APPOINTMENT_ID"" = " + appId;
+                string query = @"UPDATE ""VACCINATION_EVENT"" SET ""SCHEDULED_DATE"" = '" + date.ToString("yyyy-MM-dd") + @"', ""VACCINATION_DATE"" = '" + date.ToString("yyyy-MM-dd") + @"', ""MODIFIED_ON"" = now(), ""MODIFIEDON"" = now() WHERE ""APPOINTMENT_ID"" = " + appId;
+
                 int rowAffected = DBManager.ExecuteNonQueryCommand(query, CommandType.Text, null);
                 return rowAffected;
             }
@@ -253,7 +255,7 @@ namespace GIIS.DataLayer
         {
             try
             {
-                string query = @"UPDATE ""VACCINATION_EVENT"" SET ""SCHEDULED_DATE"" = '" + date.ToString("yyyy-MM-dd") + @"', ""VACCINATION_DATE"" = '" + date.ToString("yyyy-MM-dd") + @"' WHERE ""ID"" = " + vId;
+                string query = @"UPDATE ""VACCINATION_EVENT"" SET ""SCHEDULED_DATE"" = '" + date.ToString("yyyy-MM-dd") + @"', ""VACCINATION_DATE"" = '" + date.ToString("yyyy-MM-dd") + @"', ""MODIFIED_ON"" = now(), ""MODIFIEDON"" = now() WHERE ""ID"" = " + vId;
                 int rowAffected = DBManager.ExecuteNonQueryCommand(query, CommandType.Text, null);
                 return rowAffected;
             }
