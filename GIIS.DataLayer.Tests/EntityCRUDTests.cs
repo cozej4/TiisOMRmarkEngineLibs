@@ -1,4 +1,5 @@
-﻿using System;
+﻿//Sample license text.
+using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GIIS.DataLayer;
 using Npgsql;
