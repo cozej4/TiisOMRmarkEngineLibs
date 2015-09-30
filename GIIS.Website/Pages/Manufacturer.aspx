@@ -63,7 +63,7 @@
         <div class="col-md-1 col-xs-1 col-sm-1 col-lg-1 clearfix"></div>
         <div class="col-md-2 col-xs-2 col-sm-2 col-lg-2 clearfix">
             <asp:Label ID="lblCode" runat="server" Text="Code" />
-            <%--  <span style="color: Red">*</span>--%>
+              <span style="color: Red">*</span>
         </div>
         <div class="col-md-3 col-xs-3 col-sm-3 col-lg-3 clearfix">
             <div class="form-group">
@@ -71,6 +71,7 @@
             </div>
         </div>
         <div class="col-md-5 col-xs-5 col-sm-5 col-lg-5 clearfix">
+              <asp:RequiredFieldValidator ID="rfvCode" runat="server" ErrorMessage="This field must be filled!" ControlToValidate="txtCode" ValidationGroup="saveManufacturer" Display="Dynamic" CssClass="label label-warning" Font-Size="Small" ForeColor="White" />
             <asp:RegularExpressionValidator ID="revCode" runat="server"
                 ErrorMessage=" Code should be 3 characters long and should not contain numbers!"
                 ControlToValidate="txtCode" Display="Dynamic" CssClass="label label-danger" Font-Size="Small" ForeColor="White"

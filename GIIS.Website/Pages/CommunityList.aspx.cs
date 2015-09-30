@@ -127,9 +127,9 @@ public partial class _CommunityList : System.Web.UI.Page
 
     protected void btnExcel_Click(object sender, EventArgs e)
     {
-        if (Session["PlaceList-Name"] != null)
+        if (Session["CommunityList-Name"] != null)
         {
-            string name = Session["PlaceList-Name"].ToString();
+            string name = Session["CommunityList-Name"].ToString();
             if (!string.IsNullOrEmpty(name))
             {
                 int maximumRows = int.MaxValue;

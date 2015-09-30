@@ -40,7 +40,7 @@ namespace GIIS.DataLayer
         public bool IsActive { get; set; }
         public DateTime ModifiedOn { get; set; }
         public Int32 ModifiedBy { get; set; }
-        public DateTime Timestamp { get; set; }
+       // public DateTime Timestamp { get; set; }
         public VaccinationAppointment Appointment
         {
             get
@@ -294,7 +294,7 @@ new NpgsqlParameter("@Id", DbType.Int32) { Value = id }
                     o.IsActive = Helper.ConvertToBoolean(row["IS_ACTIVE"]);
                     o.ModifiedOn = Helper.ConvertToDate(row["MODIFIED_ON"]);
                     o.ModifiedBy = Helper.ConvertToInt(row["MODIFIED_BY"]);
-                    o.Timestamp = Helper.ConvertToDate(row["MODIFIEDON"]);
+                   // o.Timestamp = Helper.ConvertToDate(row["MODIFIEDON"]);
                     return o;
                 }
                 catch (Exception ex)
@@ -329,7 +329,7 @@ new NpgsqlParameter("@Id", DbType.Int32) { Value = id }
                     o.IsActive = Helper.ConvertToBoolean(row["IS_ACTIVE"]);
                     o.ModifiedOn = Helper.ConvertToDate(row["MODIFIED_ON"]);
                     o.ModifiedBy = Helper.ConvertToInt(row["MODIFIED_BY"]);
-                    o.Timestamp = Helper.ConvertToDate(row["MODIFIEDON"]);
+                    //o.Timestamp = Helper.ConvertToDate(row["MODIFIEDON"]);
                     oList.Add(o);
                 }
                 catch (Exception ex)

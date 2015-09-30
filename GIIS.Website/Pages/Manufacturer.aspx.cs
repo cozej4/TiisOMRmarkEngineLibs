@@ -136,8 +136,10 @@ public partial class _Manufacturer : System.Web.UI.Page
                 int userId = CurrentEnvironment.LoggedUser.Id;
                 if (nameExists(txtName.Text.Replace("'", @"''")))
                     return;
-                if (codeExists(txtCode.Text.Replace("'", @"''")))
-                    return;
+
+                if (!String.IsNullOrEmpty(txtCode.Text))
+                    if (codeExists(txtCode.Text.Replace("'", @"''")))
+                        return;
                 Manufacturer o = new Manufacturer();
 
                 o.Name = txtName.Text.Replace("'", @"''");

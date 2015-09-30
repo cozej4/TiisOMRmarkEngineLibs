@@ -304,7 +304,7 @@ public partial class _AdjustmentReason : System.Web.UI.Page
             Response.ContentType = "application/ms-excel";
             System.IO.StringWriter stringWrite = new System.IO.StringWriter();
             System.Web.UI.HtmlTextWriter htmlWrite = new HtmlTextWriter(stringWrite);
-            gvExport.RenderControl(htmlWrite);
+            gvAdjustmentReason.RenderControl(htmlWrite);
             Response.Write(stringWrite.ToString());
             Response.End();
 

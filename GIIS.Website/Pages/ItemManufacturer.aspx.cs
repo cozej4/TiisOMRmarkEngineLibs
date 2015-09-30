@@ -12,7 +12,7 @@
 //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
- //******************************************************************************
+//******************************************************************************
 using GIIS.DataLayer;
 using System;
 using System.Collections.Generic;
@@ -114,9 +114,10 @@ public partial class Pages_ItemManufacturer : System.Web.UI.Page
                     txtPrice.Text = o.Price.ToString();
                     ddlAlt1UOM.SelectedValue = o.Alt1Uom;
                     txtAlt1Qty.Text = o.Alt1QtyPer.ToString();
-                    if(!string.IsNullOrEmpty(o.Alt2Uom))
-                    {ddlAlt2UOM.SelectedValue = o.Alt2Uom;
-                    txtAlt2Qty.Text = o.Alt2QtyPer.ToString();
+                    if (!string.IsNullOrEmpty(o.Alt2Uom))
+                    {
+                        ddlAlt2UOM.SelectedValue = o.Alt2Uom;
+                        txtAlt2Qty.Text = o.Alt2QtyPer.ToString();
                     }
                     rblIsActive.SelectedValue = o.IsActive.ToString();
                     txtStorageSpace.Text = o.StorageSpace.ToString();
@@ -147,7 +148,7 @@ public partial class Pages_ItemManufacturer : System.Web.UI.Page
             if (Page.IsValid)
             {
                 int i = 0;
-
+                Boolean insert = false;
                 string gtin = Request.QueryString["gtin"];
                 if (!String.IsNullOrEmpty(gtin))
                 {
@@ -169,7 +170,7 @@ public partial class Pages_ItemManufacturer : System.Web.UI.Page
                     {
                         // Set kit items to the list
                         o.KitItems.Clear();
-                        foreach(var idx in ddlGTINParent.GetSelectedIndices())
+                        foreach (var idx in ddlGTINParent.GetSelectedIndices())
                         {
                             o.KitItems.Add(ItemManufacturer.GetItemManufacturerByGtin(ddlGTINParent.Items[idx].Value));
                         }
@@ -193,6 +194,7 @@ public partial class Pages_ItemManufacturer : System.Web.UI.Page
                 }
                 else
                 {
+                    insert = true;
                     ItemManufacturer o = new ItemManufacturer();
 
                     if (!String.IsNullOrEmpty(txtGTIN.Text))
@@ -238,24 +240,27 @@ public partial class Pages_ItemManufacturer : System.Web.UI.Page
                     gtin = o.Gtin;
                 }
 
-                if (i > 0)
+                if (i >= 0)
                 {
-                    List<HealthFacility> hfList = HealthFacility.GetHealthFacilityList();
-                    foreach(HealthFacility hf in hfList)
+                    if (insert)
                     {
-                        GtinHfStockPolicy o = new GtinHfStockPolicy();
-                        if (!String.IsNullOrEmpty(txtGTIN.Text))
-                            o.Gtin = txtGTIN.Text;
-                        o.HealthFacilityCode = hf.Code;
-                        
-                        o.ReorderQty = 1;
-                        o.SafetyStock = 0;
-                        o.AvgDailyDemandRate = 0;
-                        o.LeadTime = 1;
-                        o.ConsumptionLogic = "FEFO";
-                        o.ForecastPeriodDemand = 0;
+                        List<HealthFacility> hfList = HealthFacility.GetHealthFacilityList();
+                        foreach (HealthFacility hf in hfList)
+                        {
+                            GtinHfStockPolicy o = new GtinHfStockPolicy();
+                            if (!String.IsNullOrEmpty(txtGTIN.Text))
+                                o.Gtin = txtGTIN.Text;
+                            o.HealthFacilityCode = hf.Code;
 
-                        GtinHfStockPolicy.Insert(o);
+                            o.ReorderQty = 1;
+                            o.SafetyStock = 0;
+                            o.AvgDailyDemandRate = 0;
+                            o.LeadTime = 1;
+                            o.ConsumptionLogic = "FEFO";
+                            o.ForecastPeriodDemand = 0;
+
+                            GtinHfStockPolicy.Insert(o);
+                        }
                     }
 
                     ClearControls(this);
