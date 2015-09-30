@@ -60,7 +60,8 @@ public partial class Pages_RegisterVaccination : System.Web.UI.Page
                 this.lbVaccineDose.Text = wtList["VaccinationEventDose"];
                 this.lbHealthCenter.Text = wtList["VaccinationEventHealthFacility"];
                 this.lbScheduledDate.Text = wtList["VaccinationEventScheduledDate"];
-                //to add this.lbChildBirthdate.Text = wtList["VaccinationEventBirthdate"];
+                this.lbChildBirthdate.Text = wtList["VaccinationEventBirthdate"];
+                //this.cvVaccinationdate.ErrorMessage = wtList["VaccinationEventDateValidator"];
 
                 //grid header text
                 gvVaccinationEvent.Columns[1].HeaderText = wtList["VaccinationEventDose"];
@@ -395,26 +396,29 @@ public partial class Pages_RegisterVaccination : System.Web.UI.Page
         }
     }
 
-    //protected void ValidateVaccinationDate(object sender, ServerValidateEventArgs e)
-    //{
-    //    if (Page.IsValid)
-    //    {
-    //        for (int rowIndex = 0; rowIndex < gvVaccinationEvent.Rows.Count; rowIndex++)
-    //        {
-    //            //extract the TextBox values
-    //            TextBox txtVaccinationDate = (TextBox)gvVaccinationEvent.Rows[rowIndex].Cells[3].FindControl("txtVaccinationDate");
+    protected void ValidateVaccinationDate(object sender, ServerValidateEventArgs e)
+    {
+        if (Page.IsValid)
+        {
+            for (int rowIndex = 0; rowIndex < gvVaccinationEvent.Rows.Count; rowIndex++)
+            {
+                //extract the TextBox values
+                TextBox txtVaccinationDate = (TextBox)gvVaccinationEvent.Rows[rowIndex].Cells[3].FindControl("txtVaccinationDate");
+                   Label lblId = (Label)gvVaccinationEvent.Rows[rowIndex].Cells[7].FindControl("lblId");
+                    int id = int.Parse(lblId.Text);
+                    VaccinationEvent v = VaccinationEvent.GetVaccinationEventById(id);
+                   Child c = v.Child;
+                ConfigurationDate dateformat = ConfigurationDate.GetConfigurationDateById(int.Parse(Configuration.GetConfigurationByName("DateFormat").Value));
 
-    //            ConfigurationDate dateformat = ConfigurationDate.GetConfigurationDateById(int.Parse(Configuration.GetConfigurationByName("DateFormat").Value));
+                DateTime date = DateTime.ParseExact(txtVaccinationDate.Text, dateformat.DateFormat, CultureInfo.CurrentCulture);
 
-    //            DateTime date = DateTime.ParseExact(txtVaccinationDate.Text, dateformat.DateFormat, CultureInfo.CurrentCulture);
+                e.IsValid = date <= DateTime.Today && date >= c.Birthdate ;
 
-    //            e.IsValid = date <= DateTime.Today;
-
-    //            if (e.IsValid == false)
-    //                break;
-    //        }
-    //    }
-    //}
+                if (e.IsValid == false)
+                    break;
+            }
+        }
+    }
     protected void cvVaccinationEvent_ServerValidate(object source, ServerValidateEventArgs args)
     {
         if (Page.IsValid)
