@@ -9,14 +9,6 @@
             Illegal state exception indicates an operation failed because of an illegal state guard condition
             </summary>
         </member>
-        <member name="M:GIIS.BusinessLogic.Exceptions.IllegalStateException.#ctor(GIIS.BusinessLogic.OrderStatusType,System.String,System.String)">
-            <summary>
-            Creates a new instance of the <see cref="T:GIIS.BusinessLogic.Exception.IllegalStateException"/> class
-            </summary>
-            <param name="currentState">The current state of the object that caused the exception</param>
-            <param name="className">The name of the class in the state which caused the exception</param>
-            <param name="action">The name of the action which caused the exception</param>
-        </member>
         <member name="P:GIIS.BusinessLogic.Exceptions.IllegalStateException.CurrentState">
             <summary>
             The current state which caused the exception
@@ -31,6 +23,14 @@
             <summary>
             Gets the attempted action that caused the exception
             </summary>
+        </member>
+        <member name="M:GIIS.BusinessLogic.Exceptions.IllegalStateException.#ctor(GIIS.BusinessLogic.OrderStatusType,System.String,System.String)">
+            <summary>
+            Creates a new instance of the <see cref="T:GIIS.BusinessLogic.Exception.IllegalStateException"/> class
+            </summary>
+            <param name="currentState">The current state of the object that caused the exception</param>
+            <param name="className">The name of the class in the state which caused the exception</param>
+            <param name="action">The name of the action which caused the exception</param>
         </member>
         <member name="T:GIIS.BusinessLogic.OrderManagementLogic">
             <summary>
@@ -392,7 +392,7 @@
             <param name="remove"> If the vaccination event is being rolled back so rescheduling needs to be rolled back also</param>
             <returns></returns>
         </member>
-        <member name="M:GIIS.BusinessLogic.VaccinationLogic.UpdateVaccinationEvent(System.Int32,System.Int32,System.DateTime,System.Int32,System.Boolean,System.Int32,System.Int32)">
+        <member name="M:GIIS.BusinessLogic.VaccinationLogic.UpdateVaccinationEvent(System.Int32,System.Int32,System.DateTime,System.Int32,System.Boolean,System.Int32,System.Int32,System.DateTime)">
             <summary>
             Updates Vaccination Event with given id <paramref name="id"/> with all the other parameters.
             </summary>

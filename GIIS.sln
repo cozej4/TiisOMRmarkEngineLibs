@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GIIS.DataLayer", "GIIS.DataLayer\GIIS.DataLayer.csproj", "{241F7080-2919-4084-AD56-DACFD85DD65E}"
 EndProject
@@ -40,6 +40,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\..\..\Downloads\NOTICE.txt = ..\..\..\Downloads\NOTICE.txt
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GIIS.BusinessLogic.Test", "GIIS.BusinessLogic.Test\GIIS.BusinessLogic.Test.csproj", "{9E218A66-1608-437C-AA39-891C6C276A8C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GIIS.DataLayer.Tests", "GIIS.DataLayer.Tests\GIIS.DataLayer.Tests.csproj", "{E42426EE-21AB-49DC-B717-6083F84AEDB3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GIIS.HIESync", "HIESync\GIIS.HIESync.csproj", "{3840A0E9-BB6A-4192-8E3C-E31760403DAE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,6 +64,18 @@ Global
 		{F2A29378-FEA6-4064-BA43-A6A06C6981CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2A29378-FEA6-4064-BA43-A6A06C6981CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F2A29378-FEA6-4064-BA43-A6A06C6981CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E218A66-1608-437C-AA39-891C6C276A8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E218A66-1608-437C-AA39-891C6C276A8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E218A66-1608-437C-AA39-891C6C276A8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E218A66-1608-437C-AA39-891C6C276A8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E42426EE-21AB-49DC-B717-6083F84AEDB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E42426EE-21AB-49DC-B717-6083F84AEDB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E42426EE-21AB-49DC-B717-6083F84AEDB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E42426EE-21AB-49DC-B717-6083F84AEDB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3840A0E9-BB6A-4192-8E3C-E31760403DAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3840A0E9-BB6A-4192-8E3C-E31760403DAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3840A0E9-BB6A-4192-8E3C-E31760403DAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3840A0E9-BB6A-4192-8E3C-E31760403DAE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

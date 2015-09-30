@@ -1,0 +1,73 @@
+﻿<!--
+Currently this is loaded and manipulated with XPath, that means that it is terribly slow (more than it needs to be). This should be updated to 
+use serialization which would provide faster runtimes.
+-->
+<indicatorGroup name="Immunization" created="2012-12-14T03:35:12.399+0000" lastUpdated="2015-02-24T15:01:32.404+0000" id="vF7J5Z6v5Rj">
+  <indicators>
+    <indicator name="OPV 3 under 1 year coverage" id="ELLbdOFMLWJ">
+      <fullname>OPV 3</fullname>
+      <ageGroup>UNDER 1 YEAR</ageGroup>
+    </indicator>
+    <indicator name="Penta 1 Vaccination Coverage" id="xYQQikKq096">
+      <fullname>DTP-HepB-Hib 1</fullname>
+    </indicator>
+    <indicator name="Measles Vaccination Coverage (Inside Service Area)" id="OXig4wNy58A">
+      <fullname>Measles 1</fullname>
+    </indicator>
+    <indicator name="OPV 1 under 1 year coverage" id="oNRjoTjc8KT">
+      <fullname>OPV 1</fullname>
+      <ageGroup>UNDER 1 YEAR</ageGroup>
+    </indicator>
+    <indicator name="Penta 1 under 1 year Coverage" id="U8dxgw0u8ef">
+      <fullname>DTP-HepB-Hib 1</fullname>
+      <ageGroup>UNDER 1 YEAR</ageGroup>
+    </indicator>
+    <indicator name="Penta 3 under 1 year Vaccination Coverage ( Outside Area )" id="oD057RvVI9Z">
+      <fullname>DTP-HepB-Hib 3</fullname>
+      <ageGroup>UNDER 1 YEAR</ageGroup>
+    </indicator>
+    <indicator name="Penta 2 under 1 year Coverage" id="Q3b2jESQhmU">
+      <fullname>DTP-HepB-Hib 2</fullname>
+      <ageGroup>UNDER 1 YEAR</ageGroup>
+    </indicator>
+    <indicator name="OPV 3 Vaccination Coverage" id="heyJnpx5b37">
+      <fullname>OPV 3</fullname>
+    </indicator>
+    <indicator name="Penta 3 under 1 year Vaccination Coverage" id="WhsP7nsuwnz">
+      <fullname>DTP-HepB-Hib 3</fullname>
+      <ageGroup>UNDER 1 YEAR</ageGroup>
+    </indicator>
+    <indicator name="Measles Vaccination Coverage" id="c29EE9nH8gQ">
+      <fullname>Measles 1</fullname>
+    </indicator>
+    <indicator name="BCG under 1 year coverage " id="yho46pwbbNQ">
+      <fullname>BCG</fullname>
+      <ageGroup>UNDER 1 YEAR</ageGroup>
+    </indicator>
+    <indicator name="Penta 1-3 drop-out rate" id="ZuSGTHZ8S5S">
+      <fullname>DTP-HepB-Hib 3</fullname>
+      <dropout>
+        <month>-2</month>
+        <indicator id="xYQQikKq096"/>
+      </dropout>
+    </indicator>
+    <indicator name="OPV 1 Vaccination Coverage" id="DTw7dYG827x">
+      <fullname>OPV 1</fullname>
+    </indicator>
+    <indicator name="BCG Vaccine Coverage" id="N49KMfFrg5K">
+      <fullname>BCG</fullname>
+    </indicator>
+    <indicator name="OPV 0 Vaccination coverage" id="DIaAbN1SSln">
+      <fullname>OPV0</fullname>
+    </indicator>
+    <indicator name="OPV 0 under 1 year Coverage" id="U64yiAGJu7F">
+      <fullname>OPV0</fullname>
+      <ageGroup>UNDER 1 YEAR</ageGroup>
+    </indicator>
+    <indicator name="Rotavirus Vaccines coverage" id="pavgh0yzpvU">
+      <fullname>Rota 1</fullname>
+      <fullname>Rota 2</fullname>
+      <fullname>Rota 3</fullname>
+    </indicator>
+  </indicators>
+</indicatorGroup>
