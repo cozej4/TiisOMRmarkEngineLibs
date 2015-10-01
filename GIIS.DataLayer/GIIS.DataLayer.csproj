@@ -169,6 +169,8 @@
   <ItemGroup>
     <Content Include="Library\Mono.Security.dll" />
     <Content Include="Library\Npgsql.dll" />
+    <Content Include="LICENSE.txt" />
+    <Content Include="NOTICE.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="GIIS.DataLayer.licenseheader" />

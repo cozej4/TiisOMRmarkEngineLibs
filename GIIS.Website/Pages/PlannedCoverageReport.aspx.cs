@@ -82,9 +82,9 @@ public partial class Pages_PlannedCoverageReport : System.Web.UI.Page
 
                 txtEndDate.Text = DateTime.Today.ToString(cd.DateFormat);
 
-                //rfvFromDate.ErrorMessage = wtList["PlannedCoverageReportDateErrorMessage"];
-                //rfvToDate.ErrorMessage = wtList["PlannedCoverageReportDateErrorMessage"];
-                //rfvEndDate.ErrorMessage = wtList["PlannedCoverageReportDateErrorMessage"];
+                rfvFromDate.ErrorMessage = wtList["PlannedCoverageReportDateErrorMessage"];
+                rfvToDate.ErrorMessage = wtList["PlannedCoverageReportDateErrorMessage"];
+                rfvEndDate.ErrorMessage = wtList["PlannedCoverageReportDateErrorMessage"];
             }
             else
             {

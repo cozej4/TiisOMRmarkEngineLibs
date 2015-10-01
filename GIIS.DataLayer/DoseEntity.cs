@@ -93,7 +93,7 @@ namespace GIIS.DataLayer
             {
                 string query = @"SELECT * FROM ""DOSE"" WHERE 1 = 1  "
                                   + @" AND ( UPPER(""FULLNAME"") like @Fullname OR @Fullname is null or @Fullname = '')"
-                                  + @" AND ""SCHEDULED_VACCINATION_ID"" = @ScheduledVaccinationId OR @ScheduledVaccinationId is null or @ScheduledVaccinationId = -1"
+                                  + @" AND (""SCHEDULED_VACCINATION_ID"" = @ScheduledVaccinationId OR @ScheduledVaccinationId is null or @ScheduledVaccinationId = -1)"
                                   + @" ORDER BY ""SCHEDULED_VACCINATION_ID"", ""FULLNAME"" OFFSET @StartRowIndex LIMIT @MaximumRows;";
 
                 List<NpgsqlParameter> parameters = new List<NpgsqlParameter>()

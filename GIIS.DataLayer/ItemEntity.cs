@@ -155,7 +155,7 @@ namespace GIIS.DataLayer
             {
                 string query = @"SELECT * FROM ""ITEM""  WHERE 1 = 1"
                                   + @" AND ( UPPER(""NAME"") like @Name OR @Name is null or @Name = '')"
-                                  + @" AND ""ITEM_CATEGORY_ID"" = @ItemCategoryId OR @ItemCategoryId is null or @ItemCategoryId = -1"
+                                  + @" AND (""ITEM_CATEGORY_ID"" = @ItemCategoryId OR @ItemCategoryId is null or @ItemCategoryId = -1)"
                                   + @" ORDER BY ""ITEM_CATEGORY_ID"", ""NAME"" OFFSET @StartRowIndex LIMIT @MaximumRows;";
 
                 List<NpgsqlParameter> parameters = new List<NpgsqlParameter>()

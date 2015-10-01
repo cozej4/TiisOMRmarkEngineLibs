@@ -144,8 +144,8 @@ public partial class Pages_HealthFacilityList : System.Web.UI.Page
         odsHealthFacility.SelectParameters.Add("code", csearch.ToUpper());
         odsHealthFacility.SelectParameters.Add("hfid", s);
 
-        Session["HealthFacilityList-Name"] = wsearch;
-        Session["HealthFacilityList-Code"] = csearch;
+        Session["HealthFacilityList-Name"] = wsearch.ToUpper();
+        Session["HealthFacilityList-Code"] = csearch.ToUpper();
         Session["HealthFacilityList-HFID"] = s;
         
     }

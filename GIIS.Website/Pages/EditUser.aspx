@@ -209,7 +209,7 @@
                 ControlToValidate="txtConfirmPassword"
                 ErrorMessage="Your passwords do not match!"
                 CssClass="label label-warning" Font-Size="Small" ForeColor="White"
-                ValidationGroup="password"
+                ValidationGroup="saveUser"
                 Display="Dynamic" />
         </div>
     </div>

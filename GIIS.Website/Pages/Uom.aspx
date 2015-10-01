@@ -57,7 +57,8 @@
         <div class="col-md-4 col-xs-4 col-sm-4 col-lg-4 clearfix">&nbsp;</div>
         <div class="col-md-8 col-xs-8 col-sm-8 col-lg-8 clearfix">
             <asp:Label ID="revUom" runat="server" CssClass="label label-warning" Font-Size="Small" Text=" The Uom you have chosen is not valid! Please choose from the options!" Visible="false"></asp:Label>
-            <asp:CustomValidator ID="cvUom" runat="server" ErrorMessage=" All fields marked with * must be filled!" ClientValidationFunction="cvUom_Validate" CssClass="label label-warning" Font-Size="Small" ForeColor="White" Display="Dynamic" ValidationGroup="saveUom"></asp:CustomValidator>
+                       <asp:RequiredFieldValidator ID="rfvName" runat="server" ErrorMessage="Name must be filled!" ControlToValidate="txtName" ValidationGroup="saveUom" Display="Dynamic" CssClass="label label-warning" Font-Size="Small" ForeColor="White" />
+            <%-- <asp:CustomValidator ID="cvUom" runat="server" ErrorMessage=" All fields marked with * must be filled!" ClientValidationFunction="cvUom_Validate" CssClass="label label-warning" Font-Size="Small" ForeColor="White" Display="Dynamic" ValidationGroup="saveUom"></asp:CustomValidator>--%>
             <asp:RegularExpressionValidator ID="revName" runat="server"
                 ErrorMessage=" Name should be at least 2 characters and not contain numbers."
                 ControlToValidate="txtName" Display="Dynamic" CssClass="label label-danger" Font-Size="Small" ForeColor="White" ValidationGroup="saveUom"

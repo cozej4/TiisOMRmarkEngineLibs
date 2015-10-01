@@ -135,9 +135,9 @@
                 ClientValidationFunction="cvHealthFacility_Validate" CssClass="label label-warning" Font-Size="Small" ForeColor="White"
                 Display="Dynamic" ValidationGroup="saveVaccinationEvent"></asp:CustomValidator>--%>
             <asp:CustomValidator ID="cvVaccinationEvent" runat="server" ErrorMessage="All fields marked with * must be filled!" OnServerValidate="cvVaccinationEvent_ServerValidate" CssClass="label label-warning" Font-Size="Small" ForeColor="White" Display="Dynamic" ValidationGroup="saveVaccinationEvent"></asp:CustomValidator>
-          <%--  <asp:CustomValidator ID="cvVaccinationdate" runat="server" ErrorMessage="Vaccination Date cannot be after today!"
+            <asp:CustomValidator ID="cvVaccinationdate" runat="server" ErrorMessage="Vaccination Date cannot be after today or before the date of birth!"
                 OnServerValidate="ValidateVaccinationDate" CssClass="label label-warning" Font-Size="Small" ForeColor="White" Display="Dynamic"
-                ValidationGroup="saveVaccinationEvent" ValidateEmptyText="false"></asp:CustomValidator>--%>
+                ValidationGroup="saveVaccinationEvent" ValidateEmptyText="false"></asp:CustomValidator>
         </div>
     </div>
     <br />

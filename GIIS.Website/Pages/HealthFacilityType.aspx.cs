@@ -148,7 +148,6 @@ public partial class Pages_HealthFacilityType : System.Web.UI.Page
             lblError.Visible = true;
         }
 
-        Response.Redirect(Request.RawUrl, false);
     }
     protected void btnEdit_Click(object sender, EventArgs e)
     {

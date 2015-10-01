@@ -98,6 +98,10 @@
     <Folder Include="Lib\" />
     <Folder Include="Model\" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="LICENSE.txt" />
+    <Content Include="NOTICE.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!--<Import Project="$(SolutionDir)\.nuget\nuget.targets" />-->
   <!--<Import Project="$(SolutionDir)\.nuget\nuget.targets" />-->
