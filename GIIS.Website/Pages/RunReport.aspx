@@ -59,7 +59,9 @@
 
     <div class="row">
         <div class="col-md-12">
-            <input type="submit" class="btn btn-primary" value="Download <%=Request.QueryString["format"] %>" />
+            <input type="submit" class="btn btn-primary" value="View (HTML)" onclick="$('#launchReport').attr('action','<%=this.jasperAction%>.html');" />
+            <input type="submit" class="btn btn-success" value="Download (PDF)" onclick="$('#launchReport').attr('action','<%=this.jasperAction%>.pdf');" />
+            <input type="submit" class="btn btn-success" value="Download (XLS)" onclick="$('#launchReport').attr('action','<%=this.jasperAction%>.xls');" />
         </div>
     </div>
     </form>

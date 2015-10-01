@@ -12,13 +12,14 @@
 //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
- //******************************************************************************
+//******************************************************************************
 using GIIS.DataLayer;
 using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
@@ -30,13 +31,17 @@ public partial class Pages_RunReport : System.Web.UI.Page
     public string jasperAction = String.Empty;
     public string jasperXLSAction = String.Empty;
 
-    private void SetReportLayout(Decimal id, String format)
+    private void SetReportLayout(Decimal id, String format, List<String> actionList)
     {
         try
         {
 
+            StringBuilder myRoles = new StringBuilder();
+            actionList.ForEach(a => myRoles.AppendFormat("'{0}',", a));
+            myRoles.Remove(myRoles.Length - 1, 1);
 
-            string command = "SELECT * FROM \"REPORT\" WHERE \"ID\" = @Id";
+            // HACK: This should be placed in the DAL
+            string command = "SELECT * FROM \"REPORT\" WHERE \"ID\" = @Id AND \"ACTION_ID\" IN (SELECT \"ID\" FROM \"ACTIONS\" WHERE \"NAME\" IN (" + myRoles.ToString() + "))";
             using (var dt = DBManager.ExecuteReaderCommand(command, System.Data.CommandType.Text, new List<Npgsql.NpgsqlParameter>() {
             new NpgsqlParameter("Id", NpgsqlTypes.NpgsqlDbType.Integer) { Value = id }
         }))
@@ -45,7 +50,7 @@ public partial class Pages_RunReport : System.Web.UI.Page
                 {
                     if (rdr.Read())
                     {
-                        this.jasperAction = String.Format("{0}/{1}.{2}", ConfigurationManager.AppSettings["JasperServer"], rdr["JASPER_ID"], Request.QueryString["format"]);
+                        this.jasperAction = String.Format("{0}/{1}", ConfigurationManager.AppSettings["JasperServer"], rdr["JASPER_ID"]);
                         this.lblTitle.Text = rdr["REPORT_NAME"].ToString();
                         this.lblReportName.Text = rdr["REPORT_NAME"].ToString();
                         this.lblReportDescription.Text = rdr["DESCRIPTION"].ToString();
@@ -56,7 +61,7 @@ public partial class Pages_RunReport : System.Web.UI.Page
             }
 
             /// Command
-            command = "SELECT * FROM \"REPORT_PARAMETERS\" A INNER JOIN \"REPORT_PARAMETER_INPUT_TYPE\" B ON (A.\"INPUT_TYPE\" = B.\"ID\") WHERE \"REPORT_ID\" = @Id ORDER BY \"PARM_ID\"";
+            command = "SELECT *, C.\"NAME\" AS ACTION FROM \"REPORT_PARAMETERS\" A INNER JOIN \"REPORT_PARAMETER_INPUT_TYPE\" B ON (A.\"INPUT_TYPE\" = B.\"ID\") INNER JOIN \"ACTIONS\" C ON (A.\"ACTION_ID\" = C.\"ID\") WHERE \"REPORT_ID\" = @Id ORDER BY \"PARM_ID\"";
             using (var dt = DBManager.ExecuteReaderCommand(command, System.Data.CommandType.Text, new List<Npgsql.NpgsqlParameter>() {
             new NpgsqlParameter("Id", NpgsqlTypes.NpgsqlDbType.Integer) { Value = id }
         }))
@@ -67,7 +72,12 @@ public partial class Pages_RunReport : System.Web.UI.Page
                     {
                         var inputControl = new HtmlGenericControl(rdr["TAG"].ToString());
                         if (rdr["TYPE"] != DBNull.Value)
-                            inputControl.Attributes.Add("type", rdr["TYPE"].ToString());
+                        {
+                            if (actionList.Contains(rdr["ACTION"].ToString()))
+                                inputControl.Attributes.Add("type", rdr["TYPE"].ToString());
+                            else
+                                inputControl.Attributes.Add("type", "hidden");
+                        }
                         inputControl.Attributes.Add("id", rdr["PARM_ID"].ToString());
                         inputControl.Attributes.Add("style", "z-index:8");
 
@@ -79,7 +89,7 @@ public partial class Pages_RunReport : System.Web.UI.Page
                                 new NpgsqlParameter("@FacilityCode", NpgsqlTypes.NpgsqlDbType.Integer) { Value = CurrentEnvironment.LoggedUser.HealthFacility.Code },
                                 new NpgsqlParameter("@UserId", NpgsqlTypes.NpgsqlDbType.Integer) { Value = CurrentEnvironment.LoggedUser.Id }
                             };
-                            if (rdr["TAG"].ToString() == "input")
+                            if (rdr["TAG"].ToString() == "input" || inputControl.Attributes["type"] == "hidden")
                             {
                                 inputControl.Attributes.Add("value", DBManager.ExecuteScalarCommand(rdr["COMPLETE_SOURCE"].ToString(), System.Data.CommandType.Text, contextParms).ToString());
                             }
@@ -170,7 +180,7 @@ public partial class Pages_RunReport : System.Web.UI.Page
                 HttpContext.Current.Cache.Insert("Reports-dictionary" + language, wtList);
             }
 
-            this.SetReportLayout(Decimal.Parse(Request.QueryString["reportId"]), Request.QueryString["format"]);
+            this.SetReportLayout(Decimal.Parse(Request.QueryString["reportId"]), Request.QueryString["format"], actionList);
         }
         else
         {
