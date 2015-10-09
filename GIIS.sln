@@ -36,8 +36,25 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GIIS.BusinessLogic", "GIIS.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{06C30281-CC65-4EFA-9B5E-A86ABE18D7F5}"
 	ProjectSection(SolutionItems) = preProject
+		HIESync\Project Items\AtnaApi.dll = HIESync\Project Items\AtnaApi.dll
 		..\..\..\Downloads\LICENSE.txt = ..\..\..\Downloads\LICENSE.txt
+		HIESync\Project Items\MARC.Everest.dll = HIESync\Project Items\MARC.Everest.dll
+		HIESync\Project Items\MARC.Everest.Formatters.XML.Datatypes.R1.dll = HIESync\Project Items\MARC.Everest.Formatters.XML.Datatypes.R1.dll
+		HIESync\Project Items\MARC.Everest.Formatters.XML.ITS1.dll = HIESync\Project Items\MARC.Everest.Formatters.XML.ITS1.dll
+		HIESync\Project Items\MARC.Everest.RMIM.UV.CDAr2.dll = HIESync\Project Items\MARC.Everest.RMIM.UV.CDAr2.dll
+		HIESync\Project Items\MARC.IHE.Xds.dll = HIESync\Project Items\MARC.IHE.Xds.dll
+		HIESync\Project Items\MARC.IHE.Xds.dll.config = HIESync\Project Items\MARC.IHE.Xds.dll.config
+		HIESync\Project Items\MohawkCollege.Util.Console.Parameters.dll = HIESync\Project Items\MohawkCollege.Util.Console.Parameters.dll
+		HIESync\Project Items\Mono.Security.dll = HIESync\Project Items\Mono.Security.dll
+		HIESync\Project Items\NHapi.Base.dll = HIESync\Project Items\NHapi.Base.dll
+		HIESync\Project Items\NHapi.Base.xml = HIESync\Project Items\NHapi.Base.xml
+		HIESync\Project Items\NHapi.Model.V231.dll = HIESync\Project Items\NHapi.Model.V231.dll
+		HIESync\Project Items\NHapi.Model.V231.xml = HIESync\Project Items\NHapi.Model.V231.xml
+		HIESync\Project Items\NHapi.Model.V25.dll = HIESync\Project Items\NHapi.Model.V25.dll
+		HIESync\Project Items\NHapi.Model.V25.xml = HIESync\Project Items\NHapi.Model.V25.xml
 		..\..\..\Downloads\NOTICE.txt = ..\..\..\Downloads\NOTICE.txt
+		HIESync\Project Items\Npgsql.dll = HIESync\Project Items\Npgsql.dll
+		HIESync\Project Items\Npgsql.xml = HIESync\Project Items\Npgsql.xml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GIIS.BusinessLogic.Test", "GIIS.BusinessLogic.Test\GIIS.BusinessLogic.Test.csproj", "{9E218A66-1608-437C-AA39-891C6C276A8C}"
