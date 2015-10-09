@@ -121,26 +121,13 @@ public partial class _Report : System.Web.UI.Page
                             // Link to the report
                             var li = new HtmlGenericControl("li");
                             currentGroup.Controls.Add(li);
-                            li.Controls.Add(new Label() { Text = rdr["REPORT_NAME"].ToString() });
-                            li.Controls.Add(new Label() { Text = "(" });
-                            li.Controls.Add(new HyperLink()
+                                li.Controls.Add(new HyperLink()
                                 {
-                                    Target = "_blank",
-                                    Text = "PDF",
-                                    NavigateUrl = "~/Pages/RunReport.aspx?reportId=" + rdr["ID"].ToString() + "&format=pdf"
+                                    Text = rdr["REPORT_NAME"].ToString(),
+                                    NavigateUrl = "~/Pages/RunReport.aspx?reportId=" + rdr["ID"].ToString()
                                 }
                             );
-                            li.Controls.Add(new Label() { Text = "|" });
-                            li.Controls.Add(new HyperLink()
-                            {
-                                Target = "_blank",
-                                Text = "XLS",
-                                NavigateUrl = "~/Pages/RunReport.aspx?reportId=" + rdr["ID"].ToString() + "&format=xls"
-                            }
-                            );
-                            li.Controls.Add(new Label() { Text = ")" });
-
-
+                            
                         }
                     }
                 }

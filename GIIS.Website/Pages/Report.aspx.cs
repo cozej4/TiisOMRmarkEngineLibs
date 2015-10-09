@@ -127,7 +127,6 @@ public partial class _Report : System.Web.UI.Page
                                     NavigateUrl = "~/Pages/RunReport.aspx?reportId=" + rdr["ID"].ToString() 
                                 }
                             );
-                            li.Controls.Add(new Label() { Text = ")" });
 
 
                         }

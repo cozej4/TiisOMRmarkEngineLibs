@@ -62,9 +62,7 @@ public partial class Pages_RunReport : System.Web.UI.Page
 
             /// Command
             command = "SELECT *, C.\"NAME\" AS ACTION FROM \"REPORT_PARAMETERS\" A INNER JOIN \"REPORT_PARAMETER_INPUT_TYPE\" B ON (A.\"INPUT_TYPE\" = B.\"ID\") INNER JOIN \"ACTIONS\" C ON (A.\"ACTION_ID\" = C.\"ID\") WHERE \"REPORT_ID\" = @Id ORDER BY \"PARM_ID\"";
-            using (var dt = DBManager.ExecuteReaderCommand(command, System.Data.CommandType.Text, new List<Npgsql.NpgsqlParameter>() {
-            new NpgsqlParameter("Id", NpgsqlTypes.NpgsqlDbType.Integer) { Value = id }
-        }))
+            using (var dt = DBManager.ExecuteReaderCommand(command, System.Data.CommandType.Text, new List<Npgsql.NpgsqlParameter>() { new NpgsqlParameter("Id", NpgsqlTypes.NpgsqlDbType.Integer) { Value = id }}))
             {
                 using (var rdr = dt.CreateDataReader())
                 {
@@ -72,12 +70,11 @@ public partial class Pages_RunReport : System.Web.UI.Page
                     {
                         var inputControl = new HtmlGenericControl(rdr["TAG"].ToString());
                         if (rdr["TYPE"] != DBNull.Value)
-                        {
-                            if (actionList.Contains(rdr["ACTION"].ToString()))
-                                inputControl.Attributes.Add("type", rdr["TYPE"].ToString());
-                            else
-                                inputControl.Attributes.Add("type", "hidden");
-                        }
+                            inputControl.Attributes.Add("type", rdr["TYPE"].ToString());
+
+                        if (!actionList.Contains(rdr["ACTION"].ToString()))
+                            inputControl.Attributes.Add("disabled", "disabled");
+
                         inputControl.Attributes.Add("id", rdr["PARM_ID"].ToString());
                         inputControl.Attributes.Add("style", "z-index:8");
 

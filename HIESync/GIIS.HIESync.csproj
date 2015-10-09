@@ -64,6 +64,9 @@
     <Reference Include="MohawkCollege.Util.Console.Parameters">
       <HintPath>Project Items\MohawkCollege.Util.Console.Parameters.dll</HintPath>
     </Reference>
+    <Reference Include="Mono.Security">
+      <HintPath>Project Items\Mono.Security.dll</HintPath>
+    </Reference>
     <Reference Include="NHapi.Base">
       <HintPath>Project Items\NHapi.Base.dll</HintPath>
     </Reference>
@@ -73,8 +76,7 @@
     <Reference Include="NHapi.Model.V25">
       <HintPath>Project Items\NHapi.Model.V25.dll</HintPath>
     </Reference>
-    <Reference Include="Npgsql, Version=2.0.11.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Npgsql">
       <HintPath>Project Items\Npgsql.dll</HintPath>
     </Reference>
     <Reference Include="System" />
