@@ -84,6 +84,7 @@ namespace HIESync.Synchronization
 
             XmlDocument map = new XmlDocument();
             map.Load(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "WeightIndicatorMap.xml"));
+            valueSet.DataSet = map.SelectSingleNode("//*[local-name() = 'map']/@id").Value;
 
             foreach (XmlNode nd in map.SelectNodes("//*[local-name() = 'indicator']"))
                 indicatorMap.Add(new KeyValuePair<string, KeyValuePair<int, string>>(nd.Attributes["id"].Value, new KeyValuePair<int, string>(Int32.Parse(nd.Attributes["ageGroup"].Value), nd.Attributes["column"].Value)));
@@ -111,7 +112,7 @@ namespace HIESync.Synchronization
                                     Numerator = Convert.ToInt32(dataReader[itm.Value.Value]),
                                     Denominator = 1,
                                     OrgUnit = Convert.ToString(dataReader["HEALTH_FACILITY_CODE"]).Replace("urn:uuid:", ""),
-                                    Period = string.Format("{0}M{1}", dataReader["YEAR"], dataReader["MONTH"]),
+                                    Period = string.Format("{0:0000}{1:00}", dataReader["YEAR"], dataReader["MONTH"]),
                                     Value= Convert.ToInt32(dataReader[itm.Value.Value])
                                 });
 
@@ -134,6 +135,8 @@ namespace HIESync.Synchronization
             DxfMessage message = new DxfMessage();
             DxfValueSet valueSet = new DxfValueSet();
             message.ValueSets.Add(valueSet);
+            valueSet.DataSet = this.m_indicators.SelectSingleNode("//*[local-name() = 'indicatorGroup']/@id").Value;
+
             using (NpgsqlConnection conn = new NpgsqlConnection(ConfigurationManager.ConnectionStrings["GiisConnectionString"].ConnectionString))
             {
                 conn.Open();
@@ -159,7 +162,7 @@ namespace HIESync.Synchronization
                                 {
                                     value = new DxfValue()
                                     {
-                                        Period = String.Format("{0}M{1}", dataReader["VACC_YEAR"], dataReader["VACC_MONTH"]),
+                                        Period = String.Format("{0:0000}{1:00}", dataReader["VACC_YEAR"], dataReader["VACC_MONTH"]),
                                         OrgUnit = dataReader["HF_CODE"].ToString().Replace("urn:uuid:", ""),
                                         Value = Convert.ToDecimal(dataReader["ADMIN_COVERAGE"]),
                                         DataElement = nd.Attributes["id"].Value

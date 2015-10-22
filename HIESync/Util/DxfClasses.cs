@@ -67,6 +67,11 @@ namespace HIESync.Util
         [XmlElement("dataValue", Namespace = "http://dhis2.org/schema/dxf/2.0")]
         public List<DxfValue> Value { get; set; }
 
+        /// <summary>
+        /// The data set
+        /// </summary>
+        [XmlAttribute("dataSet")]
+        public String DataSet { get; set; }
     }
 
     /// <summary>

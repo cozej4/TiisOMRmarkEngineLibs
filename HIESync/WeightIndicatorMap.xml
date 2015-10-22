@@ -17,7 +17,7 @@
  -    limitations under the License.
  -->
 
-<map>
+<map id="PVpWPS5xDsL">
 
   <indicator id="K0uJn2cD0fq" name="24 Month Weight for Age &lt; 60%" ageGroup="6" column="underweight"/>
   <indicator id="q9oJBWPHPiC" name="24 Month Weight for Age 60% - 80%" ageGroup="6" column="normal"/>

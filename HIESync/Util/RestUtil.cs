@@ -94,9 +94,13 @@ namespace HIESeeding.Util
                 WebRequest request = WebRequest.Create(requestUri);
                 request.Method = "POST";
                 request.ContentType = "application/xml";
+
                 if (username != null && password != null)
+                {
+                    request.Headers.Add("Authorization", String.Format("Basic {0}", Convert.ToBase64String(Encoding.UTF8.GetBytes(String.Format("{0}:{1}", username, password)))));
                     request.Credentials = new NetworkCredential(username, password);
-                
+                }
+
                 XmlSerializer xsz = new XmlSerializer(data.GetType());
                 xsz.Serialize(request.GetRequestStream(), data);
 

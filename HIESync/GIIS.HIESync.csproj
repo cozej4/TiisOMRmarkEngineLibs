@@ -58,6 +58,9 @@
     <Reference Include="MARC.Everest.RMIM.UV.CDAr2">
       <HintPath>Project Items\MARC.Everest.RMIM.UV.CDAr2.dll</HintPath>
     </Reference>
+    <Reference Include="MARC.HI.EHRS.SVC.Core">
+      <HintPath>Project Items\MARC.HI.EHRS.SVC.Core.dll</HintPath>
+    </Reference>
     <Reference Include="MARC.IHE.Xds">
       <HintPath>Project Items\MARC.IHE.Xds.dll</HintPath>
     </Reference>
