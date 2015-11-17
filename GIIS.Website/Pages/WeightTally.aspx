@@ -58,7 +58,7 @@
         </div>
         <div class="row">
             <div class="col-md-12">
-                <a href="../forms/wts.oxps">Download WTS Template</a>
+                <a href="../forms/wts.pdf">Download WTS Template</a>
             </div>
         </div>
 </asp:Content>

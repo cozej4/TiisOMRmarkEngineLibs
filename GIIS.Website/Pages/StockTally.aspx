@@ -54,7 +54,7 @@
         </div>
     <div class="row">
         <div class="col-md-12">
-            <a href="../forms/sts.oxps">Download STS Template</a>
+            <a href="../forms/sts.pdf">Download STS Template</a>
         </div>
     </div>
 </asp:Content>
