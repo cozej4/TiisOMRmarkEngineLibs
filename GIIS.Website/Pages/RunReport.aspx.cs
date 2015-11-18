@@ -24,7 +24,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
-
+using System.Diagnostics;
 public partial class Pages_RunReport : System.Web.UI.Page
 {
 
@@ -68,12 +68,22 @@ public partial class Pages_RunReport : System.Web.UI.Page
                 {
                     while (rdr.Read())
                     {
+                        //HtmlGenericControl backingInput = null;
                         var inputControl = new HtmlGenericControl(rdr["TAG"].ToString());
-                        if (rdr["TYPE"] != DBNull.Value)
-                            inputControl.Attributes.Add("type", rdr["TYPE"].ToString());
 
                         if (!actionList.Contains(rdr["ACTION"].ToString()))
-                            inputControl.Attributes.Add("disabled", "disabled");
+                        {
+                            //inputControl.Attributes.Add("readOnly", "readonly");
+                            //inputControl.Attributes.Add("disabled", "disabled");
+                            inputControl.Attributes["type"] = "hidden";
+                            inputControl.TagName = "input";
+                            // Used because readonly has no effect 
+                            //backingInput = new HtmlGenericControl("input");
+                            //backingInput.Attributes.Add("type", "hidden");
+                            //backingInput.Attributes.Add("name", rdr["PARM_ID"].ToString());
+                        }
+                        else if (rdr["TYPE"] != DBNull.Value)
+                            inputControl.Attributes.Add("type", rdr["TYPE"].ToString());
 
                         inputControl.Attributes.Add("id", rdr["PARM_ID"].ToString());
                         inputControl.Attributes.Add("style", "z-index:8");
@@ -81,18 +91,40 @@ public partial class Pages_RunReport : System.Web.UI.Page
                         // Value?
                         if (rdr["COMPLETE_SOURCE"] != DBNull.Value)
                         {
-                            var contextParms = new List<NpgsqlParameter>() {
+                            List<NpgsqlParameter> contextParms = new List<NpgsqlParameter>() {
+                                new NpgsqlParameter("@FacilityId", NpgsqlTypes.NpgsqlDbType.Integer) { Value = CurrentEnvironment.LoggedUser.HealthFacilityId },
+                                new NpgsqlParameter("@FacilityCode", NpgsqlTypes.NpgsqlDbType.Integer) { Value = CurrentEnvironment.LoggedUser.HealthFacility.Code },
+                                new NpgsqlParameter("@UserId", NpgsqlTypes.NpgsqlDbType.Integer) { Value = CurrentEnvironment.LoggedUser.Id }
+                            },
+                            contextParms2 = new List<NpgsqlParameter>() {
                                 new NpgsqlParameter("@FacilityId", NpgsqlTypes.NpgsqlDbType.Integer) { Value = CurrentEnvironment.LoggedUser.HealthFacilityId },
                                 new NpgsqlParameter("@FacilityCode", NpgsqlTypes.NpgsqlDbType.Integer) { Value = CurrentEnvironment.LoggedUser.HealthFacility.Code },
                                 new NpgsqlParameter("@UserId", NpgsqlTypes.NpgsqlDbType.Integer) { Value = CurrentEnvironment.LoggedUser.Id }
                             };
+
+                            // Hidden value or input is just a value
                             if (rdr["TAG"].ToString() == "input" || inputControl.Attributes["type"] == "hidden")
                             {
                                 inputControl.Attributes.Add("value", DBManager.ExecuteScalarCommand(rdr["COMPLETE_SOURCE"].ToString(), System.Data.CommandType.Text, contextParms).ToString());
+
+                                //if (backingInput != null)
+                                //    backingInput.Attributes.Add("value", DBManager.ExecuteScalarCommand(rdr["COMPLETE_SOURCE"].ToString(), System.Data.CommandType.Text, contextParms2).ToString());
+
                             }
                             else
                             {
-                                using (var idt = DBManager.ExecuteReaderCommand(rdr["COMPLETE_SOURCE"].ToString(), System.Data.CommandType.Text, contextParms))
+
+                                // default value for drop down
+                                String defaultValue = null;
+                                if (rdr["DEFAULT"] != DBNull.Value)
+                                    defaultValue = DBManager.ExecuteScalarCommand(rdr["DEFAULT"].ToString(), System.Data.CommandType.Text, contextParms).ToString();
+                                
+                                //if (backingInput != null)
+                                //    backingInput.Attributes.Add("value", defaultValue);
+
+                                Debug.WriteLine(rdr["COMPLETE_SOURCE"]);
+                                // Populate drop down options
+                                using (var idt = DBManager.ExecuteReaderCommand(rdr["COMPLETE_SOURCE"].ToString(), System.Data.CommandType.Text, contextParms2))
                                 {
                                     using (var irdr = idt.CreateDataReader())
                                     {
@@ -101,6 +133,8 @@ public partial class Pages_RunReport : System.Web.UI.Page
                                             var opt = new HtmlGenericControl("option");
                                             inputControl.Controls.Add(opt);
                                             opt.Attributes.Add("value", irdr[0].ToString());
+                                            if (defaultValue == irdr[0].ToString())
+                                                opt.Attributes.Add("selected", "selected");
                                             opt.InnerText = irdr[1].ToString();
                                         }
                                     }
@@ -111,7 +145,7 @@ public partial class Pages_RunReport : System.Web.UI.Page
                         inputControl.Attributes.Add("name", rdr["PARM_ID"].ToString());
                         inputControl.Attributes.Add("title", rdr["DESCRIPTION"].ToString());
                         // Hidden
-                        if (rdr["TYPE"].ToString() == "hidden")
+                        if (inputControl.Attributes["type"]  == "hidden")
                         {
                             this.reportInputs.Controls.Add(inputControl);
                             continue;
@@ -124,6 +158,7 @@ public partial class Pages_RunReport : System.Web.UI.Page
                             Text = rdr["PARM_NAME"].ToString()
                         };
 
+
                         var row = new HtmlGenericControl("div");
                         row.Attributes.Add("class", "row");
                         row.Attributes.Add("style", "margin:5px");
@@ -135,7 +170,9 @@ public partial class Pages_RunReport : System.Web.UI.Page
                         row.Controls.Add(colMd8);
                         colMd4.Controls.Add(labelControl);
                         colMd8.Controls.Add(inputControl);
+                        //colMd8.Controls.Add(backingInput);
                         this.reportInputs.Controls.Add(row);
+
 
                         if (rdr["DATATYPE"].ToString() == "System.DateTime")
                             Page.RegisterStartupScript(rdr["PARM_ID"].ToString(),
@@ -148,7 +185,9 @@ public partial class Pages_RunReport : System.Web.UI.Page
                 }
             }
         }
-        catch {}
+        catch(Exception e) {
+            Debug.WriteLine(e.ToString());
+        }
     
     }
 
