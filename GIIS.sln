@@ -63,6 +63,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GIIS.DataLayer.Tests", "GII
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GIIS.HIESync", "HIESync\GIIS.HIESync.csproj", "{3840A0E9-BB6A-4192-8E3C-E31760403DAE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GIIS.ScanForms.UserInterface", "GIIS.ScanForms.UserInterface\GIIS.ScanForms.UserInterface.csproj", "{3504798F-8CC9-49E2-A416-883E4C8A1FF7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GIIS.DataLayer.Contract", "GIIS.DataLayer.Contract\GIIS.DataLayer.Contract.csproj", "{2C2E16EE-A1E5-437A-9E99-7F28B395E532}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,6 +97,14 @@ Global
 		{3840A0E9-BB6A-4192-8E3C-E31760403DAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3840A0E9-BB6A-4192-8E3C-E31760403DAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3840A0E9-BB6A-4192-8E3C-E31760403DAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3504798F-8CC9-49E2-A416-883E4C8A1FF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3504798F-8CC9-49E2-A416-883E4C8A1FF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3504798F-8CC9-49E2-A416-883E4C8A1FF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3504798F-8CC9-49E2-A416-883E4C8A1FF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C2E16EE-A1E5-437A-9E99-7F28B395E532}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C2E16EE-A1E5-437A-9E99-7F28B395E532}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C2E16EE-A1E5-437A-9E99-7F28B395E532}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C2E16EE-A1E5-437A-9E99-7F28B395E532}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
