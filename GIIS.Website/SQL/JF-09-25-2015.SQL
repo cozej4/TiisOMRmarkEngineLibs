@@ -1,4 +1,185 @@
-﻿-- ADD ACTION ID TO THE PARAMETER TABLE
+﻿-- DVDMT REPORT
+
+CREATE OR REPLACE FUNCTION dvdmt_report(
+    IN month integer,
+    IN year integer,
+	IN facilityId integer,
+	IN regionId integer,
+	IN districtId integer)
+  RETURNS TABLE(hf_name text, bcg_011 bigint, bcg_12 bigint, opv1_0 bigint, opv1_011 bigint, opv1_12 bigint, opv2_011 bigint, opv2_12 bigint, opv3_011 bigint, opv3_12 bigint, dtp1_011 bigint, dtp1_12 bigint, dtp2_011 bigint, dtp2_12 bigint, dtp3_011 bigint, dtp3_12 bigint, pvc1_011 bigint, pvc1_12 bigint, pvc2_011 bigint, pvc2_12 bigint, pvc3_011 bigint, pvc3_12 bigint, rota1_011 bigint, rota1_12 bigint, rota2_011 bigint, rota2_12 bigint, rota3_011 bigint, rota3_12 bigint, measles1_011 bigint, measles1_12 bigint, measles2_018 bigint, measles2_18 bigint, tt1 bigint, tt2 bigint, tt3 bigint, tt4 bigint, tt5 bigint, bcg_r real, bcg_b real, bcg_s real, bcg_vvm real, bcg_fr real, bcg_exp real, bcg_o real, opv_r real, opv_b real, opv_s real, opv_vvm real, opv_fr real, opv_exp real, opv_o real, dtp_r real, dtp_b real, dtp_s real, dtp_vvm real, dtp_fr real, dtp_exp real, dtp_o real, pvc_r real, pvc_b real, pvc_s real, pvc_vvm real, pvc_fr real, pvc_exp real, pvc_o real, tet_r real, tet_b real, tet_s real, tet_vvm real, tet_fr real, tet_exp real, tet_o real, rot_r real, rot_b real, rot_s real, rot_vvm real, rot_fr real, rot_exp real, rot_o real, msl_r real, msl_b real, msl_s real, msl_vvm real, msl_fr real, msl_exp real, msl_o real) AS
+$BODY$
+WITH RECURSIVE facility(hfid) AS (
+	SELECT "ID" as hfid , "PARENT_ID" FROM "HEALTH_FACILITY" WHERE "ID" = COALESCE(facilityId,districtId,regionId)
+	UNION
+	SELECT "ID", facility.hfid FROM facility, "HEALTH_FACILITY" WHERE "HEALTH_FACILITY"."PARENT_ID" = facility.hfid
+	)
+SELECT h."NAME",
+--BCG
+(SELECT dvdmt_dose_under_months(61,$1,$2,h."ID",330)),
+(SELECT dvdmt_dose_over_months(61,$1,$2,h."ID",330)),
+--OPV0
+(SELECT dvdmt_dose_under_months(62,$1,$2,h."ID",1)),
+--OPV1
+(SELECT dvdmt_dose_under_months(63,$1,$2,h."ID",330)),
+(SELECT dvdmt_dose_over_months(63,$1,$2,h."ID",330)),
+--OPV2
+(SELECT dvdmt_dose_under_months(64,$1,$2,h."ID",330)),
+(SELECT dvdmt_dose_over_months(64,$1,$2,h."ID",330)),
+--OPV3
+(SELECT dvdmt_dose_under_months(65,$1,$2,h."ID",330)),
+(SELECT dvdmt_dose_over_months(65,$1,$2,h."ID",330)),
+--DTP1
+(SELECT dvdmt_dose_under_months(66,$1,$2,h."ID",330)),
+(SELECT dvdmt_dose_over_months(66,$1,$2,h."ID",330)),
+--DTP2
+(SELECT dvdmt_dose_under_months(67,$1,$2,h."ID",330)),
+(SELECT dvdmt_dose_over_months(67,$1,$2,h."ID",330)),
+--DTP3
+(SELECT dvdmt_dose_under_months(68,$1,$2,h."ID",330)),
+(SELECT dvdmt_dose_over_months(68,$1,$2,h."ID",330)),
+--PVC1
+(SELECT dvdmt_dose_under_months(74,$1,$2,h."ID",330)),
+(SELECT dvdmt_dose_over_months(74,$1,$2,h."ID",330)),
+--PVC2
+(SELECT dvdmt_dose_under_months(75,$1,$2,h."ID",330)),
+(SELECT dvdmt_dose_over_months(75,$1,$2,h."ID",330)),
+--PVC3
+(SELECT dvdmt_dose_under_months(76,$1,$2,h."ID",330)),
+(SELECT dvdmt_dose_over_months(76,$1,$2,h."ID",330)),
+--ROTA1
+(SELECT dvdmt_dose_under_months(69,$1,$2,h."ID",330)),
+(SELECT dvdmt_dose_over_months(69,$1,$2,h."ID",330)),
+--ROTA2
+(SELECT dvdmt_dose_under_months(70,$1,$2,h."ID",330)),
+(SELECT dvdmt_dose_over_months(70,$1,$2,h."ID",330)),
+--ROTA3
+(SELECT dvdmt_dose_under_months(71,$1,$2,h."ID",330)),
+(SELECT dvdmt_dose_over_months(71,$1,$2,h."ID",330)),
+--MSL1
+(SELECT dvdmt_dose_under_months(77,$1,$2,h."ID",330)),
+(SELECT dvdmt_dose_over_months(77,$1,$2,h."ID",330)),
+--MSL2
+(SELECT dvdmt_dose_under_months(77,$1,$2,h."ID",540)),
+(SELECT dvdmt_dose_over_months(77,$1,$2,h."ID",540)),
+--TT1
+(SELECT dvdmt_dose_under_months((SELECT "ID" FROM "DOSE" WHERE "FULLNAME" = 'TT1'),$1,$2,h."ID",540)),
+(SELECT dvdmt_dose_under_months((SELECT "ID" FROM "DOSE" WHERE "FULLNAME" = 'TT2'),$1,$2,h."ID",540)),
+(SELECT dvdmt_dose_under_months((SELECT "ID" FROM "DOSE" WHERE "FULLNAME" = 'TT3'),$1,$2,h."ID",540)),
+(SELECT dvdmt_dose_under_months((SELECT "ID" FROM "DOSE" WHERE "FULLNAME" = 'TT4'),$1,$2,h."ID",540)),
+(SELECT dvdmt_dose_under_months((SELECT "ID" FROM "DOSE" WHERE "FULLNAME" = 'TT5'),$1,$2,h."ID",540)),
+
+--------------
+--STOCK-------
+--------------
+--ADJUSTMENTS
+--25 EXPIRED
+--32 VVM
+--99 FROZEN
+
+--BCG
+(SELECT dvdmt_item_received(42,h."CODE")),
+(SELECT dvdmt_item_balance(42,h."CODE")),
+(SELECT dvdmt_item_stock(42,h."CODE")),
+(SELECT dvdmt_item_adjustment(42,h."CODE",32)),
+(SELECT dvdmt_item_adjustment(42,h."CODE",99)),
+(SELECT dvdmt_item_adjustment(42,h."CODE",25)),
+(SELECT dvdmt_item_adjustment(42,h."CODE",24)),
+
+--OPV
+(SELECT dvdmt_item_received(44,h."CODE")),
+(SELECT dvdmt_item_balance(44,h."CODE")),
+(SELECT dvdmt_item_stock(44,h."CODE")),
+(SELECT dvdmt_item_adjustment(44,h."CODE",32)),
+(SELECT dvdmt_item_adjustment(44,h."CODE",99)),
+(SELECT dvdmt_item_adjustment(44,h."CODE",25)),
+(SELECT dvdmt_item_adjustment(44,h."CODE",24)),
+
+--DTP
+(SELECT dvdmt_item_received(45,h."CODE")),
+(SELECT dvdmt_item_balance(45,h."CODE")),
+(SELECT dvdmt_item_stock(45,h."CODE")),
+(SELECT dvdmt_item_adjustment(45,h."CODE",32)),
+(SELECT dvdmt_item_adjustment(45,h."CODE",99)),
+(SELECT dvdmt_item_adjustment(45,h."CODE",25)),
+(SELECT dvdmt_item_adjustment(45,h."CODE",24)),
+
+--PCV
+(SELECT dvdmt_item_received(60,h."CODE")),
+(SELECT dvdmt_item_balance(60,h."CODE")),
+(SELECT dvdmt_item_stock(60,h."CODE")),
+(SELECT dvdmt_item_adjustment(60,h."CODE",32)),
+(SELECT dvdmt_item_adjustment(60,h."CODE",99)),
+(SELECT dvdmt_item_adjustment(60,h."CODE",25)),
+(SELECT dvdmt_item_adjustment(60,h."CODE",24)),
+
+--TETANUS
+(SELECT dvdmt_item_received(59,h."CODE")),
+(SELECT dvdmt_item_balance(59,h."CODE")),
+(SELECT dvdmt_item_stock(59,h."CODE")),
+(SELECT dvdmt_item_adjustment(59,h."CODE",32)),
+(SELECT dvdmt_item_adjustment(59,h."CODE",99)),
+(SELECT dvdmt_item_adjustment(59,h."CODE",25)),
+(SELECT dvdmt_item_adjustment(59,h."CODE",24)),
+
+--ROTA
+(SELECT dvdmt_item_received(48,h."CODE")),
+(SELECT dvdmt_item_balance(48,h."CODE")),
+(SELECT dvdmt_item_stock(48,h."CODE")),
+(SELECT dvdmt_item_adjustment(48,h."CODE",32)),
+(SELECT dvdmt_item_adjustment(48,h."CODE",99)),
+(SELECT dvdmt_item_adjustment(48,h."CODE",25)),
+(SELECT dvdmt_item_adjustment(48,h."CODE",24)),
+
+--MEASLES
+(SELECT dvdmt_item_received(61,h."CODE")),
+(SELECT dvdmt_item_balance(61,h."CODE")),
+(SELECT dvdmt_item_stock(61,h."CODE")),
+(SELECT dvdmt_item_adjustment(61,h."CODE",32)),
+(SELECT dvdmt_item_adjustment(61,h."CODE",99)),
+(SELECT dvdmt_item_adjustment(61,h."CODE",25)),
+(SELECT dvdmt_item_adjustment(61,h."CODE",24))
+
+FROM "HEALTH_FACILITY" h
+JOIN "VACCINATION_EVENT" v ON h."ID" = v."HEALTH_FACILITY_ID"
+WHERE h."ID" IN (SELECT hfid FROM facility)
+GROUP BY h."NAME", h."ID"
+ORDER BY h."NAME";
+$BODY$
+  LANGUAGE sql VOLATILE;
+
+-- CROSSTAB FOR VACCINATION DATES
+CREATE VIEW child_vaccination_date_crosstab AS
+SELECT * FROM crosstab(
+	'SELECT c."ID", c."LASTNAME1", c."FIRSTNAME1", c."HEALTHCENTER_ID", d."FULLNAME", CASE WHEN v."VACCINATION_STATUS" THEN v."VACCINATION_DATE" ELSE NULL END AS vacc_date FROM "VACCINATION_EVENT" v INNER JOIN "CHILD" c ON (v."CHILD_ID" = c."ID") INNER JOIN "DOSE" d ON (v."DOSE_ID" = d."ID") ORDER BY 1, d."FULLNAME"',
+	'SELECT "FULLNAME" FROM "DOSE" ORDER BY "FULLNAME"'
+)
+	as (
+		"ID" INT, 
+		"LASTNAME1" TEXT, 
+		"FIRSTNAME1" TEXT, 
+		"HEALTHCENTER_ID" INT,
+		"BCG" DATE,
+		"DTP-HepB-Hib 1" DATE,
+		"DTP-HepB-Hib 2" DATE,
+		"DTP-HepB-Hib 3" DATE,
+		"Measles 1" DATE,
+		"Measles 2" DATE,
+		"Measles Rubella 1" DATE,
+		"Measles Rubella 2" DATE,
+		"OPV 1" DATE,
+		"OPV 2" DATE,
+		"OPV 3" DATE,
+		"OPV0" DATE,
+		"PCV 1" DATE,
+		"PCV 2" DATE,
+		"PCV 3" DATE,
+		"Rota 1" DATE,
+		"Rota 2" DATE
+	);
+
+	
+
+-- ADD ACTION ID TO THE PARAMETER TABLE
 ALTER TABLE "REPORT_PARAMETERS" ADD "ORDER" INTEGER NOT NULL DEFAULT 0;
 ALTER TABLE "REPORT_PARAMETER_INPUT_TYPE" ALTER COLUMN "COMPLETE_SOURCE" TYPE TEXT;
 ALTER TABLE "REPORT_PARAMETERS" ADD "ACTION_ID" INTEGER NOT NULL DEFAULT 482;
@@ -22,7 +203,7 @@ TRUNCATE TABLE "REPORT_PARAMETER_INPUT_TYPE" CASCADE;
 -- PARAMETERS AS DEFINED IN THE SPREADSHEET
 INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (1, 'DATE', 'input', NULL, 'text', 'System.DateTime', null);
 INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (2, 'FACILITY', 'select', 'SELECT "ID","NAME" FROM (WITH RECURSIVE facility(hfid) AS ( SELECT "ID" as hfid, "PARENT_ID" FROM "HEALTH_FACILITY" WHERE "ID" = @FacilityId UNION SELECT "ID", facility.hfid FROM facility, "HEALTH_FACILITY" WHERE "HEALTH_FACILITY"."PARENT_ID" = facility.hfid) SELECT "ID", "NAME", "NAME" as SORT FROM "HEALTH_FACILITY" WHERE "ID" IN (SELECT hfid FROM facility) UNION SELECT NULL, ''All'', ''AAAAAAAAA'') AS H ORDER BY sort ', '1', 'System.Int32', 'SELECT @FacilityId');
-INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (3, 'CHILD', 'select', 'SELECT "ID", "LASTNAME1" || ',' || "FIRSTNAME1" FROM "CHILD" WHERE "HEALTHCENTER_ID" IN (WITH RECURSIVE facility(hfid) AS ( SELECT "ID" as hfid, "PARENT_ID" FROM "HEALTH_FACILITY" WHERE "ID" = @FacilityId UNION SELECT "ID", facility.hfid FROM facility, "HEALTH_FACILITY" WHERE "HEALTH_FACILITY"."PARENT_ID" = facility.hfid) SELECT HFID FROM FACILITY)', '1', 'System.Int32', null);
+INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (3, 'CHILD', 'select', 'SELECT "ID", "LASTNAME1" || '','' || "FIRSTNAME1" FROM "CHILD" WHERE "HEALTHCENTER_ID" IN (WITH RECURSIVE facility(hfid) AS ( SELECT "ID" as hfid, "PARENT_ID" FROM "HEALTH_FACILITY" WHERE "ID" = @FacilityId UNION SELECT "ID", facility.hfid FROM facility, "HEALTH_FACILITY" WHERE "HEALTH_FACILITY"."PARENT_ID" = facility.hfid) SELECT HFID FROM FACILITY)', '1', 'System.Int32', null);
 INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (4, 'HIDDEN', 'input', 'SELECT @FacilityId', 'hidden', 'System.Int32', null);
 INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (5, 'DOSE', 'select', 'SELECT "ID","FULLNAME" FROM "DOSE" ORDER BY "FULLNAME"', '1', 'System.Int32', null);
 INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (6, 'MONTH', 'select', 'SELECT I, TO_CHAR(TO_TIMESTAMP(I::TEXT, ''MM''),''MON'') FROM generate_series(1,12) I', '1', 'System.Int32', 'SELECT EXTRACT(MONTH FROM CURRENT_TIMESTAMP)' );
@@ -55,6 +236,7 @@ INSERT INTO "REPORT" VALUES (13, 'Pack_Order_Report', 'Facility Pick/Pack Report
 INSERT INTO "REPORT" VALUES (11, 'Vaccine_Report_Barcode', 'Monthly Register', 481, 4, NULL, 'F');
 INSERT INTO "REPORT" VALUES (12, 'Vaccine_Report_Temp', 'Monthly Register (Temp Id)', 481, 4, NULL, 'F');
 
+
 -- PARAMETERS
 INSERT INTO "REPORT_PARAMETERS" SELECT 2, 'villageId', 'Villiage Name', 'Identifies the village which should be filtered', true, 11, "ID", 2 FROM "ACTIONS" WHERE "NAME" = 'VaccinatorReportParms';
 INSERT INTO "REPORT_PARAMETERS" SELECT 2, 'dobFrom', 'DOB (From)', 'Identifies the lower bound of the date of birth filter', true, 1, "ID", 4 FROM "ACTIONS" WHERE "NAME" = 'VaccinatorReportParms';
@@ -62,5 +244,16 @@ INSERT INTO "REPORT_PARAMETERS" SELECT 2, 'dobTo', 'DOB (To)', 'Identifies the u
 --INSERT INTO "REPORT_PARAMETERS" SELECT 2, 'birthFacility', 'Birth Facility', 'Identifies the type of birth facility', true, 12, "ID" FROM "ACTIONS" WHERE "NAME" = 'VaccinatorReportParms';
 INSERT INTO "REPORT_PARAMETERS" SELECT 2, 'healthFacility', 'Health Facility', 'Identifies the current facility for the child', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
 INSERT INTO "REPORT_PARAMETERS" SELECT 2, 'districtId', 'District', 'Identifies the district (nb: facilities are not filtered when this value changes)', true, 13, "ID", 1 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
-INSERT INTO "REPORT_PARAMETERS" SELECT 2, 'regionId', 'Region', 'Identifies the region (nb: district is not filtered when this value changes)', true, 13, "ID", 0 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 2, 'regionId', 'Region', 'Identifies the region (nb: district is not filtered when this value changes)', true, 14, "ID", 0 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
 
+INSERT INTO "REPORT_PARAMETERS" SELECT 6, 'dobFrom', 'DOB (From)', 'Identifies the lower bound of the date of birth filter', true, 1, "ID", 4 FROM "ACTIONS" WHERE "NAME" = 'VaccinatorReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 6, 'dobTo', 'DOB (To)', 'Identifies the upper bound of the date of birth filter', true, 1, "ID", 5 FROM "ACTIONS" WHERE "NAME" = 'VaccinatorReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 6, 'healthFacility', 'Health Facility', 'Identifies the current facility for the child', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 6, 'districtId', 'District', 'Identifies the district (nb: facilities are not filtered when this value changes)', true, 13, "ID", 1 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 6, 'regionId', 'Region', 'Identifies the region (nb: district is not filtered when this value changes)', true, 14, "ID", 0 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
+
+INSERT INTO "REPORT_PARAMETERS" SELECT 8, 'Month', 'Month', 'Identifies the month which should be generated for the DVDMT', true, 6, "ID", 4 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 8, 'Year', 'Year', 'Identifies the year which should be generated for the DVDMT', true, 7, "ID", 5 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 8, 'healthFacility', 'Health Facility', 'Identifies the current facility for the child', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 8, 'districtId', 'District', 'Identifies the district (nb: facilities are not filtered when this value changes)', true, 13, "ID", 1 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 8, 'regionId', 'Region', 'Identifies the region (nb: district is not filtered when this value changes)', true, 14, "ID", 0 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
