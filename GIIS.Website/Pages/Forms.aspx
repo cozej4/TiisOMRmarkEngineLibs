@@ -32,7 +32,13 @@
         <div class="col-md-1 col-xs-1 col-sm-1 col-lg-1 clearfix"></div>
         <div class="col-md-6 col-xs-6 col-sm-6 col-lg-6 clearfix">
             <ul runat="server" id="ulReports">
-
+                <li><h4 runat="server" id="frms">Scan Forms</h4>
+                    <ul>
+                        <li><a runat="server" id="tz02" href="/forms/TZ02.pdf">Form #2 - Registration</a></li>
+                        <li><a runat="server" id="tz03" href="/forms/TZ03.pdf">Form #3 - Weigh Tally (New)</a></li>
+                        <li><a runat="server" id="tz04" href="/forms/TZ04.pdf">Form #4 - Stock Tally (New)</a></li>
+                    </ul>
+                </li>
             </ul>
             <br />
             <br />

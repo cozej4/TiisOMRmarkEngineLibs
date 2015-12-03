@@ -29,6 +29,9 @@ namespace GIIS.ScanForms.UserInterface
 
         public void UploadData(OmrPageOutput page)
         {
+            StatusDialog dlg = new StatusDialog();
+            dlg.Show();
+
 
             try
             {
@@ -119,6 +122,8 @@ namespace GIIS.ScanForms.UserInterface
                         throw new InvalidOperationException(String.Format("Birthdate is in the future on row {0}", rowNum));
                     if (gender == null)
                         throw new InvalidOperationException(String.Format("Gender must be selected for row {0}", rowNum));
+                    if (birthdate.Month > monthBubble.ValueAsFloat)
+                        throw new InvalidOperationException(String.Format("Child with id {0} is born in the future (relative to the form date). Correct and re-scan sheet", barcodeId));
 
                     var childResult = restUtil.Get<RestReturn>("ChildManagement.svc/RegisterChildWithAppoitments", 
                         new KeyValuePair<string, object>("barcodeId", barcodeId),
@@ -127,7 +132,7 @@ namespace GIIS.ScanForms.UserInterface
                         new KeyValuePair<String, Object>("healthFacilityId", facilityId),
                         new KeyValuePair<String, Object>("modifiedOn", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")),
                         new KeyValuePair<String, Object>("modifiedBy", userInfo.Id),
-                        new KeyValuePair<String, Object>("domicileId", placeInfo.First(o=>o.Id > 0).Id)
+                        new KeyValuePair<String, Object>("domicileId", (placeInfo.FirstOrDefault(o=>o.Id > 0) ?? placeInfo.First()).Id)
                         );
 
                     if (childResult.Id < 0)
@@ -237,7 +242,10 @@ namespace GIIS.ScanForms.UserInterface
                 Trace.TraceError("Error:{0}",e);
                 throw;
             }
-
+            finally
+            {
+                dlg.Close();
+            }
         }
 
 
@@ -251,7 +259,7 @@ namespace GIIS.ScanForms.UserInterface
 
             restUtil.Get<RestReturn>("VaccinationEvent.svc/UpdateVaccinationEventById",
                 new KeyValuePair<string, object>("vaccinationEventId", evt.Id),
-                new KeyValuePair<String, Object>("vaccinationDate", evt.ScheduledDate.ToString("yyyy-MM-dd HH:mm:ss")),
+                new KeyValuePair<String, Object>("vaccinationDate", evt.ScheduledDate.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss Z")),
                 new KeyValuePair<String, Object>("notes", "From form scanner"),
                 new KeyValuePair<String, Object>("vaccinationStatus", true));
 

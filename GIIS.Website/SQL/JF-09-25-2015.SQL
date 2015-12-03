@@ -176,15 +176,52 @@ SELECT * FROM crosstab(
 		"Rota 1" DATE,
 		"Rota 2" DATE
 	);
-
 	
+ALTER TABLE "WEIGHT_TALLY" ADD EBF INT;
+ALTER TABLE "WEIGHT_TALLY" ADD RF INT;
+
+
+CREATE OR REPLACE FUNCTION insert_new_weight(
+    hf_in integer,
+    date_in date,
+    age_group_in integer,
+    m_gt_80_in integer,
+    m_60_80_in integer,
+    m_lt_60_in integer,
+	m_rf_in integer,
+	m_ebf_in integer,
+    f_gt_80_in integer,
+    f_60_80_in integer,
+    f_lt_60_in integer,
+	f_rf_in integer,
+	f_ebf_in integer
+) RETURNS void AS
+$BODY$
+BEGIN
+	INSERT INTO "WEIGHT_TALLY" 
+		(HEALTHFACILITY_ID, ENTRY_DATE, OVERWEIGHT, NORMALWEIGHT, UNDERWEIGHT, AGE_ID, GENDER, EBF, RF)
+		VALUES
+		(HF_IN, DATE_IN, M_GT_80_IN, M_60_80_IN, M_LT_60_IN, AGE_GROUP_IN, 'M', M_EBF_IN, M_RF_IN);
+	INSERT INTO "WEIGHT_TALLY" 
+		(HEALTHFACILITY_ID, ENTRY_DATE, OVERWEIGHT, NORMALWEIGHT, UNDERWEIGHT, AGE_ID, GENDER, EBF, RF)
+		VALUES
+		(HF_IN, DATE_IN, F_GT_80_IN, F_60_80_IN, F_LT_60_IN, AGE_GROUP_IN,'F', F_EBF_IN, F_RF_IN);
+	RETURN;		 
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION insert_new_weight(integer, date, character varying, integer, integer, integer, integer, integer, integer)
+  OWNER TO postgres;
+
+INSERT INTO "DOSE" ("SCHEDULED_VACCINATION_ID", "AGE_DEFINITION_ID", "DOSE_NUMBER", "FULLNAME", "IS_ACTIVE", "MODIFIED_ON", "MODIFIED_BY") VALUES (41, 31, 1, 'TT1', FALSE, CURRENT_TIMESTAMP, 1);
 
 -- ADD ACTION ID TO THE PARAMETER TABLE
-ALTER TABLE "REPORT_PARAMETERS" ADD "ORDER" INTEGER NOT NULL DEFAULT 0;
 ALTER TABLE "REPORT_PARAMETER_INPUT_TYPE" ALTER COLUMN "COMPLETE_SOURCE" TYPE TEXT;
 ALTER TABLE "REPORT_PARAMETERS" ADD "ACTION_ID" INTEGER NOT NULL DEFAULT 482;
 ALTER TABLE "REPORT_PARAMETERS" ALTER COLUMN "ACTION_ID" DROP DEFAULT;
 ALTER TABLE "REPORT_PARAMETER_INPUT_TYPE" ADD "DEFAULT" VARCHAR(128); 
+ALTER TABLE "REPORT_PARAMETERS" ADD "ORDER" INTEGER NOT NULL DEFAULT 0;
 
 INSERT INTO "ACTIONS" ("NAME", "NOTES") VALUES ('VaccinatorReportParms', 'Vaccinator Report Parameters');
 INSERT INTO "ACTIONS" ("NAME", "NOTES") VALUES ('DistrictReportParms', 'District Report Parameters');
@@ -202,18 +239,18 @@ TRUNCATE TABLE "REPORT_PARAMETER_INPUT_TYPE" CASCADE;
 
 -- PARAMETERS AS DEFINED IN THE SPREADSHEET
 INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (1, 'DATE', 'input', NULL, 'text', 'System.DateTime', null);
-INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (2, 'FACILITY', 'select', 'SELECT "ID","NAME" FROM (WITH RECURSIVE facility(hfid) AS ( SELECT "ID" as hfid, "PARENT_ID" FROM "HEALTH_FACILITY" WHERE "ID" = @FacilityId UNION SELECT "ID", facility.hfid FROM facility, "HEALTH_FACILITY" WHERE "HEALTH_FACILITY"."PARENT_ID" = facility.hfid) SELECT "ID", "NAME", "NAME" as SORT FROM "HEALTH_FACILITY" WHERE "ID" IN (SELECT hfid FROM facility) UNION SELECT NULL, ''All'', ''AAAAAAAAA'') AS H ORDER BY sort ', '1', 'System.Int32', 'SELECT @FacilityId');
+INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (2, 'FACILITY', 'select', 'SELECT "ID","NAME" FROM (WITH RECURSIVE facility(hfid) AS ( SELECT "ID" as hfid, "PARENT_ID" FROM "HEALTH_FACILITY" WHERE "ID" = @FacilityId UNION SELECT "ID", facility.hfid FROM facility, "HEALTH_FACILITY" WHERE "HEALTH_FACILITY"."PARENT_ID" = facility.hfid) SELECT "ID", "NAME", "NAME" as SORT FROM "HEALTH_FACILITY" WHERE "ID" IN (SELECT hfid FROM facility) AND "LEAF" = TRUE UNION SELECT NULL, ''All'', ''AAAAAAAAA'') AS H ORDER BY sort ', '1', 'System.Int32', 'SELECT @FacilityId');
 INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (3, 'CHILD', 'select', 'SELECT "ID", "LASTNAME1" || '','' || "FIRSTNAME1" FROM "CHILD" WHERE "HEALTHCENTER_ID" IN (WITH RECURSIVE facility(hfid) AS ( SELECT "ID" as hfid, "PARENT_ID" FROM "HEALTH_FACILITY" WHERE "ID" = @FacilityId UNION SELECT "ID", facility.hfid FROM facility, "HEALTH_FACILITY" WHERE "HEALTH_FACILITY"."PARENT_ID" = facility.hfid) SELECT HFID FROM FACILITY)', '1', 'System.Int32', null);
 INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (4, 'HIDDEN', 'input', 'SELECT @FacilityId', 'hidden', 'System.Int32', null);
 INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (5, 'DOSE', 'select', 'SELECT "ID","FULLNAME" FROM "DOSE" ORDER BY "FULLNAME"', '1', 'System.Int32', null);
 INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (6, 'MONTH', 'select', 'SELECT I, TO_CHAR(TO_TIMESTAMP(I::TEXT, ''MM''),''MON'') FROM generate_series(1,12) I', '1', 'System.Int32', 'SELECT EXTRACT(MONTH FROM CURRENT_TIMESTAMP)' );
-INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (7, 'YEAR', 'select', 'SELECT DISTINCT EXTRACT(YEAR FROM "MODIFIED_ON"), EXTRACT(YEAR FROM "MODIFIED_ON") FROM "CHILD" UNION SELECT MAX(EXTRACT(YEAR FROM "MODIFIED_ON")) + 1, MAX(EXTRACT(YEAR FROM "MODIFIED_ON")) + 1 FROM "CHILD"', '1', 'System.Int32', 'SELECT EXTRACT(YEAR FROM CURRENT_TIMESTAMP)');
+INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (7, 'YEAR', 'select', 'SELECT DISTINCT EXTRACT(YEAR FROM "MODIFIED_ON"), EXTRACT(YEAR FROM "MODIFIED_ON") FROM "CHILD" WHERE EXTRACT(YEAR FROM "MODIFIED_ON") > 1990 UNION SELECT MAX(EXTRACT(YEAR FROM "MODIFIED_ON")) + 1, MAX(EXTRACT(YEAR FROM "MODIFIED_ON")) + 1 FROM "CHILD"', '1', 'System.Int32', 'SELECT EXTRACT(YEAR FROM CURRENT_TIMESTAMP)');
 INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (8, 'STATUS', 'select', 'SELECT I, CASE WHEN I = 1 THEN ''REQUESTED'' WHEN I = 2 THEN ''RELEASED'' WHEN I = 3 THEN ''PACKED'' WHEN I = 4 THEN ''SHIPPED'' WHEN I = 5 THEN ''CANCELLED'' END AS STATUS FROM GENERATE_SERIES(1,5) I', '1', 'System.Int32', null);
 INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (9, 'FACILITY_GLN', 'select', 'SELECT "CODE","NAME" FROM (WITH RECURSIVE facility(hfid) AS ( SELECT "ID" as hfid, "PARENT_ID" FROM "HEALTH_FACILITY" WHERE "ID" = @FacilityId UNION SELECT "ID", facility.hfid FROM facility, "HEALTH_FACILITY" WHERE "HEALTH_FACILITY"."PARENT_ID" = facility.hfid) SELECT "CODE", "NAME", "NAME" as SORT FROM "HEALTH_FACILITY" WHERE "ID" IN (SELECT hfid FROM facility) UNION SELECT NULL, ''All'', ''AAAAAAAAA'') AS H ORDER BY sort ', '1', 'System.Int32', 'SELECT @FacilityId');
 INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (10, 'MYFACILITY_GLN', 'input', 'SELECT "CODE" FROM "HEALTH_FACILITY" WHERE "ID" = @FacilityId', 'input', 'System.String', null);
 INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (11, 'VILLAGE', 'select', 'SELECT "ID","NAME" FROM (SELECT p."ID",p."NAME", p."NAME" AS s FROM "PLACE" p WHERE "HEALTH_FACILITY_ID" IN (WITH RECURSIVE facility(hfid) AS ( SELECT "ID" as hfid, "PARENT_ID" FROM "HEALTH_FACILITY" WHERE "ID" = @FacilityId UNION SELECT "ID", facility.hfid FROM facility, "HEALTH_FACILITY" WHERE "HEALTH_FACILITY"."PARENT_ID" = facility.hfid) SELECT HFID FROM facility) UNION SELECT NULL, ''All'', ''AAA'') H ORDER BY s', '1', 'System.Int32', null);
 INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (12, 'BIRTHPLC', 'select', 'SELECT "ID","NAME" FROM (SELECT p."ID",p."NAME", p."NAME" AS s FROM "BIRTHPLACE" p UNION SELECT NULL, ''All'', ''AAA'') H ORDER BY s', '1', 'System.Int32', null);
-INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (13, 'DISTRICT', 'select', 'SELECT "ID","NAME" FROM (SELECT "ID", "NAME", "NAME" AS S FROM "HEALTH_FACILITY" WHERE "TYPE_ID" = 2 UNION SELECT NULL, ''All'', ''AAAAA'') Q','1','System.Int32', null);
+INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (13, 'DISTRICT', 'select', 'SELECT "ID","NAME" FROM (SELECT "ID", "NAME", "NAME" AS S FROM "HEALTH_FACILITY" WHERE "TYPE_ID" = 2 UNION SELECT NULL, ''All'', ''AAAAA'') Q','1','System.Int32', 'SELECT CASE WHEN "TYPE_ID" = 2 THEN "ID" ELSE "PARENT_ID" END AS "ID" FROM "HEALTH_FACILITY" WHERE "ID" = @FacilityId');
 INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (14, 'REGION', 'select', 'SELECT "ID","NAME" FROM (SELECT "ID", "NAME", "NAME" AS S FROM "HEALTH_FACILITY" WHERE "TYPE_ID" = 1 UNION SELECT NULL, ''All'', ''AAAAA'') Q','1','System.Int32', null);
 
 -- REPORTS
@@ -235,7 +272,7 @@ INSERT INTO "REPORT" VALUES (13, 'Pack_Order_Report', 'Facility Pick/Pack Report
 -- FORMS
 INSERT INTO "REPORT" VALUES (11, 'Vaccine_Report_Barcode', 'Monthly Register', 481, 4, NULL, 'F');
 INSERT INTO "REPORT" VALUES (12, 'Vaccine_Report_Temp', 'Monthly Register (Temp Id)', 481, 4, NULL, 'F');
-
+INSERT INTO "REPORT" VALUES (16, 'New_Vaccination_Register', 'Monthly Register (v9)', 481, 4, 'Prints a list of children due for vaccines at a particular facility', 'F');
 
 -- PARAMETERS
 INSERT INTO "REPORT_PARAMETERS" SELECT 2, 'villageId', 'Villiage Name', 'Identifies the village which should be filtered', true, 11, "ID", 2 FROM "ACTIONS" WHERE "NAME" = 'VaccinatorReportParms';
@@ -248,7 +285,7 @@ INSERT INTO "REPORT_PARAMETERS" SELECT 2, 'regionId', 'Region', 'Identifies the 
 
 INSERT INTO "REPORT_PARAMETERS" SELECT 6, 'dobFrom', 'DOB (From)', 'Identifies the lower bound of the date of birth filter', true, 1, "ID", 4 FROM "ACTIONS" WHERE "NAME" = 'VaccinatorReportParms';
 INSERT INTO "REPORT_PARAMETERS" SELECT 6, 'dobTo', 'DOB (To)', 'Identifies the upper bound of the date of birth filter', true, 1, "ID", 5 FROM "ACTIONS" WHERE "NAME" = 'VaccinatorReportParms';
-INSERT INTO "REPORT_PARAMETERS" SELECT 6, 'healthFacility', 'Health Facility', 'Identifies the current facility for the child', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 6, 'facilityId', 'Health Facility', 'Identifies the current facility for the child', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
 INSERT INTO "REPORT_PARAMETERS" SELECT 6, 'districtId', 'District', 'Identifies the district (nb: facilities are not filtered when this value changes)', true, 13, "ID", 1 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
 INSERT INTO "REPORT_PARAMETERS" SELECT 6, 'regionId', 'Region', 'Identifies the region (nb: district is not filtered when this value changes)', true, 14, "ID", 0 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
 
@@ -257,3 +294,16 @@ INSERT INTO "REPORT_PARAMETERS" SELECT 8, 'Year', 'Year', 'Identifies the year w
 INSERT INTO "REPORT_PARAMETERS" SELECT 8, 'healthFacility', 'Health Facility', 'Identifies the current facility for the child', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
 INSERT INTO "REPORT_PARAMETERS" SELECT 8, 'districtId', 'District', 'Identifies the district (nb: facilities are not filtered when this value changes)', true, 13, "ID", 1 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
 INSERT INTO "REPORT_PARAMETERS" SELECT 8, 'regionId', 'Region', 'Identifies the region (nb: district is not filtered when this value changes)', true, 14, "ID", 0 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
+
+
+INSERT INTO "REPORT_PARAMETERS" SELECT 11, 'Month', 'Month', 'Identifies the month which should be generated for the DVDMT', true, 6, "ID", 4 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 11, 'Year', 'Year', 'Identifies the year which should be generated for the DVDMT', true, 7, "ID", 5 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 11, 'healthFacility', 'Health Facility', 'Identifies the current facility for the child', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+
+INSERT INTO "REPORT_PARAMETERS" SELECT 12, 'Month', 'Month', 'Identifies the month which should be generated for the DVDMT', true, 6, "ID", 4 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 12, 'Year', 'Year', 'Identifies the year which should be generated for the DVDMT', true, 7, "ID", 5 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 12, 'healthFacility', 'Health Facility', 'Identifies the current facility for the child', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+
+INSERT INTO "REPORT_PARAMETERS" SELECT 16, 'month', 'Month', 'Identifies the month which should be generated for the DVDMT', true, 6, "ID", 4 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 16, 'year', 'Year', 'Identifies the year which should be generated for the DVDMT', true, 7, "ID", 5 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 16, 'facilityId', 'Health Facility', 'Identifies the current facility for the child', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';

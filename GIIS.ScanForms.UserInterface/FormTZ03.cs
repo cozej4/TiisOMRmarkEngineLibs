@@ -22,6 +22,10 @@ namespace GIIS.ScanForms.UserInterface
         public void UploadData(OmrPageOutput page)
         {
 
+            StatusDialog dlg = new StatusDialog();
+            dlg.Show();
+
+
             try
             {
                 int facilityId = FacilitySelectionContext.FacilityId;
@@ -96,6 +100,7 @@ namespace GIIS.ScanForms.UserInterface
                 Trace.TraceError("Error:{0}",e);
                 throw;
             }
+            finally { dlg.Close(); }
 
         }
 

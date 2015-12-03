@@ -60,6 +60,7 @@ public partial class Pages_RunReport : System.Web.UI.Page
                 }
             }
 
+            bool noAuthorization = false;
             /// Command
             command = "SELECT *, C.\"NAME\" AS ACTION FROM \"REPORT_PARAMETERS\" A INNER JOIN \"REPORT_PARAMETER_INPUT_TYPE\" B ON (A.\"INPUT_TYPE\" = B.\"ID\") INNER JOIN \"ACTIONS\" C ON (A.\"ACTION_ID\" = C.\"ID\") WHERE \"REPORT_ID\" = @Id ORDER BY \"PARM_ID\"";
             using (var dt = DBManager.ExecuteReaderCommand(command, System.Data.CommandType.Text, new List<Npgsql.NpgsqlParameter>() { new NpgsqlParameter("Id", NpgsqlTypes.NpgsqlDbType.Integer) { Value = id }}))
@@ -77,6 +78,7 @@ public partial class Pages_RunReport : System.Web.UI.Page
                             //inputControl.Attributes.Add("disabled", "disabled");
                             inputControl.Attributes["type"] = "hidden";
                             inputControl.TagName = "input";
+                            noAuthorization = true;
                             // Used because readonly has no effect 
                             //backingInput = new HtmlGenericControl("input");
                             //backingInput.Attributes.Add("type", "hidden");
@@ -105,7 +107,11 @@ public partial class Pages_RunReport : System.Web.UI.Page
                             // Hidden value or input is just a value
                             if (rdr["TAG"].ToString() == "input" || inputControl.Attributes["type"] == "hidden")
                             {
-                                inputControl.Attributes.Add("value", DBManager.ExecuteScalarCommand(rdr["COMPLETE_SOURCE"].ToString(), System.Data.CommandType.Text, contextParms).ToString());
+                                
+                                if(noAuthorization && rdr["DEFAULT"] != DBNull.Value)
+                                    inputControl.Attributes.Add("value", DBManager.ExecuteScalarCommand(rdr["DEFAULT"].ToString(), System.Data.CommandType.Text, contextParms).ToString());
+                                else
+                                    inputControl.Attributes.Add("value", DBManager.ExecuteScalarCommand(rdr["COMPLETE_SOURCE"].ToString(), System.Data.CommandType.Text, contextParms).ToString());
 
                                 //if (backingInput != null)
                                 //    backingInput.Attributes.Add("value", DBManager.ExecuteScalarCommand(rdr["COMPLETE_SOURCE"].ToString(), System.Data.CommandType.Text, contextParms2).ToString());
@@ -186,6 +192,7 @@ public partial class Pages_RunReport : System.Web.UI.Page
             }
         }
         catch(Exception e) {
+
             Debug.WriteLine(e.ToString());
         }
     

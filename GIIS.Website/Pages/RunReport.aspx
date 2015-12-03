@@ -46,7 +46,7 @@
         </div>
     </div>
     </form>
-    <form class="form" method="get" action="<%= this.jasperAction %>" id="launchReport" >
+    <form target="_blank" onsubmit="scrubNullValues()" class="form" method="get" action="<%= this.jasperAction %>" id="launchReport" >
     <div class="row">
             <div class="col-md-12">
                     <asp:TextBox ID="hack" runat="server" Visible="false" />
@@ -65,6 +65,19 @@
         </div>
     </div>
     </form>
-
+    <script type="text/javascript">
+        function scrubNullValues() {
+            $('input').each(function(i) {
+                var $input = $(this);
+                if ($input.val() == '')
+                    $input.attr('disabled', 'disabled');
+            });
+            $('select').each(function(i) {
+                var $input = $(this);
+                if ($input.val() == '')
+                    $input.attr('disabled', 'disabled');
+            });
+        }
+    </script>
     <ajaxToolkit:CalendarExtender TargetControlID="hack" ID="ceMain" runat="server" />
 </asp:Content>

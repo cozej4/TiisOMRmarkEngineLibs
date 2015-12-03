@@ -32,10 +32,10 @@
             this.label2 = new System.Windows.Forms.Label();
             this.txtBarcode = new System.Windows.Forms.TextBox();
             this.btnOk = new System.Windows.Forms.Button();
-            this.pnlView = new System.Windows.Forms.Panel();
             this.pbBarcode = new System.Windows.Forms.PictureBox();
-            this.pnlView.SuspendLayout();
+            this.pnlView = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.pbBarcode)).BeginInit();
+            this.pnlView.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -52,9 +52,9 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(9, 257);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(230, 13);
+            this.label2.Size = new System.Drawing.Size(281, 13);
             this.label2.TabIndex = 2;
-            this.label2.Text = "Please type the barcode in the space provided:";
+            this.label2.Text = "Please type the data located above or below the barcode:";
             // 
             // txtBarcode
             // 
@@ -75,15 +75,6 @@
             this.btnOk.UseVisualStyleBackColor = true;
             this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
             // 
-            // pnlView
-            // 
-            this.pnlView.AutoScroll = true;
-            this.pnlView.Controls.Add(this.pbBarcode);
-            this.pnlView.Location = new System.Drawing.Point(15, 25);
-            this.pnlView.Name = "pnlView";
-            this.pnlView.Size = new System.Drawing.Size(267, 229);
-            this.pnlView.TabIndex = 5;
-            // 
             // pbBarcode
             // 
             this.pbBarcode.Location = new System.Drawing.Point(3, 3);
@@ -92,6 +83,15 @@
             this.pbBarcode.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pbBarcode.TabIndex = 2;
             this.pbBarcode.TabStop = false;
+            // 
+            // pnlView
+            // 
+            this.pnlView.AutoScroll = true;
+            this.pnlView.Controls.Add(this.pbBarcode);
+            this.pnlView.Location = new System.Drawing.Point(15, 25);
+            this.pnlView.Name = "pnlView";
+            this.pnlView.Size = new System.Drawing.Size(267, 229);
+            this.pnlView.TabIndex = 5;
             // 
             // BarcodeCorrection
             // 
@@ -110,9 +110,9 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Barcode Correction";
             this.TopMost = true;
+            ((System.ComponentModel.ISupportInitialize)(this.pbBarcode)).EndInit();
             this.pnlView.ResumeLayout(false);
             this.pnlView.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pbBarcode)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -124,7 +124,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox txtBarcode;
         private System.Windows.Forms.Button btnOk;
-        private System.Windows.Forms.Panel pnlView;
         private System.Windows.Forms.PictureBox pbBarcode;
+        private System.Windows.Forms.Panel pnlView;
     }
 }

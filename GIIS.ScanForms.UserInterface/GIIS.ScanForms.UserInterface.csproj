@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GIIS.ScanForms.UserInterface</RootNamespace>
     <AssemblyName>GIIS.ScanForms.UserInterface</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -55,6 +56,7 @@
     <Compile Include="FacilitySelectionContext.cs" />
     <Compile Include="FormBID01.cs" />
     <Compile Include="FormBID03.cs" />
+    <Compile Include="FormTZ01.cs" />
     <Compile Include="FormTZ02.cs" />
     <Compile Include="FormTZ04.cs" />
     <Compile Include="FormTZ03.cs" />
@@ -70,6 +72,18 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="StatusDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatusDialog.Designer.cs">
+      <DependentUpon>StatusDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VaccineCorrection.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VaccineCorrection.Designer.cs">
+      <DependentUpon>VaccineCorrection.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GIIS.DataLayer.Contract\GIIS.DataLayer.Contract.csproj">
@@ -83,6 +97,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Forms\BID01.mxml" />
+    <None Include="Forms\BID03.mxml" />
+    <None Include="Forms\BIDSTS.mxml" />
+    <None Include="Forms\TZ01.mxml" />
+    <None Include="Forms\TZ02.mxml" />
+    <None Include="Forms\TZ03.mxml" />
+    <None Include="Forms\TZ04.mxml" />
+    <None Include="Forms\WTS.mxml" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="BarcodeCorrection.resx">
@@ -95,6 +117,16 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="StatusDialog.resx">
+      <DependentUpon>StatusDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VaccineCorrection.resx">
+      <DependentUpon>VaccineCorrection.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="install.iss" />
+    <Content Include="Logo.bmp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
