@@ -225,9 +225,10 @@ INSERT INTO "DOSE" ("SCHEDULED_VACCINATION_ID", "AGE_DEFINITION_ID", "DOSE_NUMBE
 
 -- ADD ACTION ID TO THE PARAMETER TABLE
 ALTER TABLE "REPORT_PARAMETER_INPUT_TYPE" ALTER COLUMN "COMPLETE_SOURCE" TYPE TEXT;
+ALTER TABLE "REPORT_PARAMETER_INPUT_TYPE" ADD "DEFAULT" VARCHAR(128); 
 ALTER TABLE "REPORT_PARAMETERS" ADD "ACTION_ID" INTEGER NOT NULL DEFAULT 482;
 ALTER TABLE "REPORT_PARAMETERS" ALTER COLUMN "ACTION_ID" DROP DEFAULT;
-ALTER TABLE "REPORT_PARAMETER_INPUT_TYPE" ADD "DEFAULT" VARCHAR(128); 
+ALTER TABLE "REPORT_PARAMETERS" ADD CONSTRAINT "FK_REPORT_PARAMETERS_ACTION" FOREIGN KEY ("ACTION_ID") REFERENCES "ACTIONS"("ID");
 ALTER TABLE "REPORT_PARAMETERS" ADD "ORDER" INTEGER NOT NULL DEFAULT 0;
 
 INSERT INTO "ACTIONS" ("NAME", "NOTES") VALUES ('VaccinatorReportParms', 'Vaccinator Report Parameters');
@@ -270,7 +271,8 @@ INSERT INTO "REPORT" VALUES (6, 'Child_Vaccinations', 'Child Vaccinations', 482,
 -- MONTHLY REPORTS
 INSERT INTO "REPORT" VALUES (8, 'DVDMT_Report', 'DVDMT Worksheet', 481, 3, NULL, 'R');
 INSERT INTO "REPORT" VALUES (14, 'drp_divo_overview', 'Forecasted Consumption', 481, 3, NULL, 'R');
-INSERT INTO "REPORT" VALUES (15, 'Facility_Coverage', 'Facility Coverage/Performance', 481, 3, NULL, 'R');
+INSERT INTO "REPORT" VALUES (15, 'Facility_Coverage_Admin', 'Facility Coverage (targets)', 482, 3, 'Review the coverage rates of facilities based on coverage targets', 'R');
+INSERT INTO "REPORT" VALUES (17, 'Facility_Coverage_Actual', 'Facility Coverage (scheduled)', 482, 3, 'Review the coverage rates of facilities as a function of those who were expected to show up (appointment data)', 'R');
 
 -- VACCINATIONS
 INSERT INTO "REPORT" VALUES (5, 'Vaccines_Administered', 'Health Facility Consumption', 481, 1, NULL, 'R');
@@ -304,14 +306,28 @@ INSERT INTO "REPORT_PARAMETERS" SELECT 8, 'districtId', 'District', 'Identifies 
 INSERT INTO "REPORT_PARAMETERS" SELECT 8, 'regionId', 'Region', 'Identifies the region (nb: district is not filtered when this value changes)', true, 14, "ID", 0 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
 
 
-INSERT INTO "REPORT_PARAMETERS" SELECT 11, 'Month', 'Month', 'Identifies the month which should be generated for the DVDMT', true, 6, "ID", 4 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
-INSERT INTO "REPORT_PARAMETERS" SELECT 11, 'Year', 'Year', 'Identifies the year which should be generated for the DVDMT', true, 7, "ID", 5 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
-INSERT INTO "REPORT_PARAMETERS" SELECT 11, 'healthFacility', 'Health Facility', 'Identifies the current facility for the child', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 11, 'Month', 'Month', 'Identifies the month which should be generated for the monthly register', true, 6, "ID", 4 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 11, 'Year', 'Year', 'Identifies the year which should be generated for the monthly register', true, 7, "ID", 5 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 11, 'healthFacility', 'Health Facility', 'Identifies the current facility for the  monthly register', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
 
-INSERT INTO "REPORT_PARAMETERS" SELECT 12, 'Month', 'Month', 'Identifies the month which should be generated for the DVDMT', true, 6, "ID", 4 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
-INSERT INTO "REPORT_PARAMETERS" SELECT 12, 'Year', 'Year', 'Identifies the year which should be generated for the DVDMT', true, 7, "ID", 5 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
-INSERT INTO "REPORT_PARAMETERS" SELECT 12, 'healthFacility', 'Health Facility', 'Identifies the current facility for the child', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 12, 'Month', 'Month', 'Identifies the month which should be generated for the  monthly register', true, 6, "ID", 4 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 12, 'Year', 'Year', 'Identifies the year which should be generated for the  monthly register', true, 7, "ID", 5 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 12, 'healthFacility', 'Health Facility', 'Identifies the current facility for the  monthly register', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
 
-INSERT INTO "REPORT_PARAMETERS" SELECT 16, 'month', 'Month', 'Identifies the month which should be generated for the DVDMT', true, 6, "ID", 4 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
-INSERT INTO "REPORT_PARAMETERS" SELECT 16, 'year', 'Year', 'Identifies the year which should be generated for the DVDMT', true, 7, "ID", 5 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
-INSERT INTO "REPORT_PARAMETERS" SELECT 16, 'facilityId', 'Health Facility', 'Identifies the current facility for the child', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 16, 'month', 'Month', 'Identifies the month which should be generated for the  monthly register', true, 6, "ID", 4 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 16, 'year', 'Year', 'Identifies the year which should be generated for the  monthly register', true, 7, "ID", 5 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 16, 'facilityId', 'Health Facility', 'Identifies the current facility for the  monthly register', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+
+INSERT INTO "REPORT_PARAMETERS" SELECT 15, 'dateFrom', 'Date (From)', 'Identifies the month which should be generated for the facility balance report', true, 1, "ID", 4 FROM "ACTIONS" WHERE "NAME" = 'VaccinatorReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 15, 'dateTo', 'Date (To)', 'Identifies the year which should be generated for the facility balance report', true, 1, "ID", 5 FROM "ACTIONS" WHERE "NAME" = 'VaccinatorReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 15, 'antigenId', 'Antigen', 'Identifies the antigen which should be displayed', true, 15, "ID", 4 FROM "ACTIONS" WHERE "NAME" = 'VaccinatorReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 15, 'facilityId', 'Health Facility', 'Identifies the current facility for the facility balance report', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 15, 'districtId', 'District', 'Identifies the district (nb: facilities are not filtered when this value changes)', true, 13, "ID", 1 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 15, 'regionId', 'Region', 'Identifies the region (nb: district is not filtered when this value changes)', true, 14, "ID", 0 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
+
+INSERT INTO "REPORT_PARAMETERS" SELECT 17, 'dateFrom', 'Date (From)', 'Identifies the month which should be generated for the facility balance report', true, 1, "ID", 4 FROM "ACTIONS" WHERE "NAME" = 'VaccinatorReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 17, 'dateTo', 'Date (To)', 'Identifies the year which should be generated for the facility balance report', true, 1, "ID", 5 FROM "ACTIONS" WHERE "NAME" = 'VaccinatorReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 17, 'antigenId', 'Antigen', 'Identifies the antigen which should be displayed', true, 15, "ID", 4 FROM "ACTIONS" WHERE "NAME" = 'VaccinatorReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 17, 'facilityId', 'Health Facility', 'Identifies the current facility for the facility balance report', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 17, 'districtId', 'District', 'Identifies the district (nb: facilities are not filtered when this value changes)', true, 13, "ID", 1 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 17, 'regionId', 'Region', 'Identifies the region (nb: district is not filtered when this value changes)', true, 14, "ID", 0 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';

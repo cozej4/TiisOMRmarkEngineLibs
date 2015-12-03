@@ -77,6 +77,20 @@
                 if ($input.val() == '')
                     $input.attr('disabled', 'disabled');
             });
+            setTimeout(resetNullValues, 500);
+        }
+
+        function resetNullValues() {
+            $('input[disabled=disabled]').each(function(i) {
+                var $input = $(this);
+                if ($input.val() == '')
+                    $input.removeAttr('disabled');
+            });
+            $('select[disabled=disabled]').each(function(i) {
+                var $input = $(this);
+                if ($input.val() == '')
+                    $input.removeAttr('disabled');
+            });
         }
     </script>
     <ajaxToolkit:CalendarExtender TargetControlID="hack" ID="ceMain" runat="server" />
