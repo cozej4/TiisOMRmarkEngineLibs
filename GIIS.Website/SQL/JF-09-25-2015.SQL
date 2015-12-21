@@ -175,7 +175,12 @@ SELECT * FROM crosstab(
 		"PCV 2" DATE,
 		"PCV 3" DATE,
 		"Rota 1" DATE,
-		"Rota 2" DATE
+		"Rota 2" DATE,
+		"TT1" DATE,
+		"TT2" DATE,
+		"TT3" DATE,
+		"TT4" DATE,
+		"TT5" DATE
 	);
 	
 ALTER TABLE "WEIGHT_TALLY" ADD EBF INT;
