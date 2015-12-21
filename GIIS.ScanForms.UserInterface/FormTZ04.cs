@@ -42,7 +42,7 @@ namespace GIIS.ScanForms.UserInterface
 
                 var monthBubble = page.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "Month");
                 if (monthBubble == null)
-                    Err += "Must select month!; ";
+                    throw new InvalidOperationException("Missing month selection on form");
 
                 // Now we want to upload the data 
                 BirthDoseSubmission submission = new BirthDoseSubmission()

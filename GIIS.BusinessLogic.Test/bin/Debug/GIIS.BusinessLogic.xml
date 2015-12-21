@@ -1,0 +1,415 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GIIS.BusinessLogic</name>
+    </assembly>
+    <members>
+        <member name="T:GIIS.BusinessLogic.Exceptions.IllegalStateException">
+            <summary>
+            Illegal state exception indicates an operation failed because of an illegal state guard condition
+            </summary>
+        </member>
+        <member name="P:GIIS.BusinessLogic.Exceptions.IllegalStateException.CurrentState">
+            <summary>
+            The current state which caused the exception
+            </summary>
+        </member>
+        <member name="P:GIIS.BusinessLogic.Exceptions.IllegalStateException.ClassName">
+            <summary>
+            Gets the name of the class that caused the exception
+            </summary>
+        </member>
+        <member name="P:GIIS.BusinessLogic.Exceptions.IllegalStateException.Action">
+            <summary>
+            Gets the attempted action that caused the exception
+            </summary>
+        </member>
+        <member name="M:GIIS.BusinessLogic.Exceptions.IllegalStateException.#ctor(GIIS.BusinessLogic.OrderStatusType,System.String,System.String)">
+            <summary>
+            Creates a new instance of the <see cref="T:GIIS.BusinessLogic.Exception.IllegalStateException"/> class
+            </summary>
+            <param name="currentState">The current state of the object that caused the exception</param>
+            <param name="className">The name of the class in the state which caused the exception</param>
+            <param name="action">The name of the action which caused the exception</param>
+        </member>
+        <member name="T:GIIS.BusinessLogic.OrderManagementLogic">
+            <summary>
+            Order Management Logic
+            </summary>
+        </member>
+        <member name="M:GIIS.BusinessLogic.OrderManagementLogic.UpdateOrderDetails(GIIS.DataLayer.TransferOrderHeader,System.Int32)">
+            <summary>
+            Update the order details
+            </summary>
+            <param name="order">The order whose details should be updated</param>
+            <param name="modifiedBy">The identification of the user performing the update</param>
+        </member>
+        <member name="M:GIIS.BusinessLogic.OrderManagementLogic.GetOldestLot(GIIS.DataLayer.HealthFacility,System.String)">
+            <summary>
+            Gets the oldest lot in a facility of the specified <paramref name="gtin"/>
+            </summary>
+            <param name="facility">The facility in which the oldest lot should be found</param>
+            <param name="gtin">The GTIN of the item to be found</param>
+            <returns>The <see cref="T:GIIS.DataLayer.ItemLot"/> with the earliest expiry date</returns>
+        </member>
+        <member name="M:GIIS.BusinessLogic.OrderManagementLogic.AddOrderLine(GIIS.DataLayer.TransferOrderHeader,System.String,System.String,System.Int32,GIIS.DataLayer.Uom,System.Int32)">
+             <summary>
+             Add an order line to the order defined by <paramref name="order"/>
+             </summary>
+             <param name="order">The order to which the line should be added</param>
+             <param name="gtin">The global trade identification number of the item in the line</param>
+             <param name="lot">(Optional) The lot number to be used. Note if null is passed in <paramref name="lot"/> then the oldest lot is used first</param>
+             <param name="qty">The quantity of the item to be added to the order</param>
+             <param name="uom">(Optional) The base unit of measure. If <paramref name="uom"/> is null then the default UOM for the item described by <paramref name="gtin"/> is used</param>
+             <returns>The constructed and saved <see cref="T:GIIS.DataLayer.TransferOrderDetail"/></returns>
+             <remarks>
+             The add order line function is responsible for adding a new order line to the order detail. This function operates in the following manner: 
+             <list type="ordered">
+             <item>
+                 <description>[Guard Condition] If the order passed into the function IS in the “Packed” or “Shipped” state then throw an invalid state exception (sanity check)</description>
+             </item>
+             <item>
+                 <description>Lookup the item by the GTIN provided in the function call.</description>
+             </item>
+             <item>
+                 <description>[Guard Condition] If the lot number is provided, and the lot number is not a valid lot number for the item provided then throw an error code</description>
+             </item>
+             <item>
+                 <description>If the current status of the order to which the detail is to be attached is “Released” then
+                     <list type="ordered">
+                         <item>
+                             <description>Instantiate a StockManagementLogic BLL class</description>
+                         </item>
+                         <item>Allocate the stock using the Allocate method</item>
+                     </list>
+                 </description>
+             </item>
+             <item>
+                 <description>Set the unit of measure, quantity, gtin, etc. fields of the TransferOrderDetail instance to the parameters and fields derived from loaded Item.</description>
+             </item>
+             <item>
+                 <description>Save the order line.</description>
+             </item>
+            </list>
+             </remarks>
+        </member>
+        <member name="M:GIIS.BusinessLogic.OrderManagementLogic.CancelOrder(GIIS.DataLayer.TransferOrderHeader,System.Int32)">
+            <summary>
+            Cancels an order regardless of state
+            </summary>
+            <param name="order">The order to be cancelled</param>
+            <returns>The cancelled <see cref="T:GIIS.DataLayer.TransferOrderHeader"/></returns>
+            <remarks>
+            The cancel order function is used to cancel any order and back-out any stock transactions that have occurred. 
+            The process for this function is as follows:
+            <list type="ordered">
+            <item><description>	[Guard Condition] If the order passed into the function IS NOT in states “Requested”, “Released” or “Packed” then throw an invalid state exception (sanity check)</description></item>
+            <item><description>	Create an instance of the StockManagementLogic BLL class</description></item>
+            <item><description>	The function updates the TransferOrderHeader status to “Cancelled”</description></item>
+            <item><description>	For each item in the TransferOrderDetails for the order:
+                <list type="ordered">
+                    <item><description>Call the UpdateOrderLine function to set the status of the order detail item to “Cancelled”.</description></item>
+                </list>
+            </description></item>
+            
+            <item><description>	Save the TransferOrderHeader</description></item>
+            </list>
+            </remarks>
+        </member>
+        <member name="M:GIIS.BusinessLogic.OrderManagementLogic.PackOrder(GIIS.DataLayer.TransferOrderHeader,System.Int32)">
+            <summary>
+            Updates the order to packed
+            </summary>
+            <param name="order">The order which is the be set in the packed state</param>
+            <returns>The <see cref="T:GIIS.DataLayer.TransferOrderHeader"/> which has been marked as Packed</returns>
+            <remarks>
+            The pack order function is used whenever the caller wishes to update an existing order to the “packed” status. This function does no stock transaction and merely updates the order lines.
+            The process for this function is as follows:
+            <list type="ordered">
+            <item><description>	[Guard Condition] If the order passed into the function IS NOT in state “Released” then throw an invalid state exception (sanity check)</description></item>
+            <item><description>	The function updates the TransferOrderHeader status to “Packed”.</description></item>
+            <item><description>	For each item in the TransferOrderDetails for the order:
+                <list type="ordered">
+                    <item><description>a.	Call UpdateOrderLine function to set the status of the order detail item to “Packed”</description></item>
+                </list>
+            </description></item>
+            <item><description>	Save the TransferOrderHeader</description></item>
+            </list>
+            </remarks>
+        </member>
+        <member name="M:GIIS.BusinessLogic.OrderManagementLogic.ReleaseOrder(GIIS.DataLayer.TransferOrderHeader,System.Int32)">
+            <summary>
+            Releases an order 
+            </summary>
+            <param name="order">The order which is to be placed in the released state</param>
+            <returns>The <see cref="T:GIIS.DataLayer.TransferOrderHeader"/> of the released order</returns>
+            <remarks>
+            The release order function is used whenever the caller wishes to update an existing order and “release” it. This function allocates stock in the item transaction tables (using the StockManagementLogic class).
+            The process for this function is as follows:
+            <list type="ordered">
+            <item><description>	[Guard Condition] If the order passed into the function IS NOT in state “Requested” then throw an invalid state exception (sanity check)</description></item>
+            <item><description>	For each item in the TransferOrderDetails for the order:
+                <list type="ordered">
+                    <item><description>Call UpdateOrderLine function to set the status of the order detail item to “Released”</description></item>
+                </list>
+            </description></item>
+            <item><description>	Save the TransferOrderHeader</description></item>
+            </list>
+            </remarks>
+        </member>
+        <member name="M:GIIS.BusinessLogic.OrderManagementLogic.RemoveOrderLine(GIIS.DataLayer.TransferOrderDetail,System.Int32)">
+            <summary>
+            Remove an order line
+            </summary>
+            <param name="line">The order line which is to be removed from its parent order</param>
+            <returns>The <see cref="T:GIIS.DataLayer.TransferOrderDetail"/> representing the line that was removed</returns>
+            <remarks>
+            The remove order line function is used to remove an order detail from a transfer order. The process is as follows:
+            <list type="ordered">
+            <item><description>	Load the current order line for the database using the order line #</description></item>
+            <item><description>	Instantiate an instance of <see cref="T:GIIS.BusinessLogic.StockManagementLogic"/>  BLL class.</description></item>
+            <item><description>	If the status of the current order line is:
+                <list type="table">
+                    <listheader>
+                        <term>State</term>
+                        <description>Action</description>
+                    </listheader>
+                    <item><term>Released</term><description>Call the <see cref="M:GIIS.BusinessLogic.StockManagementLogic.Allocate(GIIS.DataLayer.HealthFacility, System.String, System.String, System.Int32)"/> method of the <see cref="T:GIIS.BusinessLogic.StockManagementLogic"/> instance to perform the de-allocation of the item.</description></item>
+                    <item><term>Packed</term><description>Call the Allocate method of the <see cref="T:GIIS.BusinessLogic.StockManagementLogic"/>  instance to perform the de-allocation of the item.</description></item>
+                    <item><term>Shipped</term><description>Throw an invalid operation exception as shipped orders (and their lines) cannot be edited</description></item>
+                    <item><term>Cancelled</term><description>Throw an invalid operation exception as cancelled orders (and their lines) cannot be edited</description></item>
+                </list>
+            </description></item>
+            <item><description>	Delete the order line from the transfer order table.</description></item>
+            </list>
+            </remarks>
+        </member>
+        <member name="M:GIIS.BusinessLogic.OrderManagementLogic.RequestOrderFromDrp(GIIS.DataLayer.HealthFacility,System.Int32)">
+            <summary>
+            Request an order from a mini-drp run
+            </summary>
+            <param name="to">The facility which is the target of the drp run</param>
+            <param name="modifiedBy">The user which is requesting the order from DRP run</param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:GIIS.BusinessLogic.OrderManagementLogic.RequestOrder(System.Int32[],System.Int32)" -->
+        <member name="M:GIIS.BusinessLogic.OrderManagementLogic.RequestOrder(GIIS.DataLayer.HealthFacility,GIIS.DataLayer.HealthFacility,System.DateTime,System.Int32)">
+            <summary>
+            Manually requests an order be created from <paramref name="from"/> to <paramref name="to"/> in the Requested state
+            </summary>
+            <param name="from">The <see cref="T:GIIS.DataLayer.HealthFacility"/> from which the order is originating (where stock originates)</param>
+            <param name="to">The <see cref="T:GIIS.DataLayer.HealthFacility"/> to which the order is destined (where stock will end up)</param>
+            <param name="orderDate">The date that the order is to take place</param>
+            <returns>A constructed <see cref="T:GIIS.DataLayer.TransferOrderHeader"/> containing the constructed order items</returns>
+            <remarks>
+            Callers of this function will need to make subsequent calls to <see cref="M:GIIS.BusinessLogic.OrderManagementLogic.AddOrderLine(GIIS.DataLayer.TransferOrderHeader, System.String, System.String, System.Int32, GIIS.DataLayer.Uom) "/> function
+            to add order lines.
+            </remarks>
+        </member>
+        <member name="M:GIIS.BusinessLogic.OrderManagementLogic.ShipOrder(GIIS.DataLayer.TransferOrderHeader,System.Int32)">
+             <summary>
+             Ships the specified <paramref name="order"/>
+             </summary>
+             <param name="order">The order which is to be marked as "shipped"</param>
+             <returns>The <see cref="T:GIIS.DataLayer.TransferOrderHeader"/> which has been marked as Shipped</returns>
+             <remarks>
+             The ship order function is used whenever the caller wishes to update an existing order to the “shipped” status and perform the transfers. 
+            The process for this function is as follows:
+            <list type="ordered">
+             <item><description>	[Guard Condition] If the order passed into the function IS NOT in state “Packed” then throw an invalid state exception (sanity check)</description></item>
+             <item><description>	The function updates the TransferOrderHeader status to “Shipped”.</description></item>
+             <item><description>	For each item in the TransferOrderDetails for the order:
+                 <list type="ordered">
+                     <item><description>Call <see cref="M:GIIS.BusinessLogic.OrderManagementLogic.UpdateOrderLine(GIIS.DataLayer.TransferOrderDetail)"/>function to set the status of the order detail item to “Shipped”</description></item>    
+             </list>
+             </description></item>
+             <item><description>	Save the TransferOrderHeader</description></item>
+             </list>
+             </remarks>
+        </member>
+        <member name="M:GIIS.BusinessLogic.OrderManagementLogic.UpdateOrderLine(GIIS.DataLayer.TransferOrderDetail,System.Int32)">
+            <summary>
+            Updates the specified <paramref name="orderLine"/> based on business rules
+            </summary>
+            <param name="orderLine">The <see cref="T:GIIS.DataLayer.TransferOrderDetail"/> line to be updated</param>
+            <returns>The <see cref="T:GIIS.DataLayer.TransferOrderDetail"/> which was updated</returns>
+            <remarks>
+            <list type="ordered">
+            <item><description>	Load the current order line for the database using the order line #</description></item>
+            <item><description>	Instantiate an instance of StockManagementLogic BLL class.</description></item>
+            <item><description>	If the status of the current order line is:
+                <list type="table">
+                    <listHeader>
+                        <term>State</term>
+                        <description>Actions</description>
+                    </listHeader>
+                    <item>
+                        <term>Requested</term>
+                        <description>
+                            <list type="ordered">
+                                <item><description>[Guard Condition] Ensure the new state is either “Cancelled”, “Requested” or “Released” otherwise throw an invalid state transition exception</description></item>
+                                <item><description>Update the quantity and status of the  order detail item</description></item>
+                                <item><description>If the new state is “Released” then call the Allocate function of the StockManagementLogic instance to allocate the specified order detail.</description></item>
+                                <item><description>Save the order detail</description></item>
+                            </list>
+                        </description>
+                    </item>
+                    <item>
+                        <term>Released</term>
+                        <description>
+                            <list type="ordered">
+                                <item><description>[Guard Condition] Ensure the new state is either “Cancelled”, “Released” or “Packed” otherwise thrown an invalid state transition exception</description></item>
+                                <item><description>If the current state is “Released” then
+                                    <list type="ordered">
+                                        <item><description>Calculate the difference in quantity from the “old” record and “new” record</description></item>
+                                        <item><description>Call the Allocate method of the StockManagementLogic instance to perform the additional allocation/de-allocation.</description></item>
+                                    </list>
+                                </description></item>
+                                <item><description>	Update the quantity and status of the order detail item.</description></item>
+                                <item><description>If the new state is “Cancelled” then call the Allocate method of the StockManagementLogic instance to perform the de-allocation of the item.</description></item>
+                                <item><description>Save the order detail</description></item>
+                            </list>
+                        </description>
+                    </item>
+                    <item>
+                        <term>Packed</term>
+                        <description>
+                            <list type="ordered">
+                                <item><description>[Guard Condition] Ensure the new state is either “Cancelled”, “Packed” or “Shipped”</description></item>
+                                <item><description>Update the quantity and status of the order detail item.</description></item>
+                                <item><description>If the new state is “cancelled” then call the Allocate method of the StockManagementLogic instance to perform the de-allocation of the item.</description></item>
+                                <item><description>If the new state is “Shipped” then
+                                    <list type="ordered">
+                                        <item><description>Call the allocate method of the StockManagementLogic instance to perform the de-allocation of the line item.</description></item>
+                                        <item><description>Call the Transfer method of the StockManagementLogic instance to perform the transfer transactions between the source and target facilities.</description></item>
+                                    </list>
+                                </description></item>
+                                <item><description>Save the order detail</description></item>
+                            </list>
+                        </description>
+                    </item>
+                    <item>
+                        <term>Shipped</term>
+                        <description>Throw an invalid operation exception as shipped orders (and their lines) cannot be edited</description>
+                    </item>
+                    <item>
+                        <term>Cancelled</term>
+                        <description>Throw an invalid operation exception as cancelled orders (and their lines) cannot be edited</description>
+                    </item>
+                </list>
+            </description></item>
+            </list>
+            </remarks>
+        </member>
+        <member name="T:GIIS.BusinessLogic.OrderStatusType">
+            <summary>
+            Status of orders and lines
+            </summary>
+        </member>
+        <member name="T:GIIS.BusinessLogic.StockManagementLogic">
+            <summary>
+            Stock management business logic
+            </summary>
+        </member>
+        <member name="M:GIIS.BusinessLogic.StockManagementLogic.GetCurrentBalance(GIIS.DataLayer.HealthFacility,System.String,System.String)">
+            <summary>
+            Gets the current health facility balance for <paramref name="facility"/> of item with <paramref name="gtin"/> or creates if necessary
+            </summary>
+            <param name="facility">The facility to query for current balance</param>
+            <param name="gtin">The GTIN of the item to retrieve the balance for</param>
+            <param name="lot">The lot number to retrieve the balance</param>
+            <returns></returns>
+        </member>
+        <member name="M:GIIS.BusinessLogic.StockManagementLogic.Adjust(GIIS.DataLayer.HealthFacility,System.String,System.String,System.Int32,GIIS.DataLayer.AdjustmentReason,System.Int32,System.DateTime)">
+            <summary>
+            Make an adjustment
+            </summary>
+            <param name="facility">The facility in which the adjustment is being made</param>
+            <param name="gtin">The GTIN of the stock item being adjusted</param>
+            <param name="lot">The lot number of the stock being adjusted</param>
+            <param name="qty">The amount of the adjustment</param>
+            <param name="reason">The reason for the adjustment</param>
+            <returns>The <see cref="T:GIIS.DataLayer.ItemTransaction"/> representing the transaction created</returns>
+            <remarks>This method updates the ItemTransaction and HealthFacility Balances</remarks>
+        </member>
+        <member name="M:GIIS.BusinessLogic.StockManagementLogic.Allocate(GIIS.DataLayer.HealthFacility,System.String,System.String,System.Int32,GIIS.DataLayer.TransferOrderDetail,System.Int32)">
+            <summary>
+            Allocate stock
+            </summary>
+            <param name="facility">The facility in which to allocate stock</param>
+            <param name="gtin">The GTIN of the stock to be allocated</param>
+            <param name="lot">The lot number of stock to be allocated</param>
+            <param name="qty">The amount of stock to be allocated</param>
+            <returns>The <see cref="T:GIIS.DataLayer.ItemTransaction"/> representing the allocation</returns>
+        </member>
+        <member name="M:GIIS.BusinessLogic.StockManagementLogic.Transfer(GIIS.DataLayer.HealthFacility,GIIS.DataLayer.HealthFacility,System.String,System.String,GIIS.DataLayer.TransferOrderDetail,System.Int32,System.Int32)">
+            <summary>
+            Transfers stock from facility <paramref name="from"/> to facility <paramref name="to"/>
+            </summary>
+            <param name="from">The facility from which stock is being transferred</param>
+            <param name="to">The facility to which stock is being transferred</param>
+            <param name="gtin">The GTIN of the stock being transfered</param>
+            <param name="lot">The lot of the stock being transferred</param>
+            <param name="orderDetail">The order detail which informed this transfer</param>
+            <param name="qty">The quantity of stock to be transferred</param>
+            <returns>The <see cref="T:GIIS.DataLayer.ItemTransaction"/> representing the transfers </returns>
+        </member>
+        <member name="M:GIIS.BusinessLogic.StockManagementLogic.Vaccinate(GIIS.DataLayer.HealthFacility,GIIS.DataLayer.VaccinationEvent)">
+            <summary>
+            Performs stock transaction for a vaccination event
+            </summary>
+            <param name="facility">The facility in which the vaccination event occurred</param>
+            <param name="vaccination">The vaccination event</param>
+            <returns>The <see cref="T:GIIS.DataLayer.ItemTransaction"/> representing the transfer</returns>
+        </member>
+        <member name="M:GIIS.BusinessLogic.StockManagementLogic.StockCount(GIIS.DataLayer.HealthFacility,System.String,System.String,System.UInt32,System.Int32,System.DateTime)">
+            <summary>
+            Performs a stock count for the specified <paramref name="gtin"/> at <paramref name="facility"/>
+            </summary>
+            <param name="facility">The facility in which the count occurred</param>
+            <param name="gtin">The GTIN of the item being counted</param>
+            <param name="lot">The lot number of the item being counted</param>
+            <param name="count">The count of items</param>
+            <returns>The <see cref="T:GIIS.DataLayer.ItemTransaction"/> representing the count</returns>
+        </member>
+        <member name="M:GIIS.BusinessLogic.StockManagementLogic.ClearBalance(GIIS.DataLayer.HealthFacility,System.Int32)">
+            <summary>
+            Performs rollback of stock transaction for a vaccination event
+            </summary>
+            <param name="facility">The healthfacility where the vaccination event happened</param>
+            <param name="vaccineLotId">The vaccine lot that was used in the vaccination event</param>
+        </member>
+        <member name="T:GIIS.BusinessLogic.VaccinationLogic">
+            <summary>
+            Vaccination logic
+            </summary>
+        </member>
+        <member name="M:GIIS.BusinessLogic.VaccinationLogic.RescheduleNextDose(GIIS.DataLayer.VaccinationEvent,System.Boolean)">
+            <summary>
+            Recalculates scheduled date for vaccination event following <paramref name="ve"/> with the difference between scheduled date and vaccination date
+            </summary>
+            <param name="ve">The vaccination event that triggers the reschedule of the following vaccination event </param>
+            <param name="daysdiff">The difference between scheduled date and actual vaccination date</param>
+            <param name="remove"> If the vaccination event is being rolled back so rescheduling needs to be rolled back also</param>
+            <returns></returns>
+        </member>
+        <member name="M:GIIS.BusinessLogic.VaccinationLogic.UpdateVaccinationEvent(System.Int32,System.Int32,System.DateTime,System.Int32,System.Boolean,System.Int32,System.Int32,System.DateTime)">
+            <summary>
+            Updates Vaccination Event with given id <paramref name="id"/> with all the other parameters.
+            </summary>
+            <param name="id">The id of the vaccination event that is being updated </param>
+            <param name="lotId">The vaccine lot used for this vaccination event</param>
+            <param name="vaccinationdate">The vaccination date for this vaccination event</param>
+            <param name="hfId">The health facility where this vaccination event happened</param>
+            <param name="done">Status of the vaccination event</param>
+            <param name="nonvaccreasonId">The reason for not vaccinating for this vaccination event</param>
+            <returns></returns>
+        </member>
+        <member name="M:GIIS.BusinessLogic.VaccinationLogic.RemoveVaccinationEvent(GIIS.DataLayer.VaccinationEvent,System.Int32)">
+            <summary>
+            Updates Vaccination Event with default data
+            </summary>
+            <param name="ve">Vaccination Event to be updated</param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

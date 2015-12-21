@@ -37,6 +37,7 @@
                         <li><a runat="server" id="tz02" href="/forms/TZ02.pdf">Form #2 - Registration</a></li>
                         <li><a runat="server" id="tz03" href="/forms/TZ03.pdf">Form #3 - Weigh Tally (New)</a></li>
                         <li><a runat="server" id="tz04" href="/forms/TZ04.pdf">Form #4 - Stock Tally (New)</a></li>
+                        <li><a runat="server" id="tz05" href="/forms/TZ05.pdf">Facility Monthly Stock Status (New)</a></li>
                     </ul>
                 </li>
             </ul>

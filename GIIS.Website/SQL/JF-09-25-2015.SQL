@@ -331,3 +331,8 @@ INSERT INTO "REPORT_PARAMETERS" SELECT 17, 'antigenId', 'Antigen', 'Identifies t
 INSERT INTO "REPORT_PARAMETERS" SELECT 17, 'facilityId', 'Health Facility', 'Identifies the current facility for the facility balance report', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
 INSERT INTO "REPORT_PARAMETERS" SELECT 17, 'districtId', 'District', 'Identifies the district (nb: facilities are not filtered when this value changes)', true, 13, "ID", 1 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
 INSERT INTO "REPORT_PARAMETERS" SELECT 17, 'regionId', 'Region', 'Identifies the region (nb: district is not filtered when this value changes)', true, 14, "ID", 0 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
+
+INSERT INTO "REPORT_PARAMETERS" SELECT 9, 'facilityId', 'Health Facility', 'Identifies the current facility for the facility balance report', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 9, 'districtId', 'District', 'Identifies the district (nb: facilities are not filtered when this value changes)', true, 13, "ID", 1 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 9, 'regionId', 'Region', 'Identifies the region (nb: district is not filtered when this value changes)', true, 14, "ID", 0 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
+

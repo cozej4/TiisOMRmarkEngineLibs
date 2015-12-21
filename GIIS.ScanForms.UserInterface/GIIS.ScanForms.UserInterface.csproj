@@ -97,14 +97,30 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Forms\BID01.mxml" />
-    <None Include="Forms\BID03.mxml" />
-    <None Include="Forms\BIDSTS.mxml" />
-    <None Include="Forms\TZ01.mxml" />
-    <None Include="Forms\TZ02.mxml" />
-    <None Include="Forms\TZ03.mxml" />
-    <None Include="Forms\TZ04.mxml" />
-    <None Include="Forms\WTS.mxml" />
+    <None Include="Forms\BID01.mxml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Forms\BID03.mxml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Forms\BIDSTS.mxml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Forms\TZ01.mxml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Forms\TZ02.mxml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Forms\TZ03.mxml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Forms\TZ04.mxml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Forms\WTS.mxml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="BarcodeCorrection.resx">

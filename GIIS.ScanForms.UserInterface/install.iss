@@ -24,20 +24,39 @@ OutputDir=.\dist
 OutputBaseFilename=setup
 Compression=lzma
 SolidCompression=yes
-WizardSmallImageFile=.\logo.bmp
+WizardSmallImageFile=.\logo.bmp                                                     
 [Files]
-Source: ".\Forms\*.mxml"; DestDir: "{app}"; Flags: ignoreversion
+Source: ".\bin\release\Forms\*.mxml"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\bin\release\GIIS.DataLayer.Contract.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\bin\release\GIIS.DataLayer.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\bin\release\GIIS.ScanForms.UserInterface.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\bin\release\Npgsql.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\bin\release\Mono.Security.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\bin\release\Npgsql.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: ".\Project Items\omr-installer.exe"; DestDir: {tmp} ; Flags: dontcopy
-
-[Run]
-Filename: "{tmp}\omr-installer.exe"; Parameters: "/silent /dir=""{app}"" /group=""DIVO Tools"""; Flags: waituntilterminated 
+Source: ".\Project Items\OmrScannerApplication.exe.config"; DestDir: {app} ; 
+Source: ".\Project Items\TemplateDesigner.exe.config"; DestDir: {app} ; 
+Source: ".\Project Items\omr-installer.exe"; DestDir: {tmp} ; Flags: deleteafterinstall dontcopy
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
+[Code]
+
+function PrepareToInstall(var needsRestart:Boolean): String;
+var
+  hWnd: Integer;
+  ResultCode : integer;
+  uninstallString : string;
+begin
+     Result := '';
+
+     hWnd := StrToInt(ExpandConstant('{wizardhwnd}'));
+
+     EnableFsRedirection(true);
+
+     // Should we uninstall the old?
+    ExtractTemporaryFile('omr-installer.exe')
+    if Exec(ExpandConstant('{tmp}\omr-installer.exe'), '/silent /dir="' + ExpandConstant('{app}') + '" /group="DIVO Tools"', '', SW_SHOW, ewWaitUntilTerminated, ResultCode) then begin
+       
+    end;
+end;

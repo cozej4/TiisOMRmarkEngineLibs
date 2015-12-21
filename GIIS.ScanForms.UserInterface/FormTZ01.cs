@@ -93,6 +93,21 @@ namespace GIIS.ScanForms.UserInterface
                     Child childData = null;
                     if (barcodeId.StartsWith("T")) // TEMP ID AUTH
                     {
+
+                        // Validate ... do we want to associate maybe?
+                        if(omrSticker == null && page.Details.OfType<OmrRowData>().First(o=>o.Id == String.Format("{0}-a", patientRow.Id)).Details.OfType<OmrBubbleData>().Count() != 0 ||
+                            omrSticker != null && omrSticker.BarcodeData.Length != 10)
+                        {
+                            BarcodeCorrection bc = new BarcodeCorrection(page, page.Template.Fields.Find(o=>o.Id == String.Format("{0}Sticker", patientRow.Id)) as OmrBarcodeField);
+                            if(bc.ShowDialog() == DialogResult.OK)
+                            {
+                                omrSticker = new OmrBarcodeData()
+                                {
+                                    BarcodeData = bc.BarcodeId,
+                                };
+                            }
+
+                        }
                         var childDataList = restUtil.Get<List<ChildEntity>>("ChildManagement.svc/GetChildById",
                             new KeyValuePair<string, object>("childId", barcodeId.Replace("T", ""))
                         );
