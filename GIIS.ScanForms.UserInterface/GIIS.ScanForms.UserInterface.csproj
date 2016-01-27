@@ -31,6 +31,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AForge">
+      <HintPath>Project Items\AForge.dll</HintPath>
+    </Reference>
+    <Reference Include="AForge.Imaging">
+      <HintPath>Project Items\AForge.Imaging.dll</HintPath>
+    </Reference>
+    <Reference Include="AForge.Math">
+      <HintPath>Project Items\AForge.Math.dll</HintPath>
+    </Reference>
     <Reference Include="OmrMarkEngine.Core">
       <HintPath>Project Items\OmrMarkEngine.Core.dll</HintPath>
     </Reference>
@@ -53,6 +62,7 @@
     <Compile Include="BarcodeCorrection.Designer.cs">
       <DependentUpon>BarcodeCorrection.cs</DependentUpon>
     </Compile>
+    <Compile Include="BarcodeUtil.cs" />
     <Compile Include="FacilitySelectionContext.cs" />
     <Compile Include="FormBID01.cs" />
     <Compile Include="FormBID03.cs" />

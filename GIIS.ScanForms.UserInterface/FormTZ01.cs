@@ -80,8 +80,9 @@ namespace GIIS.ScanForms.UserInterface
                     if (omrBarcode == null)
                     {
                         // Show a correction form ...
-                        BarcodeCorrection bc = new BarcodeCorrection(page, page.Template.Fields.FirstOrDefault(o => o.Id == String.Format("{0}Barcode", patientRow.Id)) as OmrBarcodeField);
-                        if (bc.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                        var barcodeField = page.Template.Fields.FirstOrDefault(o => o.Id == String.Format("{0}Barcode", patientRow.Id)) as OmrBarcodeField;
+                        BarcodeCorrection bc = new BarcodeCorrection(page, barcodeField);
+                        if (BarcodeUtil.HasData(page, barcodeField) && bc.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                             barcodeId = bc.BarcodeId;
                         else
                             throw new InvalidOperationException(String.Format("Could not read barcode on row {0}", rowNum));
@@ -98,8 +99,9 @@ namespace GIIS.ScanForms.UserInterface
                         if(omrSticker == null && page.Details.OfType<OmrRowData>().First(o=>o.Id == String.Format("{0}-a", patientRow.Id)).Details.OfType<OmrBubbleData>().Count() != 0 ||
                             omrSticker != null && omrSticker.BarcodeData.Length != 10)
                         {
-                            BarcodeCorrection bc = new BarcodeCorrection(page, page.Template.Fields.Find(o=>o.Id == String.Format("{0}Sticker", patientRow.Id)) as OmrBarcodeField);
-                            if(bc.ShowDialog() == DialogResult.OK)
+                            var barcodeField = page.Template.Fields.Find(o => o.Id == String.Format("{0}Sticker", patientRow.Id)) as OmrBarcodeField;
+                            BarcodeCorrection bc = new BarcodeCorrection(page, barcodeField);
+                            if(BarcodeUtil.HasData(page, barcodeField) && bc.ShowDialog() == DialogResult.OK)
                             {
                                 omrSticker = new OmrBarcodeData()
                                 {
@@ -190,9 +192,10 @@ namespace GIIS.ScanForms.UserInterface
 
                         if (omrAptId == null)
                         {
+                            var barcodeField = page.Template.Fields.FirstOrDefault(o => o.AnswerRowGroup == aptRow.Id) as OmrBarcodeField;
                             // Show a correction form ...
-                            BarcodeCorrection bc = new BarcodeCorrection(page, page.Template.Fields.FirstOrDefault(o => o.AnswerRowGroup == aptRow.Id) as OmrBarcodeField);
-                            if (bc.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                            BarcodeCorrection bc = new BarcodeCorrection(page, barcodeField);
+                            if (BarcodeUtil.HasData(page, barcodeField) && bc.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                                 appointment = appts.FirstOrDefault(o => o.ScheduledDate.Date.Equals(DateTime.ParseExact(bc.BarcodeId, "MM-dd-yyyy", CultureInfo.InvariantCulture)));
                         }
                         else

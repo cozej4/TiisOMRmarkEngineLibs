@@ -173,7 +173,7 @@
   <questionBubble id="8889427c-4e25-4252-8d34-523cada47bba" topLeft="2534,2029" bottomLeft="2534,2077" topRight="2582,2029" bottomRight="2582,2077" row="pat05-b" isRequiredForRow="true" behavior="One" key="day" value="7" />
   <questionBubble id="6942fd73-a12a-4b1f-aa26-6b40902341d2" topLeft="2599,2029" bottomLeft="2599,2077" topRight="2647,2029" bottomRight="2647,2077" row="pat05-b" isRequiredForRow="true" behavior="One" key="day" value="8" />
   <questionBubble id="0edad910-9877-4f83-9011-1bd067b19171" topLeft="2660,2029" bottomLeft="2660,2077" topRight="2708,2029" bottomRight="2708,2077" row="pat05-b" isRequiredForRow="true" behavior="One" key="day" value="9" />
-  <barcodeQuestion id="d5510076-f5fe-406c-b1fb-7ebeb8d45010" topLeft="696,1912" bottomLeft="696,2231" topRight="994,1912" bottomRight="994,2231" row="pat05" isRequiredForRow="false" />
+  <barcodeQuestion id="d5510076-f5fe-406c-b1fb-7ebeb8d45010" topLeft="696,1912" bottomLeft="696,2231" topRight="994,1912" bottomRight="994,2231" row="pat05-a" isRequiredForRow="false" />
   <questionBubble id="82260c6f-7691-4955-8482-1467883c1968" topLeft="997,2095" bottomLeft="997,2143" topRight="1045,2095" bottomRight="1045,2143" row="pat05-a" isRequiredForRow="true" behavior="One" key="vaccine" value="none" />
   <questionBubble id="b1ab42b6-4933-450b-acbd-e60a6efd0d89" topLeft="996,1982" bottomLeft="996,2030" topRight="1044,1982" bottomRight="1044,2030" row="pat05-a" isRequiredForRow="true" behavior="One" key="vaccine" value="all" />
   <questionBubble id="851a088c-f955-4d80-aa52-139e8212ec6d" topLeft="1087,1975" bottomLeft="1087,2023" topRight="1135,1975" bottomRight="1135,2023" row="pat05-a" isRequiredForRow="true" behavior="One" key="day10" value="0" />
