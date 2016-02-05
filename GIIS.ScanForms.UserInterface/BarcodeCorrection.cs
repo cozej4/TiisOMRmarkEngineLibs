@@ -43,6 +43,7 @@ namespace GIIS.ScanForms.UserInterface
             }
         }
 
+
         public BarcodeCorrection()
         {
             InitializeComponent();

@@ -111,8 +111,9 @@ namespace GIIS.ScanForms.UserInterface
                     if (String.IsNullOrEmpty(barcodeId))
                     {
                         // Show a correction form ...
-                        BarcodeCorrection bc = new BarcodeCorrection(page, page.Template.Fields.FirstOrDefault(o => o.Id == String.Format("{0}Barcode", dtl.Id)) as OmrBarcodeField);
-                        if(bc.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                        var barcodeField = page.Template.Fields.FirstOrDefault(o => o.Id == String.Format("{0}Barcode", dtl.Id)) as OmrBarcodeField;
+                        BarcodeCorrection bc = new BarcodeCorrection(page, barcodeField);
+                        if(BarcodeUtil.HasData(page, barcodeField) && bc.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                             barcodeId = bc.BarcodeId;
                         else
                             throw new InvalidOperationException(String.Format("Could not read barcode on row {0}", rowNum));
