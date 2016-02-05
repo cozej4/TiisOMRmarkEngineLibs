@@ -70,6 +70,12 @@
     <Compile Include="FormTZ02.cs" />
     <Compile Include="FormTZ04.cs" />
     <Compile Include="FormTZ03.cs" />
+    <Compile Include="Registration.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Registration.Designer.cs">
+      <DependentUpon>Registration.cs</DependentUpon>
+    </Compile>
     <Compile Include="LocationSelectionBox.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -135,6 +141,9 @@
   <ItemGroup>
     <EmbeddedResource Include="BarcodeCorrection.resx">
       <DependentUpon>BarcodeCorrection.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Registration.resx">
+      <DependentUpon>Registration.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LocationSelectionBox.resx">
       <DependentUpon>LocationSelectionBox.cs</DependentUpon>
