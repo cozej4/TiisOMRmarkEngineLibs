@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
+using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -18,10 +19,67 @@ namespace GIIS.ScanForms.UserInterface
     public class FormTZ01
     {
 
-        private static List<Dose> s_refDoses;
-        private static List<ScheduledVaccination> s_refVaccines;
-        private static List<Item> s_refItems;
-        private static List<ItemLot> s_refItemLots;
+
+        /// <summary>
+        /// Tz01 vaccination
+        /// </summary>
+        public struct Tz01Vaccination
+        {
+            /// <summary>
+            /// The date of vaccination
+            /// </summary>
+            public DateTime? Date { get; set; }
+            /// <summary>
+            /// True if all vaccines were given
+            /// </summary>
+            public bool All { get; set; }
+            /// <summary>
+            /// True if the vaccine is outreach
+            /// </summary>
+            public bool Outreach { get; set; }
+            /// <summary>
+            /// Gets or sets the appointment
+            /// </summary>
+            public VaccinationAppointment Appointment { get; set; }
+        }
+
+        /// <summary>
+        /// Row data for TZ01 row
+        /// </summary>
+        /// <remarks>
+        /// This could be done better, however GIIS' services are terrible
+        /// </remarks>
+        public struct Tz01RowData
+        {
+            /// <summary>
+            /// Barcode data
+            /// </summary>
+            public String Barcode { get; set; }
+            /// <summary>
+            /// Barcode data
+            /// </summary>
+            public String StickerValue { get; set; }
+            /// <summary>
+            /// Early appointment
+            /// </summary>
+            public List<Tz01Vaccination> Appointment { get; set; }
+            /// <summary>
+            /// The child to which the row applies
+            /// </summary>
+            public Child Child { get; set; }
+            /// <summary>
+            /// The row bounds
+            /// </summary>
+            public RectangleF RowBounds { get; set; }
+            /// <summary>
+            /// User info
+            /// </summary>
+            public User UserInfo { get; set; }
+            /// <summary>
+            /// Gets or sets the page
+            /// </summary>
+            public OmrPageOutput Page { get; set; }
+        }
 
         /// <summary>
         /// Error string
@@ -55,15 +113,6 @@ namespace GIIS.ScanForms.UserInterface
                 }
                 var placeInfo = restUtil.Get<Place[]>("PlaceManagement.svc/GetPlaceByHealthFacilityId", new KeyValuePair<string, object>("hf_id", facilityId));
                 
-                if (s_refDoses == null)
-                    s_refDoses = restUtil.Get<List<GIIS.DataLayer.Dose>>("DoseManagement.svc/GetDoseList");
-                if(s_refVaccines == null)
-                    s_refVaccines = restUtil.Get<List<GIIS.DataLayer.ScheduledVaccination>>("ScheduledVaccinationManagement.svc/GetScheduledVaccinationList");
-                if(s_refItems == null)
-                    s_refItems = restUtil.Get<List<GIIS.DataLayer.Item>>("ItemManagement.svc/GetItemList");
-                if(s_refItemLots == null)
-                    s_refItemLots = restUtil.Get<List<GIIS.DataLayer.ItemLot>>("StockManagement.svc/GetItemLots");
-
                 foreach (var patientRow in page.Details.OfType<OmrRowData>().Where(o=>!o.Id.Contains("-")))
                 {
                     // Master patient row processing
@@ -72,104 +121,76 @@ namespace GIIS.ScanForms.UserInterface
                     if (patientRow.Details.Count == 0)
                         continue;
 
+
+                    // Create row data for the verification form
+                    OmrBarcodeField barcodeField = page.Template.FlatFields.Find(o => o.Id == String.Format("{0}Barcode", patientRow.Id)) as OmrBarcodeField,
+                        omrStickerField = page.Template.FlatFields.Find(o => o.Id == String.Format("{0}Sticker", patientRow.Id)) as OmrBarcodeField;
+
+                    Tz01RowData rowData = new Tz01RowData()
+                    {
+                        RowBounds = new RectangleF()
+                        {
+                            Location = barcodeField.TopLeft,
+                            Width = page.BottomRight.X - barcodeField.TopLeft.X,
+                            Height = omrStickerField.BottomRight.Y - barcodeField.TopLeft.Y
+                        },
+                        UserInfo = userInfo,
+                        Page = page
+                    };
+
                     // Barcodes only at this level
                     OmrBarcodeData omrBarcode = patientRow.Details.OfType<OmrBarcodeData>().FirstOrDefault(o => o.Id == String.Format("{0}Barcode", patientRow.Id)),
                         omrSticker = patientRow.Details.OfType<OmrBarcodeData>().FirstOrDefault(o => o.Id == String.Format("{0}Sticker", patientRow.Id));
-                    String barcodeId = String.Empty;
 
+                    
                     if (omrBarcode == null)
-                    {
-                        // Show a correction form ...
-                        var barcodeField = page.Template.Fields.FirstOrDefault(o => o.Id == String.Format("{0}Barcode", patientRow.Id)) as OmrBarcodeField;
-                        BarcodeCorrection bc = new BarcodeCorrection(page, barcodeField);
-                        if (BarcodeUtil.HasData(page, barcodeField) && bc.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                            barcodeId = bc.BarcodeId;
-                        else
-                            throw new InvalidOperationException(String.Format("Could not read barcode on row {0}", rowNum));
-                    }
+                        rowData.Barcode = String.Empty;
                     else
-                        barcodeId = omrBarcode.BarcodeData;
+                        rowData.Barcode = omrBarcode.BarcodeData;
+                    rowData.StickerValue = omrSticker?.BarcodeData;
 
                     // Try to lookup the poor chap
-                    Child childData = null;
-                    if (barcodeId.StartsWith("T")) // TEMP ID AUTH
+                    if (rowData.Barcode.StartsWith("T")) // TEMP ID AUTH
                     {
-
-                        // Validate ... do we want to associate maybe?
-                        if(omrSticker == null && page.Details.OfType<OmrRowData>().First(o=>o.Id == String.Format("{0}-a", patientRow.Id)).Details.OfType<OmrBubbleData>().Count() != 0 ||
-                            omrSticker != null && omrSticker.BarcodeData.Length != 10)
-                        {
-                            var barcodeField = page.Template.Fields.Find(o => o.Id == String.Format("{0}Sticker", patientRow.Id)) as OmrBarcodeField;
-                            BarcodeCorrection bc = new BarcodeCorrection(page, barcodeField);
-                            if(BarcodeUtil.HasData(page, barcodeField) && bc.ShowDialog() == DialogResult.OK)
-                            {
-                                omrSticker = new OmrBarcodeData()
-                                {
-                                    BarcodeData = bc.BarcodeId,
-                                };
-                            }
-
-                        }
+                        rowData.StickerValue = omrSticker?.BarcodeData;
                         var childDataList = restUtil.Get<List<ChildEntity>>("ChildManagement.svc/GetChildById",
-                            new KeyValuePair<string, object>("childId", barcodeId.Replace("T", ""))
+                            new KeyValuePair<string, object>("childId", rowData.Barcode.Replace("T", ""))
                         );
                         if (childDataList == null)
                             throw new InvalidOperationException("Could not deserialize response");
                         else if (childDataList.Count == 0)
                         {
-                            throw new InvalidOperationException("Child with barcode " + barcodeId + " not found!");
+                            throw new InvalidOperationException("Child with barcode " + rowData.Barcode + " not found!");
                         }
-                        childData = childDataList[0].childEntity;
+                        rowData.Child = childDataList[0].childEntity;
                     }
                     else
                     {
                         var childDataList = restUtil.Get<List<ChildEntity>>("ChildManagement.svc/SearchByBarcode",
-                                            new KeyValuePair<string, object>("barcodeId", barcodeId));
+                                            new KeyValuePair<string, object>("barcodeId", rowData.Barcode));
                         if (childDataList == null)
                             throw new InvalidOperationException("Could not deserialize response");
                         else if (childDataList.Count == 0)
                         {
-                            throw new InvalidOperationException("Child with barcode " + barcodeId + " not found!");
-                        }
-                        childData = childDataList[0].childEntity;
-                    }
+                            if (!String.IsNullOrEmpty(rowData.StickerValue))
+                                childDataList = restUtil.Get<List<ChildEntity>>("ChildManagement.svc/SearchByBarcode",
+                                                new KeyValuePair<string, object>("barcodeId", rowData.StickerValue));
 
-                    // Are we associating the poor chap?
-                    if(omrSticker != null)
-                    {
-                        string permCode = omrSticker.BarcodeData;
-                        // Now to update the child
-                        Trace.TraceInformation("Will associated child id {0} with barcode {1}", childData.Id, permCode);
-                        childData.BarcodeId = permCode;
-
-                        // Send the update
-                        restUtil.Get<RestReturn>("ChildManagement.svc/UpdateChild",
-                            new KeyValuePair<string, object>("barcode", childData.BarcodeId),
-                            new KeyValuePair<string, object>("firstname1", childData.Firstname1),
-                            new KeyValuePair<string, object>("lastname1", childData.Lastname1),
-                            new KeyValuePair<string, object>("birthdate", childData.Birthdate.ToString("yyyy-MM-dd")),
-                            new KeyValuePair<string, object>("gender", childData.Gender),
-                            new KeyValuePair<string, object>("healthFacilityId", childData.HealthcenterId),
-                            new KeyValuePair<string, object>("birthplaceId", childData.BirthplaceId),
-                            new KeyValuePair<string, object>("domicileId", childData.DomicileId),
-                            new KeyValuePair<string, object>("statusId", childData.StatusId),
-                            new KeyValuePair<string, object>("address", childData.Address),
-                            new KeyValuePair<string, object>("phone", childData.Phone),
-                            new KeyValuePair<string, object>("motherFirstname", childData.MotherFirstname),
-                            new KeyValuePair<string, object>("motherLastname", childData.MotherLastname),
-                            new KeyValuePair<string, object>("notes", "Updated by form scanning application"),
-                            new KeyValuePair<string, object>("userId", 1),
-                            new KeyValuePair<string, object>("childId", childData.Id)
-                        );
-
+                            if (childDataList == null)
+                                throw new InvalidOperationException("Could not deserialize response");
+                            else if (childDataList.Count == 0)
+                                throw new InvalidOperationException("Child with barcode " + rowData.Barcode + " not found!");
+                        }                        
+                        rowData.Child = childDataList[0].childEntity;
                     }
 
                     // Get appointments and vaccinations for child
-                    VaccinationAppointment[] appts = restUtil.Get<VaccinationAppointment[]>("VaccinationAppointmentManagement.svc/GetVaccinationAppointmentsByChildId", new KeyValuePair<string, object>("childId", childData.Id));
-                    VaccinationEvent[] vaccinationEvent = restUtil.Get<VaccinationEvent[]>("VaccinationEvent.svc/GetVaccinationEventListByChildId", new KeyValuePair<string, object>("childId", childData.Id));
+                    VaccinationAppointment[] appts = restUtil.Get<VaccinationAppointment[]>("VaccinationAppointmentManagement.svc/GetVaccinationAppointmentsByChildId", new KeyValuePair<string, object>("childId", rowData.Child.Id));
+                    VaccinationEvent[] vaccinationEvent = restUtil.Get<VaccinationEvent[]>("VaccinationEvent.svc/GetVaccinationEventListByChildId", new KeyValuePair<string, object>("childId", rowData.Child.Id));
+                    rowData.Appointment = new List<Tz01Vaccination>();
 
                     // iterate over the sub-rows
-                    foreach (var aptRow in page.Details.OfType<OmrRowData>().Where(o=>o.Id.StartsWith(String.Format("{0}-", patientRow.Id))))
+                    foreach (var aptRow in page.Details.OfType<OmrRowData>().Where(o=>o.Id.StartsWith(String.Format("{0}-", patientRow.Id))).OrderBy(r=>r.Id))
                     {
                         OmrBarcodeData omrAptId = aptRow.Details.OfType<OmrBarcodeData>().First();
                         OmrBubbleData omrDay10 = aptRow.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "day10"),
@@ -177,85 +198,47 @@ namespace GIIS.ScanForms.UserInterface
                             omrOutreach = aptRow.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "outreach"),
                             omrVaccine = aptRow.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "vaccine");
 
-                        // Skip
-                        if (omrVaccine == null)
-                            continue;
-
-                        if(omrDay10 == null || omrDay == null)
-                        {
-                            Err += String.Format("Row {0} has no date selected; ", aptRow);
-                            continue;
-                        }
-
                         // First, get the appointment data
-                        VaccinationAppointment appointment = null;
+                        Tz01Vaccination vaccineData = new Tz01Vaccination();
 
                         if (omrAptId == null)
                         {
-                            var barcodeField = page.Template.Fields.FirstOrDefault(o => o.AnswerRowGroup == aptRow.Id) as OmrBarcodeField;
+                            barcodeField = page.Template.Fields.FirstOrDefault(o => o.AnswerRowGroup == aptRow.Id) as OmrBarcodeField;
                             // Show a correction form ...
                             BarcodeCorrection bc = new BarcodeCorrection(page, barcodeField);
                             if (BarcodeUtil.HasData(page, barcodeField) && bc.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                                appointment = appts.FirstOrDefault(o => o.ScheduledDate.Date.Equals(DateTime.ParseExact(bc.BarcodeId, "MM-dd-yyyy", CultureInfo.InvariantCulture)));
+                                vaccineData.Appointment = appts.FirstOrDefault(o => o.ScheduledDate.Date.Equals(DateTime.ParseExact(bc.BarcodeId, "MM-dd-yyyy", CultureInfo.InvariantCulture)));
                         }
                         else
                         {
-                            appointment = appts.FirstOrDefault(o => o.Id.ToString() == omrAptId.BarcodeData);
+                            vaccineData.Appointment = appts.FirstOrDefault(o => o.Id.ToString() == omrAptId.BarcodeData);
                         }
 
                         // Validate we got an appointment
-                        if (appointment == null)
+                        if (vaccineData.Appointment == null)
                             throw new InvalidOperationException(String.Format("Could not find appointment data for update on row {0}", rowNum));
 
-                        // All vaccines given
-                        if (omrVaccine.Value == "all")
-                        {
-                            foreach (var vacc in vaccinationEvent.Where(o => o.AppointmentId == appointment.Id))
+                        vaccineData.All = omrVaccine?.Value == "all";
+                        vaccineData.Outreach = Boolean.Parse(omrOutreach?.Value ?? "false");
+                        if(omrDay != null || omrDay10 != null)
+                            try
                             {
-                                vacc.VaccinationStatus = true;
-                                vacc.VaccinationDate = new DateTime(appointment.ScheduledDate.Year, appointment.ScheduledDate.Month, (int)(omrDay.ValueAsFloat + omrDay10.ValueAsFloat));
-                                if(vacc.VaccinationDate > DateTime.Now)
-                                    vacc.VaccinationDate = new DateTime(year, month, (int)(omrDay.ValueAsFloat + omrDay10.ValueAsFloat));
-                                this.UpdateVaccination(vacc);
-
-                                if (omrOutreach != null)
-                                {
-                                    restUtil.Get<RestReturn>("VaccinationAppointmentManagement.svc/UpdateVaccinationApp",
-                                        new KeyValuePair<String, Object>("outreach", true),
-                                        new KeyValuePair<String, Object>("userId", userInfo.Id),
-                                        new KeyValuePair<String, Object>("barcode", barcodeId),
-                                        new KeyValuePair<String, Object>("doseId", vacc.DoseId)
-                                        );
-                                }
-
+                                vaccineData.Date = new DateTime(vaccineData.Appointment.ScheduledDate.Year, vaccineData.Appointment.ScheduledDate.Month, (int)(omrDay?.ValueAsFloat + omrDay10?.ValueAsFloat));
+                                if (vaccineData.Date > DateTime.Now)
+                                    vaccineData.Date = new DateTime(year, month, (int)(omrDay.ValueAsFloat + omrDay10.ValueAsFloat));
                             }
-                        }
-                        else
-                        {
-                            VaccineCorrection vc = new VaccineCorrection(page , page.Template.Fields.FirstOrDefault(o => o.AnswerRowGroup == aptRow.Id) as OmrBarcodeField, appointment, vaccinationEvent, s_refDoses);
-                            if (vc.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                            {
-                                foreach(var vacc in vc.Vaccines)
-                                {
-                                    vacc.Event.VaccinationStatus = true;
-                                    vacc.Event.VaccinationDate = new DateTime(appointment.ScheduledDate.Year, appointment.ScheduledDate.Month, (int)(omrDay.ValueAsFloat + omrDay10.ValueAsFloat));
-                                    if (vacc.Event.VaccinationDate > DateTime.Now)
-                                        vacc.Event.VaccinationDate = new DateTime(year, month, (int)(omrDay.ValueAsFloat + omrDay10.ValueAsFloat));
-                                    this.UpdateVaccination(vacc.Event);
-
-                                    if (omrOutreach != null)
-                                    {
-                                        restUtil.Get<RestReturn>("VaccinationAppointmentManagement.svc/UpdateVaccinationApp",
-                                            new KeyValuePair<String, Object>("outreach", true),
-                                            new KeyValuePair<String, Object>("userId", userInfo.Id),
-                                            new KeyValuePair<String, Object>("barcode", barcodeId),
-                                            new KeyValuePair<String, Object>("doseId", vacc.Event.DoseId)
-                                            );
-                                    }
-
-                                }
+                            catch(Exception e) {
+                                Trace.TraceError(e.ToString());
                             }
-                        }
+                        rowData.Appointment.Add(vaccineData);
+                    }
+
+                    if (rowData.Appointment[0].Date.HasValue ||
+                        rowData.Appointment[1].Date.HasValue ||
+                        !String.IsNullOrEmpty(rowData.StickerValue))
+                    {
+                        VaccineCorrection vc = new VaccineCorrection(rowData, vaccinationEvent, ReferenceData.Current.Doses);
+                        vc.ShowDialog();
                     }
                 }
 

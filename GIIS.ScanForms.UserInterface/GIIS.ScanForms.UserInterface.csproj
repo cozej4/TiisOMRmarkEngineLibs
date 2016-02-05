@@ -70,6 +70,7 @@
     <Compile Include="FormTZ02.cs" />
     <Compile Include="FormTZ04.cs" />
     <Compile Include="FormTZ03.cs" />
+    <Compile Include="ReferenceData.cs" />
     <Compile Include="Registration.cs">
       <SubType>Form</SubType>
     </Compile>

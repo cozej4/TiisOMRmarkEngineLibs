@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,10 +18,61 @@ namespace GIIS.ScanForms.UserInterface
     public class FormTZ02
     {
 
-        private static List<Dose> s_refDoses;
-        private static List<ScheduledVaccination> s_refVaccines;
-        private static List<Item> s_refItems;
-        private static List<ItemLot> s_refItemLots;
+
+        /// <summary>
+        /// Row data for TZ01 row
+        /// </summary>
+        /// <remarks>
+        /// This could be done better, however GIIS' services are terrible
+        /// </remarks>
+        public struct Tz02RowData
+        {
+            /// <summary>
+            /// Barcode data
+            /// </summary>
+            public String Barcode { get; set; }
+            /// <summary>
+            /// Date of birth
+            /// </summary>
+            public DateTime? DateOfBirth { get; set; }
+            /// <summary>
+            /// Gender
+            /// </summary>
+            public Boolean Gender { get; set; }
+            /// <summary>
+            /// Vaccination date
+            /// </summary>
+            public DateTime VaccineDate { get; set; }
+            /// <summary>
+            /// Vaccines given
+            /// </summary>
+            public List<ScheduledVaccination> VaccineGiven { get; set; }
+            /// <summary>
+            /// Get or sets the facility
+            /// </summary>
+            public Int32 FacilityId { get; set; }
+            /// <summary>
+            /// The row bounds
+            /// </summary>
+            public RectangleF RowBounds { get; set; }
+            /// <summary>
+            /// User info
+            /// </summary>
+            public User UserInfo { get; set; }
+            /// <summary>
+            /// Gets or sets the page
+            /// </summary>
+            public OmrPageOutput Page { get; set; }
+            /// <summary>
+            /// Historical doses
+            /// </summary>
+            public List<Dose> Doses { get; set; }
+            /// <summary>
+            /// Outreach indicator
+            /// </summary>
+            public bool Outreach { get; set; }
+
+        }
 
         /// <summary>
         /// Error string
@@ -55,15 +107,7 @@ namespace GIIS.ScanForms.UserInterface
                 RestUtil restUtil = new RestUtil(new Uri(ConfigurationManager.AppSettings["GIIS_URL"]));
                 var userInfo = restUtil.Get<User>("UserManagement.svc/GetUserInfo", new KeyValuePair<string, object>("username", restUtil.GetCurrentUserName));
                 var placeInfo = restUtil.Get<Place[]>("PlaceManagement.svc/GetPlaceByHealthFacilityId", new KeyValuePair<string, object>("hf_id", facilityId));
-                if(s_refDoses == null)
-                    s_refDoses = restUtil.Get<List<GIIS.DataLayer.Dose>>("DoseManagement.svc/GetDoseList");
-                if(s_refVaccines == null)
-                    s_refVaccines = restUtil.Get<List<GIIS.DataLayer.ScheduledVaccination>>("ScheduledVaccinationManagement.svc/GetScheduledVaccinationList");
-                if(s_refItems == null)
-                    s_refItems = restUtil.Get<List<GIIS.DataLayer.Item>>("ItemManagement.svc/GetItemList");
-                if(s_refItemLots == null)
-                    s_refItemLots = restUtil.Get<List<GIIS.DataLayer.ItemLot>>("StockManagement.svc/GetItemLots");
-
+               
                 foreach (var dtl in page.Details.OfType<OmrRowData>())
                 {
 
@@ -93,103 +137,64 @@ namespace GIIS.ScanForms.UserInterface
                         omrVaccine = dtl.Details.OfType<OmrBubbleData>().Where(o => o.Key == "vaccine").ToArray();
 
                     // From WCF Call
-                    string barcodeId = String.Empty;
-                    string firstname1 = String.Empty;
-                    string lastname1 = String.Empty;
-                    DateTime birthdate = default(DateTime);
-                    bool? gender = null;
+                    // Create row data for the verification form
+                    OmrBarcodeField barcodeField = page.Template.FlatFields.Find(o => o.Id == String.Format("{0}Barcode", dtl.Id)) as OmrBarcodeField;
+                    OmrBubbleField outreachField = page.Template.FlatFields.OfType<OmrBubbleField>().SingleOrDefault(o => o.AnswerRowGroup == dtl.Id && o.Question == "Outreach"),
+                        monthField = page.Template.FlatFields.OfType<OmrBubbleField>().SingleOrDefault(o => o.AnswerRowGroup == dtl.Id && o.Question == "dobMonth" && o.Value == "12");
+
+                    // Barcode bounds
+                    Tz02RowData rowData = new Tz02RowData()
+                    {
+                        RowBounds = new RectangleF()
+                        {
+                            Location = new PointF(barcodeField.TopLeft.X, monthField.TopLeft.Y - 20),
+                            Width = outreachField.TopLeft.X - barcodeField.TopLeft.X,
+                            Height = barcodeField.BottomLeft.Y - monthField.TopLeft.Y - 20
+                        },
+                        UserInfo = userInfo,
+                        Page = page,
+                        FacilityId = facilityId
+                    };
+
 
                     if (omrBarcode != null)
-                        barcodeId = omrBarcode.BarcodeData;
+                        rowData.Barcode = omrBarcode.BarcodeData;
                     if(omrDobDay != null && omrDobDay10 != null &&
                         omrDobMonth != null && omrDobYear != null)
-                        birthdate = new DateTime((int)omrDobYear.ValueAsFloat, (int)omrDobMonth.ValueAsFloat, (int)omrDobDay10.ValueAsFloat + (int)omrDobDay.ValueAsFloat);
+                        rowData.DateOfBirth = new DateTime((int)omrDobYear.ValueAsFloat, (int)omrDobMonth.ValueAsFloat, (int)omrDobDay10.ValueAsFloat + (int)omrDobDay.ValueAsFloat);
                     if (omrGender != null)
-                        gender = omrGender.Value == "M" ? true : false;
+                        rowData.Gender = omrGender.Value == "M" ? true : false;
+                    if (omrOutreach != null)
+                        rowData.Outreach = omrOutreach.Value == "T";
 
-                    // Barcode read error
-                    if (String.IsNullOrEmpty(barcodeId))
-                    {
-                        // Show a correction form ...
-                        var barcodeField = page.Template.Fields.FirstOrDefault(o => o.Id == String.Format("{0}Barcode", dtl.Id)) as OmrBarcodeField;
-                        BarcodeCorrection bc = new BarcodeCorrection(page, barcodeField);
-                        if(BarcodeUtil.HasData(page, barcodeField) && bc.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                            barcodeId = bc.BarcodeId;
-                        else
-                            throw new InvalidOperationException(String.Format("Could not read barcode on row {0}", rowNum));
-
-                    }
-                    if (birthdate > DateTime.Now)
-                        throw new InvalidOperationException(String.Format("Birthdate is in the future on row {0}", rowNum));
-                    if (gender == null)
-                        throw new InvalidOperationException(String.Format("Gender must be selected for row {0}", rowNum));
-                    if (birthdate.Month > monthBubble.ValueAsFloat)
-                        throw new InvalidOperationException(String.Format("Child with id {0} is born in the future (relative to the form date). Correct and re-scan sheet", barcodeId));
-
-                    var childResult = restUtil.Get<RestReturn>("ChildManagement.svc/RegisterChildWithAppoitments", 
-                        new KeyValuePair<string, object>("barcodeId", barcodeId),
-                        new KeyValuePair<String, object>("gender", gender),
-                        new KeyValuePair<String, Object>("birthdate", birthdate.ToString("yyyy-MM-dd HH:mm:ss")),
-                        new KeyValuePair<String, Object>("healthFacilityId", facilityId),
-                        new KeyValuePair<String, Object>("modifiedOn", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")),
-                        new KeyValuePair<String, Object>("modifiedBy", userInfo.Id),
-                        new KeyValuePair<String, Object>("domicileId", (placeInfo.FirstOrDefault(o=>o.Id > 0) ?? placeInfo.First()).Id)
-                        );
-
-                    if (childResult.Id < 0)
-                        throw new InvalidOperationException("Server indicated error");
-
-                    // Now we want to update the vaccinations given to be "true"
-                    var vaccinationEvent = restUtil.Get<VaccinationEvent[]>("VaccinationEvent.svc/GetVaccinationEventListByChildId", new KeyValuePair<string, object>("childId", childResult.Id));
-                    
-                    if(omrBcg != null && omrBcg.Length > 0)
-                    {
-                        var bcgEvent = vaccinationEvent.FirstOrDefault(o => o.DoseId == (s_refDoses.Find(d => d.Fullname == "BCG").Id));
-                        this.UpdateVaccination(bcgEvent);
-
-                    }
+                    // Doses
+                    rowData.Doses = new List<Dose>();
+                    if (omrBcg != null && omrBcg.Length > 0)
+                        rowData.Doses.Add(ReferenceData.Current.Doses.Find(d => d.Fullname == "BCG"));
                     if (omrOpv != null)
-                        foreach(var bub in omrOpv)
+                        foreach (var bub in omrOpv)
                         {
                             VaccinationEvent opvEvent = null;
                             if (bub.Value == "0")
-                                opvEvent = vaccinationEvent.FirstOrDefault(o => o.DoseId == (s_refDoses.Find(d => d.Fullname == "OPV0").Id));
+                                rowData.Doses.Add(ReferenceData.Current.Doses.Find(d => d.Fullname == "OPV0"));
                             else
-                                opvEvent = vaccinationEvent.FirstOrDefault(o => o.DoseId == (s_refDoses.Find(d => d.Fullname == String.Format("OPV {0}", bub.Value)).Id));
-
-                            this.UpdateVaccination(opvEvent);
+                                rowData.Doses.Add(ReferenceData.Current.Doses.Find(d => d.Fullname == String.Format("OPV {0}", bub.Value)));
                         }
                     if (omrPenta != null)
                         foreach (var bub in omrPenta)
-                        {
-                            VaccinationEvent pentaEvent = vaccinationEvent.FirstOrDefault(o => o.DoseId == (s_refDoses.Find(d => d.Fullname == String.Format("DTP-HepB-Hib {0}", bub.Value)).Id));
-                            this.UpdateVaccination(pentaEvent);
-                        }
+                            rowData.Doses.Add(ReferenceData.Current.Doses.Find(d => d.Fullname == String.Format("DTP-HepB-Hib {0}", bub.Value)));
                     if (omrPcv != null)
                         foreach (var bub in omrPcv)
-                        {
-                            VaccinationEvent pcvEvent = vaccinationEvent.FirstOrDefault(o => o.DoseId == (s_refDoses.Find(d => d.Fullname == String.Format("PCV {0}", bub.Value)).Id));
-                            this.UpdateVaccination(pcvEvent);
-                        }
+                            rowData.Doses.Add(ReferenceData.Current.Doses.Find(d => d.Fullname == String.Format("PCV {0}", bub.Value)));
                     if (omrRota != null)
                         foreach (var bub in omrRota)
-                        {
-                            VaccinationEvent rotaEvent = vaccinationEvent.FirstOrDefault(o => o.DoseId == (s_refDoses.Find(d => d.Fullname == String.Format("Rota {0}", bub.Value)).Id));
-                            this.UpdateVaccination(rotaEvent);
-                        }
+                            rowData.Doses.Add(ReferenceData.Current.Doses.Find(d => d.Fullname == String.Format("Rota {0}", bub.Value)));
                     if (omrMr != null)
                         foreach (var bub in omrMr)
-                        {
-                            VaccinationEvent mrEvent = vaccinationEvent.FirstOrDefault(o => o.DoseId == (s_refDoses.Find(d => d.Fullname == String.Format("Measles {0}", bub.Value)).Id));
-                            this.UpdateVaccination(mrEvent);
-                        }
+                            rowData.Doses.Add(ReferenceData.Current.Doses.Find(d => d.Fullname == String.Format("Measles {0}", bub.Value)));
 
-                    // Now we need to update the new vaccines
-                    DateTime vaccTime = DateTime.Now;
-                    if (omrVaccDay10 != null && omrVaccDay != null)
-                        vaccTime = new DateTime(DateTime.Now.Month < monthBubble.ValueAsFloat ? DateTime.Now.Year - 1 : DateTime.Now.Year, (int)monthBubble.ValueAsFloat, (int)omrVaccDay10.ValueAsFloat + (int)omrVaccDay.ValueAsFloat);
-                    vaccinationEvent = restUtil.Get<VaccinationEvent[]>("VaccinationEvent.svc/GetVaccinationEventListByChildId", new KeyValuePair<string, object>("childId", childResult.Id));
-
+                    // Given vaccines
+                    rowData.VaccineGiven = new List<ScheduledVaccination>();
                     foreach (var vacc in omrVaccine)
                     {
                         string antigenName = vacc.Value;
@@ -201,39 +206,19 @@ namespace GIIS.ScanForms.UserInterface
                             antigenName = "Measles Rubella";
                         else if (antigenName == "PCV")
                             antigenName = "PCV-13";
+                        rowData.VaccineGiven.Add(ReferenceData.Current.Vaccines.First(v => v.Name == antigenName));
+                    }
 
-                        // Find the scheduled vaccine for this
-                        List<Dose> sv = s_refDoses.FindAll(o => o.ScheduledVaccinationId == s_refVaccines.First(v=>v.Name == antigenName).Id);
-                        // Find the current dose we're on
-                        var lastVe = vaccinationEvent.Where(ve => sv.Exists(o => o.Id == ve.DoseId) && ve.VaccinationStatus == true).OrderByDescending(o=>sv.Find(d=>d.Id == o.DoseId).DoseNumber).FirstOrDefault();
-                        int doseNumber = 0;
-                        // hack: OPV is odd
-                        if (antigenName == "OPV")
-                            doseNumber--;
-                        if(lastVe != null)
-                            doseNumber = sv.Find(d => d.Id == lastVe.DoseId).DoseNumber;
-                        
-                        // Next we want to get the next dose
-                        Dose myDose = sv.FirstOrDefault(o => o.DoseNumber == doseNumber + 1);
-                        if (myDose == null)
-                            MessageBox.Show(String.Format("Patient #{0} is marked to have antigen {1}. Have detected dose number {2} should be given however no dose of this exists", barcodeId, antigenName, doseNumber + 1));
-                        else
-                        {
-                            // Find an event that suits us
-                            var evt = vaccinationEvent.First(o => o.DoseId == myDose.Id);
-                            evt.VaccinationDate = evt.ScheduledDate = vaccTime;
-                            this.UpdateVaccination(evt);
+                    // Date of vaccination
+                    rowData.VaccineDate = DateTime.Now;
+                    if (omrVaccDay10 != null && omrVaccDay != null)
+                        rowData.VaccineDate = new DateTime(DateTime.Now.Month < monthBubble.ValueAsFloat ? DateTime.Now.Year - 1 : DateTime.Now.Year, (int)monthBubble.ValueAsFloat, (int)omrVaccDay10.ValueAsFloat + (int)omrVaccDay.ValueAsFloat);
 
-                            if(omrOutreach != null)
-                            {
-                                restUtil.Get<RestReturn>("VaccinationAppointmentManagement.svc/UpdateVaccinationApp",
-                                    new KeyValuePair<String,Object>("outreach", true),
-                                    new KeyValuePair<String, Object>("userId", userInfo.Id),
-                                    new KeyValuePair<String, Object>("barcode", barcodeId),
-                                    new KeyValuePair<String, Object>("doseId", myDose.Id)
-                                    );
-                            }
-                        }
+                    if (BarcodeUtil.HasData(page, barcodeField) ||
+                        dtl.Details.Count > 2)
+                    {
+                        Registration registration = new Registration(rowData);
+                        registration.ShowDialog();
                     }
                 }
 
@@ -250,20 +235,6 @@ namespace GIIS.ScanForms.UserInterface
         }
 
 
-        /// <summary>
-        /// Update vaccination
-        /// </summary>
-        /// <param name="evt"></param>
-        private void UpdateVaccination(VaccinationEvent evt)
-        {
-            RestUtil restUtil = new RestUtil(new Uri(ConfigurationManager.AppSettings["GIIS_URL"]));
-
-            restUtil.Get<RestReturn>("VaccinationEvent.svc/UpdateVaccinationEventById",
-                new KeyValuePair<string, object>("vaccinationEventId", evt.Id),
-                new KeyValuePair<String, Object>("vaccinationDate", evt.ScheduledDate.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss Z")),
-                new KeyValuePair<String, Object>("notes", "From form scanner"),
-                new KeyValuePair<String, Object>("vaccinationStatus", true));
-
-        }
+       
     }
 }
