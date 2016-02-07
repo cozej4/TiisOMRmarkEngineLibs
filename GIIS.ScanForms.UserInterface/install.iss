@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "TIIS DIVO Scanning Tools"
-#define MyAppVersion "0.8.11"
+#define MyAppVersion "0.8.16"
 #define MyAppPublisher "Path"
 #define MyAppURL "http://path.org"
 

@@ -192,7 +192,8 @@ namespace GIIS.ScanForms.UserInterface
                     // iterate over the sub-rows
                     foreach (var aptRow in page.Details.OfType<OmrRowData>().Where(o=>o.Id.StartsWith(String.Format("{0}-", patientRow.Id))).OrderBy(r=>r.Id))
                     {
-                        OmrBarcodeData omrAptId = aptRow.Details.OfType<OmrBarcodeData>().First();
+                        OmrBarcodeData omrAptId = aptRow.Details.OfType<OmrBarcodeData>().FirstOrDefault();
+                        
                         OmrBubbleData omrDay10 = aptRow.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "day10"),
                             omrDay = aptRow.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "day"),
                             omrOutreach = aptRow.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "outreach"),

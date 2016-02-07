@@ -95,6 +95,7 @@
             this.btnSkip = new System.Windows.Forms.Button();
             this.chkOutreach = new System.Windows.Forms.CheckBox();
             this.errBarcode = new System.Windows.Forms.ErrorProvider(this.components);
+            this.label26 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pbScan)).BeginInit();
             this.panel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -169,6 +170,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.label26);
             this.groupBox1.Controls.Add(this.txtTelephone);
             this.groupBox1.Controls.Add(this.label11);
             this.groupBox1.Controls.Add(this.txtMotherGiven);
@@ -797,6 +799,7 @@
             this.btnSkip.TabIndex = 24;
             this.btnSkip.Text = "Skip";
             this.btnSkip.UseVisualStyleBackColor = true;
+            this.btnSkip.Click += new System.EventHandler(this.btnSkip_Click);
             // 
             // chkOutreach
             // 
@@ -811,6 +814,16 @@
             // errBarcode
             // 
             this.errBarcode.ContainerControl = this;
+            // 
+            // label26
+            // 
+            this.label26.AutoSize = true;
+            this.label26.Location = new System.Drawing.Point(-3, 43);
+            this.label26.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label26.Name = "label26";
+            this.label26.Size = new System.Drawing.Size(58, 13);
+            this.label26.TabIndex = 20;
+            this.label26.Text = "Telephone";
             // 
             // Registration
             // 
@@ -915,5 +928,6 @@
         private System.Windows.Forms.Button btnSkip;
         private System.Windows.Forms.CheckBox chkOutreach;
         private System.Windows.Forms.ErrorProvider errBarcode;
+        private System.Windows.Forms.Label label26;
     }
 }

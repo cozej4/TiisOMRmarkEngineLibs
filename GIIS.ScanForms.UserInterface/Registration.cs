@@ -76,7 +76,15 @@ namespace GIIS.ScanForms.UserInterface
             // Selected antigens
             foreach(var itm in rowData.VaccineGiven)
             {
-                var ctl = this.grpVaccine.Controls.Find(String.Format("chk{0}", itm.Name.ToUpper()), false).FirstOrDefault() as CheckBox;
+                String antigenName = itm.Name;
+                if (antigenName == "DTP-HepB-Hib")
+                    antigenName = "PENTA";
+                else if (antigenName == "Measles Rubella")
+                    antigenName = "MR";
+                else if (antigenName == "PCV-13")
+                    antigenName = "PCV";
+
+                var ctl = this.grpVaccine.Controls.Find(String.Format("chk{0}", antigenName.ToUpper()), false).FirstOrDefault() as CheckBox;
                 if(ctl != null)
                     ctl.Checked = true;
             }
@@ -122,112 +130,119 @@ namespace GIIS.ScanForms.UserInterface
         private void button1_Click(object sender, EventArgs e)
         {
 
-            errBarcode.Clear();
-            // Validation stuff
-            if (!this.ValidateForm()) return;
-            Place selectedPlace = (cbxVillage.SelectedItem as PlaceListItem)?.Place;
-
-            // Register the child
-            var childResult = this.m_restUtil.Get<RestReturn>("ChildManagement.svc/RegisterChildWithAppoitments",
-                new KeyValuePair<string, object>("barcode", txtBarcode.Text),
-                new KeyValuePair<string, object>("firstname1", txtGiven.Text),
-                new KeyValuePair<string, object>("lastname1", txtFamily.Text),
-                new KeyValuePair<string, object>("birthdate", dtpDob.Value.ToString("yyyy-MM-dd")),
-                new KeyValuePair<string, object>("gender", cbxGender.SelectedIndex == 0 ? false : true),
-                new KeyValuePair<string, object>("healthFacilityId", this.m_rowData.FacilityId),
-                new KeyValuePair<string, object>("domicileId", selectedPlace.Id),
-                new KeyValuePair<string, object>("statusId", 1),
-                new KeyValuePair<string, object>("phone", txtTelephone.Text),
-                new KeyValuePair<string, object>("motherFirstname", txtMotherFamily.Text),
-                new KeyValuePair<string, object>("motherLastname", txtMotherGiven.Text),
-                new KeyValuePair<string, object>("notes", "Updated by form scanning application"),
-                new KeyValuePair<string, object>("userId", this.m_rowData.UserInfo.Id)
-            );
-            if (childResult.Id < 0)
+            try
             {
-                MessageBox.Show("TIIS Service reported Error code. This is usually caused by a duplicate barcode sticker");
-                return;
-            }
+                btnSubmit.Enabled = false;
+                errBarcode.Clear();
+                // Validation stuff
+                if (!this.ValidateForm()) return;
+                Place selectedPlace = (cbxVillage.SelectedItem as PlaceListItem)?.Place;
 
-
-            // Update doses
-            var vaccinationEvent = this.m_restUtil.Get<VaccinationEvent[]>("VaccinationEvent.svc/GetVaccinationEventListByChildId", new KeyValuePair<string, object>("childId", childResult.Id));
-            foreach(var evt in vaccinationEvent)
-            {
-                var dose = ReferenceData.Current.Doses.FirstOrDefault(o => o.Id == evt.DoseId);
-                String doseName = dose.Fullname.Replace(" ", "").Replace("-", "");
-                if (doseName == "BCG")
-                    doseName = "BCG0";
-
-                var ctl = this.grpHistoricalVacc.Controls.Find(String.Format("chk{0}", doseName), false).FirstOrDefault() as CheckBox;
-                if(ctl != null && ctl.Checked)
-                    this.UpdateVaccination(evt, dose);
-            }
-
-            // Re-fetch doses so we get new data from the system
-            vaccinationEvent = this.m_restUtil.Get<VaccinationEvent[]>("VaccinationEvent.svc/GetVaccinationEventListByChildId", new KeyValuePair<string, object>("childId", childResult.Id));
-            // Give doses
-
-            foreach (var ctl in grpVaccine.Controls)
-            {
-                if (!(ctl is CheckBox) )
-                    continue; // skip non check boxes
-
-                var checkbox = ctl as CheckBox;
-
-                if (!checkbox.Checked)
-                    continue;
-
-                string antigenName = checkbox.Name.Substring(3);
-                if (antigenName == "ROTA")
-                    antigenName = "Rota";
-                else if (antigenName == "PENTA")
-                    antigenName = "DTP-HepB-Hib";
-                else if (antigenName == "MR")
-                    antigenName = "Measles Rubella";
-                else if (antigenName == "PCV")
-                    antigenName = "PCV-13";
-                else if (antigenName == "Outreach")
-                    continue;
-
-                var vaccine = ReferenceData.Current.Vaccines.FirstOrDefault(o => o.Name == antigenName);
-                
-                // Find the scheduled vaccine for this
-                List<Dose> sv = ReferenceData.Current.Doses.FindAll(o => o.ScheduledVaccinationId == vaccine.Id);
-                // Find the current dose we're on
-                var lastVe = vaccinationEvent.Where(ve => sv.Exists(o => o.Id == ve.DoseId) && ve.VaccinationStatus == true).OrderByDescending(o => sv.Find(d => d.Id == o.DoseId).DoseNumber).FirstOrDefault();
-                int doseNumber = 0;
-                // hack: OPV is odd
-                if (antigenName == "OPV")
-                    doseNumber--;
-                if (lastVe != null)
-                    doseNumber = sv.Find(d => d.Id == lastVe.DoseId).DoseNumber;
-
-                // Next we want to get the next dose
-                Dose myDose = sv.FirstOrDefault(o => o.DoseNumber == doseNumber + 1);
-                if (myDose == null)
-                    MessageBox.Show(String.Format("Patient #{0} is marked to have antigen {1}. Have detected dose number {2} should be given however no dose of this exists", txtBarcode.Text, antigenName, doseNumber + 1));
-                else 
+                // Register the child
+                var childResult = this.m_restUtil.Get<RestReturn>("ChildManagement.svc/RegisterChildWithAppoitments",
+                    new KeyValuePair<string, object>("barcode", txtBarcode.Text),
+                    new KeyValuePair<string, object>("firstname1", txtGiven.Text),
+                    new KeyValuePair<string, object>("lastname1", txtFamily.Text),
+                    new KeyValuePair<string, object>("birthdate", dtpDob.Value.ToString("yyyy-MM-dd")),
+                    new KeyValuePair<string, object>("gender", cbxGender.SelectedIndex == 0 ? false : true),
+                    new KeyValuePair<string, object>("healthFacilityId", this.m_rowData.FacilityId),
+                    new KeyValuePair<string, object>("domicileId", selectedPlace.Id),
+                    new KeyValuePair<string, object>("statusId", 1),
+                    new KeyValuePair<string, object>("phone", txtTelephone.Text),
+                    new KeyValuePair<string, object>("motherFirstname", txtMotherFamily.Text),
+                    new KeyValuePair<string, object>("motherLastname", txtMotherGiven.Text),
+                    new KeyValuePair<string, object>("notes", "Updated by form scanning application"),
+                    new KeyValuePair<string, object>("userId", this.m_rowData.UserInfo.Id)
+                );
+                if (childResult.Id < 0)
                 {
-                    // Find an event that suits us
-                    var evt = vaccinationEvent.First(o => o.DoseId == myDose.Id);
-                    evt.VaccinationDate = evt.ScheduledDate = dtpVaccDate.Value;
-                    this.UpdateVaccination(evt, myDose);
+                    MessageBox.Show("TIIS Service reported Error code. This is usually caused by a duplicate barcode sticker");
+                    return;
+                }
 
-                    if (chkOutreach.Checked)
+
+                // Update doses
+                var vaccinationEvent = this.m_restUtil.Get<VaccinationEvent[]>("VaccinationEvent.svc/GetVaccinationEventListByChildId", new KeyValuePair<string, object>("childId", childResult.Id));
+                foreach (var evt in vaccinationEvent)
+                {
+                    var dose = ReferenceData.Current.Doses.FirstOrDefault(o => o.Id == evt.DoseId);
+                    String doseName = dose.Fullname.Replace(" ", "").Replace("-", "");
+                    if (doseName == "BCG")
+                        doseName = "BCG0";
+
+                    var ctl = this.grpHistoricalVacc.Controls.Find(String.Format("chk{0}", doseName), false).FirstOrDefault() as CheckBox;
+                    if (ctl != null && ctl.Checked)
+                        this.UpdateVaccination(evt, dose);
+                }
+
+                // Re-fetch doses so we get new data from the system
+                vaccinationEvent = this.m_restUtil.Get<VaccinationEvent[]>("VaccinationEvent.svc/GetVaccinationEventListByChildId", new KeyValuePair<string, object>("childId", childResult.Id));
+                // Give doses
+                foreach (var ctl in grpVaccine.Controls)
+                {
+                    if (!(ctl is CheckBox))
+                        continue; // skip non check boxes
+
+                    var checkbox = ctl as CheckBox;
+
+                    if (!checkbox.Checked)
+                        continue;
+
+                    string antigenName = checkbox.Name.Substring(3);
+                    if (antigenName == "ROTA")
+                        antigenName = "Rota";
+                    else if (antigenName == "PENTA")
+                        antigenName = "DTP-HepB-Hib";
+                    else if (antigenName == "MR")
+                        antigenName = "Measles Rubella";
+                    else if (antigenName == "PCV")
+                        antigenName = "PCV-13";
+                    else if (antigenName == "Outreach")
+                        continue;
+
+                    var vaccine = ReferenceData.Current.Vaccines.FirstOrDefault(o => o.Name == antigenName);
+
+                    // Find the scheduled vaccine for this
+                    List<Dose> sv = ReferenceData.Current.Doses.FindAll(o => o.ScheduledVaccinationId == vaccine.Id);
+                    // Find the current dose we're on
+                    var lastVe = vaccinationEvent.Where(ve => sv.Exists(o => o.Id == ve.DoseId) && ve.VaccinationStatus == true).OrderByDescending(o => sv.Find(d => d.Id == o.DoseId).DoseNumber).FirstOrDefault();
+                    int doseNumber = 0;
+                    // hack: OPV is odd
+                    if (antigenName == "OPV")
+                        doseNumber--;
+                    if (lastVe != null)
+                        doseNumber = sv.Find(d => d.Id == lastVe.DoseId).DoseNumber;
+
+                    // Next we want to get the next dose
+                    Dose myDose = sv.FirstOrDefault(o => o.DoseNumber == doseNumber + 1);
+                    if (myDose == null)
+                        MessageBox.Show(String.Format("Patient #{0} is marked to have antigen {1}. Have detected dose number {2} should be given however no dose of this exists", txtBarcode.Text, antigenName, doseNumber + 1));
+                    else
                     {
-                        this.m_restUtil.Get<RestReturn>("VaccinationAppointmentManagement.svc/UpdateVaccinationApp",
-                            new KeyValuePair<String, Object>("outreach", true),
-                            new KeyValuePair<String, Object>("userId", this.m_rowData.UserInfo.Id),
-                            new KeyValuePair<String, Object>("barcode", txtBarcode.Text),
-                            new KeyValuePair<String, Object>("doseId", myDose.Id)
-                            );
+                        // Find an event that suits us
+                        var evt = vaccinationEvent.First(o => o.DoseId == myDose.Id);
+                        evt.VaccinationDate = evt.ScheduledDate = dtpVaccDate.Value;
+                        this.UpdateVaccination(evt, myDose);
+
+                        if (chkOutreach.Checked)
+                        {
+                            this.m_restUtil.Get<RestReturn>("VaccinationAppointmentManagement.svc/UpdateVaccinationApp",
+                                new KeyValuePair<String, Object>("outreach", true),
+                                new KeyValuePair<String, Object>("userId", this.m_rowData.UserInfo.Id),
+                                new KeyValuePair<String, Object>("barcode", txtBarcode.Text),
+                                new KeyValuePair<String, Object>("doseId", myDose.Id)
+                                );
+                        }
                     }
                 }
+
+
+                this.Close();
             }
-
-
-            
+            finally
+            {
+                btnSubmit.Enabled = true;
+            }
 
         }
 
@@ -258,6 +273,9 @@ namespace GIIS.ScanForms.UserInterface
             dtpVaccDate.MinDate = dtpDob.Value;
         }
 
-     
+        private void btnSkip_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
     }
 }

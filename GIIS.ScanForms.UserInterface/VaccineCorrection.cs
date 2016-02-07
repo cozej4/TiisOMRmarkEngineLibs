@@ -135,60 +135,68 @@ namespace GIIS.ScanForms.UserInterface
         private void button1_Click(object sender, EventArgs e)
         {
 
-            // Associate the child
-            if(!String.IsNullOrEmpty(txtBarcode.Text))
+            try
             {
-                var retVal = this.m_restUtil.Get<RestReturn>("ChildManagement.svc/UpdateChild",
-                    new KeyValuePair<string, object>("barcode", txtBarcode.Text),
-                    new KeyValuePair<string, object>("firstname1", this.m_rowData.Child.Firstname1),
-                    new KeyValuePair<string, object>("lastname1", this.m_rowData.Child.Lastname1),
-                    new KeyValuePair<string, object>("birthdate", this.m_rowData.Child.Birthdate.ToString("yyyy-MM-dd")),
-                    new KeyValuePair<string, object>("gender", this.m_rowData.Child.Gender),
-                    new KeyValuePair<string, object>("healthFacilityId", this.m_rowData.Child.HealthcenterId),
-                    new KeyValuePair<string, object>("birthplaceId", this.m_rowData.Child.BirthplaceId),
-                    new KeyValuePair<string, object>("domicileId", this.m_rowData.Child.DomicileId),
-                    new KeyValuePair<string, object>("statusId", this.m_rowData.Child.StatusId),
-                    new KeyValuePair<string, object>("address", this.m_rowData.Child.Address),
-                    new KeyValuePair<string, object>("phone", this.m_rowData.Child.Phone),
-                    new KeyValuePair<string, object>("motherFirstname", this.m_rowData.Child.MotherFirstname),
-                    new KeyValuePair<string, object>("motherLastname", this.m_rowData.Child.MotherLastname),
-                    new KeyValuePair<string, object>("notes", "Updated by form scanning application"),
-                    new KeyValuePair<string, object>("userId", this.m_rowData.UserInfo.Id),
-                    new KeyValuePair<string, object>("childId", this.m_rowData.Child.Id)
-                );
-                if (retVal.Id < 0)
+                btnSubmit.Enabled = false;
+                // Associate the child
+                if (!String.IsNullOrEmpty(txtBarcode.Text))
                 {
-                    MessageBox.Show("TIIS Service reported Error code. This is usually caused by a duplicate barcode sticker");
-                    return;
+                    var retVal = this.m_restUtil.Get<RestReturn>("ChildManagement.svc/UpdateChild",
+                        new KeyValuePair<string, object>("barcode", txtBarcode.Text),
+                        new KeyValuePair<string, object>("firstname1", this.m_rowData.Child.Firstname1),
+                        new KeyValuePair<string, object>("lastname1", this.m_rowData.Child.Lastname1),
+                        new KeyValuePair<string, object>("birthdate", this.m_rowData.Child.Birthdate.ToString("yyyy-MM-dd")),
+                        new KeyValuePair<string, object>("gender", this.m_rowData.Child.Gender),
+                        new KeyValuePair<string, object>("healthFacilityId", this.m_rowData.Child.HealthcenterId),
+                        new KeyValuePair<string, object>("birthplaceId", this.m_rowData.Child.BirthplaceId),
+                        new KeyValuePair<string, object>("domicileId", this.m_rowData.Child.DomicileId),
+                        new KeyValuePair<string, object>("statusId", this.m_rowData.Child.StatusId),
+                        new KeyValuePair<string, object>("address", this.m_rowData.Child.Address),
+                        new KeyValuePair<string, object>("phone", this.m_rowData.Child.Phone),
+                        new KeyValuePair<string, object>("motherFirstname", this.m_rowData.Child.MotherFirstname),
+                        new KeyValuePair<string, object>("motherLastname", this.m_rowData.Child.MotherLastname),
+                        new KeyValuePair<string, object>("notes", "Updated by form scanning application"),
+                        new KeyValuePair<string, object>("userId", this.m_rowData.UserInfo.Id),
+                        new KeyValuePair<string, object>("childId", this.m_rowData.Child.Id)
+                    );
+                    if (retVal.Id < 0)
+                    {
+                        MessageBox.Show("TIIS Service reported Error code. This is usually caused by a duplicate barcode sticker");
+                        return;
+                    }
                 }
-            }
 
-            
-            foreach(var apt in this.m_rowData.Appointment)
-            {
+
+                foreach (var apt in this.m_rowData.Appointment)
+                {
 
                     int idx = this.m_rowData.Appointment.IndexOf(apt);
                     CheckedListBox vaccineBox = idx == 0 ? chkVaccA : chkVaccB;
-                if(vaccineBox.Enabled)
-                    foreach (var vacc in vaccineBox.CheckedItems.OfType<VaccineCheckItem>())
-                    {
-                        vacc.Event.VaccinationStatus = true;
-                        vacc.Event.VaccinationDate = idx == 0 ? dtpVaccA.Value : dtpVaccB.Value;
-                        this.UpdateVaccination(vacc.Event);
-
-                        if (idx == 0 ? chkOutreachA.Checked : chkOutreachB.Checked)
+                    if (vaccineBox.Enabled)
+                        foreach (var vacc in vaccineBox.CheckedItems.OfType<VaccineCheckItem>())
                         {
-                            this.m_restUtil.Get<RestReturn>("VaccinationAppointmentManagement.svc/UpdateVaccinationApp",
-                                new KeyValuePair<String, Object>("outreach", true),
-                                new KeyValuePair<String, Object>("userId", this.m_rowData.UserInfo.Id),
-                                new KeyValuePair<String, Object>("barcode", txtBarcode.Text),
-                                new KeyValuePair<String, Object>("doseId", vacc.Event.DoseId)
-                                );
-                        }
+                            vacc.Event.VaccinationStatus = true;
+                            vacc.Event.VaccinationDate = idx == 0 ? dtpVaccA.Value : dtpVaccB.Value;
+                            this.UpdateVaccination(vacc.Event);
 
+                            if (idx == 0 ? chkOutreachA.Checked : chkOutreachB.Checked)
+                            {
+                                this.m_restUtil.Get<RestReturn>("VaccinationAppointmentManagement.svc/UpdateVaccinationApp",
+                                    new KeyValuePair<String, Object>("outreach", true),
+                                    new KeyValuePair<String, Object>("userId", this.m_rowData.UserInfo.Id),
+                                    new KeyValuePair<String, Object>("barcode", txtBarcode.Text),
+                                    new KeyValuePair<String, Object>("doseId", vacc.Event.DoseId)
+                                    );
+                            }
+
+                        }
                 }
+                this.Close();
             }
-            this.Close();
+            finally
+            {
+                btnSubmit.Enabled = false;
+            }
         }
 
         private void chkSendB_CheckedChanged(object sender, EventArgs e)
