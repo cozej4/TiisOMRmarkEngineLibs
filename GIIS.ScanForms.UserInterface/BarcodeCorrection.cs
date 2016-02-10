@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -33,12 +34,21 @@ namespace GIIS.ScanForms.UserInterface
 
             // Crop the image
             String tPath = Path.GetTempFileName();
-            using(Bitmap bmp = new Bitmap((int)barcode.TopRight.X - (int)barcode.TopLeft.X, (int)barcode.BottomLeft.Y - (int)barcode.TopLeft.Y))
+            using (Bitmap bmp = new Bitmap((int)barcode.TopRight.X - (int)barcode.TopLeft.X, (int)barcode.BottomLeft.Y - (int)barcode.TopLeft.Y, PixelFormat.Format24bppRgb))
             using (Graphics g = Graphics.FromImage(bmp))
             using (Image img = Image.FromFile(this.m_page.AnalyzedImage))
             {
                 g.DrawImage(img, 0, 0, new Rectangle(new Point((int)barcode.TopLeft.X, (int)barcode.TopLeft.Y), bmp.Size), GraphicsUnit.Pixel);
                 bmp.Save(tPath);
+            }
+
+            // Rotate
+            using (Image img = Image.FromFile(tPath))
+            using (var rotated = new AForge.Imaging.Filters.RotateBilinear(-90).Apply((Bitmap)img))
+            using(var scaled = new AForge.Imaging.Filters.ResizeBilinear((int)(rotated.Width * 0.75), (int)(rotated.Height * .75)).Apply(rotated))
+            {
+                tPath = Path.GetTempFileName();
+                scaled.Save(tPath);
                 pbBarcode.ImageLocation = tPath;
             }
         }

@@ -60,7 +60,7 @@ namespace GIIS.ScanForms.UserInterface
                 pbBarcode.ImageLocation = tPath;
             }
 
-            lblChildName.Text = String.Format("{0}, {1}", rowData.Child?.Lastname1, rowData.Child?.Firstname1);
+            lblChildName.Text = String.Format("{1} {0}", rowData.Child?.Lastname1, rowData.Child?.Firstname1);
             txtBarcode.Text = rowData.StickerValue;
 
             // First appointment

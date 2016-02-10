@@ -102,7 +102,10 @@ namespace GIIS.ScanForms.UserInterface
 
                 var monthBubble = page.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "month");
                 if (monthBubble == null)
+                {
                     Err += "Must select month!; ";
+                    return;
+                }
 
                 RestUtil restUtil = new RestUtil(new Uri(ConfigurationManager.AppSettings["GIIS_URL"]));
                 var userInfo = restUtil.Get<User>("UserManagement.svc/GetUserInfo", new KeyValuePair<string, object>("username", restUtil.GetCurrentUserName));
@@ -127,7 +130,10 @@ namespace GIIS.ScanForms.UserInterface
                         omrGender = dtl.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "gender"),
                         omrOutreach = dtl.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "Outreach"),
                         omrVaccDay10 = dtl.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "vaccDay10"),
-                        omrVaccDay = dtl.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "vaccDay");
+                        omrVaccDay = dtl.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "vaccDay"),
+                        omrNew =  dtl.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "newInfo"),
+                        omrUpdate = dtl.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "correct"),
+                        omrIgnore = dtl.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "moved");
                     OmrBubbleData[] omrBcg = dtl.Details.OfType<OmrBubbleData>().Where(o => o.Key == "BCG").ToArray(),
                         omrOpv = dtl.Details.OfType<OmrBubbleData>().Where(o => o.Key == "OPV").ToArray(),
                         omrPenta = dtl.Details.OfType<OmrBubbleData>().Where(o => o.Key == "PENTA").ToArray(),
@@ -159,9 +165,13 @@ namespace GIIS.ScanForms.UserInterface
 
                     if (omrBarcode != null)
                         rowData.Barcode = omrBarcode.BarcodeData;
-                    if(omrDobDay != null && omrDobDay10 != null &&
+                    if (omrDobDay != null && omrDobDay10 != null &&
                         omrDobMonth != null && omrDobYear != null)
-                        rowData.DateOfBirth = new DateTime((int)omrDobYear.ValueAsFloat, (int)omrDobMonth.ValueAsFloat, (int)omrDobDay10.ValueAsFloat + (int)omrDobDay.ValueAsFloat);
+                        try
+                        {
+                            rowData.DateOfBirth = new DateTime((int)omrDobYear.ValueAsFloat, (int)omrDobMonth.ValueAsFloat, (int)omrDobDay10.ValueAsFloat + (int)omrDobDay.ValueAsFloat);
+                        }
+                        catch { }
                     if (omrGender != null)
                         rowData.Gender = omrGender.Value == "M" ? true : false;
                     if (omrOutreach != null)
@@ -213,6 +223,20 @@ namespace GIIS.ScanForms.UserInterface
                     rowData.VaccineDate = DateTime.Now;
                     if (omrVaccDay10 != null && omrVaccDay != null)
                         rowData.VaccineDate = new DateTime(DateTime.Now.Month < monthBubble.ValueAsFloat ? DateTime.Now.Year - 1 : DateTime.Now.Year, (int)monthBubble.ValueAsFloat, (int)omrVaccDay10.ValueAsFloat + (int)omrVaccDay.ValueAsFloat);
+
+                    // Determine what to do 
+                    if (omrUpdate?.Value == "T" &&
+                        BarcodeUtil.HasData(page, barcodeField) &&
+                        String.IsNullOrEmpty(rowData.Barcode))
+                    {
+                        BarcodeCorrection bc = new BarcodeCorrection(page, barcodeField);
+                        if (bc.ShowDialog() == DialogResult.OK)
+                            rowData.Barcode = bc.BarcodeId;
+                        else
+                            continue;
+                    }
+                    else if (omrIgnore?.Value == "T")
+                        continue;
 
                     if (BarcodeUtil.HasData(page, barcodeField) ||
                         dtl.Details.Count > 2)

@@ -236,7 +236,9 @@ namespace GIIS.ScanForms.UserInterface
 
                     if (rowData.Appointment[0].Date.HasValue ||
                         rowData.Appointment[1].Date.HasValue ||
-                        !String.IsNullOrEmpty(rowData.StickerValue))
+                        rowData.Appointment[0].All ||
+                        rowData.Appointment[1].All ||
+                        BarcodeUtil.HasData(page, omrStickerField))
                     {
                         VaccineCorrection vc = new VaccineCorrection(rowData, vaccinationEvent, ReferenceData.Current.Doses);
                         vc.ShowDialog();

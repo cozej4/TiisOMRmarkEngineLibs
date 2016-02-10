@@ -50,7 +50,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(9, 257);
+            this.label2.Location = new System.Drawing.Point(12, 193);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(281, 13);
             this.label2.TabIndex = 2;
@@ -58,16 +58,16 @@
             // 
             // txtBarcode
             // 
-            this.txtBarcode.Location = new System.Drawing.Point(12, 273);
+            this.txtBarcode.Location = new System.Drawing.Point(15, 209);
             this.txtBarcode.Name = "txtBarcode";
-            this.txtBarcode.Size = new System.Drawing.Size(270, 20);
+            this.txtBarcode.Size = new System.Drawing.Size(381, 20);
             this.txtBarcode.TabIndex = 3;
             this.txtBarcode.TextChanged += new System.EventHandler(this.txtBarcode_TextChanged);
             // 
             // btnOk
             // 
             this.btnOk.Enabled = false;
-            this.btnOk.Location = new System.Drawing.Point(207, 299);
+            this.btnOk.Location = new System.Drawing.Point(321, 239);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(75, 23);
             this.btnOk.TabIndex = 4;
@@ -90,14 +90,14 @@
             this.pnlView.Controls.Add(this.pbBarcode);
             this.pnlView.Location = new System.Drawing.Point(15, 25);
             this.pnlView.Name = "pnlView";
-            this.pnlView.Size = new System.Drawing.Size(267, 229);
+            this.pnlView.Size = new System.Drawing.Size(381, 165);
             this.pnlView.TabIndex = 5;
             // 
             // BarcodeCorrection
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(294, 334);
+            this.ClientSize = new System.Drawing.Size(408, 265);
             this.Controls.Add(this.pnlView);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.txtBarcode);

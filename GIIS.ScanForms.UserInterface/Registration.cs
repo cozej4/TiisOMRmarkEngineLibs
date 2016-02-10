@@ -53,24 +53,35 @@ namespace GIIS.ScanForms.UserInterface
             }
 
             this.m_rowData = rowData;
+
             cbxVillage.Items.AddRange(ReferenceData.Current.Places.Select(o => new PlaceListItem() { Place = o as Place }).OfType<Object>().ToArray());
 
-            txtBarcode.Text = rowData.Barcode;
-            if(rowData.DateOfBirth.HasValue)
-                dtpDob.Value = rowData.DateOfBirth.Value;
-            cbxGender.SelectedIndex = rowData.Gender ? 1 : 0;
+
 
             dtpDob.MaxDate = dtpVaccDate.MaxDate = DateTime.Now;
+
+            txtBarcode.Text = rowData.Barcode;
+            try
+            {
+                if (rowData.DateOfBirth.HasValue)
+                    dtpDob.Value = rowData.DateOfBirth.Value;
+            }
+            catch (Exception e){
+                errBarcode.SetError(dtpDob, e.Message);
+
+            }
+            cbxGender.SelectedIndex = rowData.Gender ? 1 : 0;
+
             try
             {
                 dtpVaccDate.Value = rowData.VaccineDate;
+                dtpVaccDate.MinDate = dtpDob.Value;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 errBarcode.SetError(dtpVaccDate, e.Message);
             }
 
-            dtpVaccDate.MinDate = dtpDob.Value;
             chkOutreach.Checked = rowData.Outreach;
 
             // Selected antigens
@@ -102,9 +113,38 @@ namespace GIIS.ScanForms.UserInterface
                     ctl.Checked = true;
             }
 
+            // Get existing data?
+            if (this.m_rowData.Barcode != null)
+                this.PopulatePatientDetails(this.m_rowData.Barcode);
+
             this.ValidateForm();
         }
-        
+
+        /// <summary>
+        /// Populate patient details
+        /// </summary>
+        private void PopulatePatientDetails(string barcode)
+        {
+            var childData = this.m_restUtil.Get<List<FormTZ01.ChildEntity>>("ChildManagement.svc/SearchByBarcode", new KeyValuePair<string, object>("barcodeId", barcode));
+            if (childData.Count == 0)
+                return;
+            var child = childData[0];
+
+            this.txtBarcode.Text = child.childEntity.BarcodeId;
+            this.txtFamily.Text = child.childEntity.Lastname1;
+            this.txtGiven.Text = child.childEntity.Firstname1;
+            this.txtMotherFamily.Text = child.childEntity.MotherLastname;
+            this.txtMotherGiven.Text = child.childEntity.MotherFirstname;
+            this.txtTelephone.Text = child.childEntity.Phone;
+
+            if(!this.m_rowData.DateOfBirth.HasValue)
+                this.dtpDob.Value = child.childEntity.Birthdate;
+
+            this.cbxGender.SelectedIndex = child.childEntity.Gender ? 1 : 0;
+            this.cbxVillage.SelectedItem = this.cbxVillage.Items.OfType<PlaceListItem>().SingleOrDefault(o => o.Place.Id == child.childEntity.DomicileId);
+
+        }
+
         /// <summary>
         /// Validate form
         /// </summary>
