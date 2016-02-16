@@ -180,7 +180,7 @@ namespace GIIS.ScanForms.UserInterface
 
                 // Register the child
                 var childResult = this.m_restUtil.Get<RestReturn>("ChildManagement.svc/RegisterChildWithAppoitments",
-                    new KeyValuePair<string, object>("barcode", txtBarcode.Text),
+                    new KeyValuePair<string, object>("barcodeId", txtBarcode.Text),
                     new KeyValuePair<string, object>("firstname1", txtGiven.Text),
                     new KeyValuePair<string, object>("lastname1", txtFamily.Text),
                     new KeyValuePair<string, object>("birthdate", dtpDob.Value.ToString("yyyy-MM-dd")),
@@ -211,6 +211,7 @@ namespace GIIS.ScanForms.UserInterface
                         doseName = "BCG0";
 
                     var ctl = this.grpHistoricalVacc.Controls.Find(String.Format("chk{0}", doseName), false).FirstOrDefault() as CheckBox;
+                    evt.VaccinationDate = evt.ScheduledDate;
                     if (ctl != null && ctl.Checked)
                         this.UpdateVaccination(evt, dose);
                 }
@@ -296,7 +297,7 @@ namespace GIIS.ScanForms.UserInterface
 
             var retVal = restUtil.Get<RestReturn>("VaccinationEvent.svc/UpdateVaccinationEventById",
                 new KeyValuePair<string, object>("vaccinationEventId", evt.Id),
-                new KeyValuePair<String, Object>("vaccinationDate", evt.ScheduledDate.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss Z")),
+                new KeyValuePair<String, Object>("vaccinationDate", evt.VaccinationDate.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss Z")),
                 new KeyValuePair<String, Object>("notes", "From form scanner"),
                 new KeyValuePair<String, Object>("userId", this.m_rowData.UserInfo.Id),
                 new KeyValuePair<String, Object>("vaccinationStatus", true));

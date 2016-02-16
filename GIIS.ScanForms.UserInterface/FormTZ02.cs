@@ -229,7 +229,7 @@ namespace GIIS.ScanForms.UserInterface
                         BarcodeUtil.HasData(page, barcodeField) &&
                         String.IsNullOrEmpty(rowData.Barcode))
                     {
-                        BarcodeCorrection bc = new BarcodeCorrection(page, barcodeField);
+                        ChildSearch bc = new ChildSearch(page, barcodeField);
                         if (bc.ShowDialog() == DialogResult.OK)
                             rowData.Barcode = bc.BarcodeId;
                         else

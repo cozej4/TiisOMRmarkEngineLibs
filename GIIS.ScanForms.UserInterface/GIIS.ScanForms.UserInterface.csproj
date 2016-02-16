@@ -56,6 +56,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChildSearch.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ChildSearch.Designer.cs">
+      <DependentUpon>ChildSearch.cs</DependentUpon>
+    </Compile>
     <Compile Include="BarcodeCorrection.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -140,6 +146,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ChildSearch.resx">
+      <DependentUpon>ChildSearch.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="BarcodeCorrection.resx">
       <DependentUpon>BarcodeCorrection.cs</DependentUpon>
     </EmbeddedResource>

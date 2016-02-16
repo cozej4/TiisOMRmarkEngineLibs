@@ -116,13 +116,14 @@ namespace GIIS.ScanForms.UserInterface
         private void UpdateVaccination(VaccinationEvent evt)
         {
 
-            var retVal = this.m_restUtil.Get<RestReturn>("VaccinationEvent.svc/UpdateVaccinationEventById",
+            var retVal = this.m_restUtil.Get<RestReturn>("VaccinationEvent.svc/UpdateVaccinationEvent",
                 new KeyValuePair<string, object>("vaccinationEventId", evt.Id),
-                new KeyValuePair<String, Object>("vaccinationDate", evt.ScheduledDate.ToString("yyyy-MM-dd HH:mm:ss")),
+                new KeyValuePair<String, Object>("vaccinationDate", evt.VaccinationDate.ToString("yyyy-MM-dd HH:mm:ss")),
                 new KeyValuePair<String, Object>("notes", "From form scanner"),
                 new KeyValuePair<String, Object>("userId", this.m_rowData.UserInfo.Id),
-
-                new KeyValuePair<String, Object>("vaccinationStatus", true));
+                new KeyValuePair<String, Object>("healthFacilityId", evt.HealthFacilityId),
+                new KeyValuePair<String, Object>("vaccineLotId", evt.VaccineLotId),
+                new KeyValuePair<String, Object>("vaccinationStatus", evt.VaccinationStatus));
             if (retVal.Id < 0)
             {
                 MessageBox.Show("TIIS Service reported Error code, please attempt to submit again in a few moments");
@@ -173,10 +174,11 @@ namespace GIIS.ScanForms.UserInterface
                     int idx = this.m_rowData.Appointment.IndexOf(apt);
                     CheckedListBox vaccineBox = idx == 0 ? chkVaccA : chkVaccB;
                     if (vaccineBox.Enabled)
-                        foreach (var vacc in vaccineBox.CheckedItems.OfType<VaccineCheckItem>())
+                        foreach (var vacc in vaccineBox.Items.OfType<VaccineCheckItem>())
                         {
                             vacc.Event.VaccinationStatus = true;
                             vacc.Event.VaccinationDate = idx == 0 ? dtpVaccA.Value : dtpVaccB.Value;
+                            vacc.Event.VaccinationStatus = vaccineBox.CheckedItems.Contains(vacc);
                             this.UpdateVaccination(vacc.Event);
 
                             if (idx == 0 ? chkOutreachA.Checked : chkOutreachB.Checked)
