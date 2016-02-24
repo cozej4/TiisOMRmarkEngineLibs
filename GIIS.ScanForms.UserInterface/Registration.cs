@@ -179,21 +179,45 @@ namespace GIIS.ScanForms.UserInterface
                 Place selectedPlace = (cbxVillage.SelectedItem as PlaceListItem)?.Place;
 
                 // Register the child
-                var childResult = this.m_restUtil.Get<RestReturn>("ChildManagement.svc/RegisterChildWithAppoitments",
-                    new KeyValuePair<string, object>("barcodeId", txtBarcode.Text),
-                    new KeyValuePair<string, object>("firstname1", txtGiven.Text),
-                    new KeyValuePair<string, object>("lastname1", txtFamily.Text),
-                    new KeyValuePair<string, object>("birthdate", dtpDob.Value.ToString("yyyy-MM-dd")),
-                    new KeyValuePair<string, object>("gender", cbxGender.SelectedIndex == 0 ? false : true),
-                    new KeyValuePair<string, object>("healthFacilityId", this.m_rowData.FacilityId),
-                    new KeyValuePair<string, object>("domicileId", selectedPlace.Id),
-                    new KeyValuePair<string, object>("statusId", 1),
-                    new KeyValuePair<string, object>("phone", txtTelephone.Text),
-                    new KeyValuePair<string, object>("motherFirstname", txtMotherFamily.Text),
-                    new KeyValuePair<string, object>("motherLastname", txtMotherGiven.Text),
-                    new KeyValuePair<string, object>("notes", "Updated by form scanning application"),
-                    new KeyValuePair<string, object>("userId", this.m_rowData.UserInfo.Id)
-                );
+                var childData = this.m_restUtil.Get<List<FormTZ01.ChildEntity>>("ChildManagement.svc/SearchByBarcode", new KeyValuePair<string, object>("barcodeId", txtBarcode.Text));
+                RestReturn childResult = null;
+                if (childData.Count == 0) // Create
+                    childResult = this.m_restUtil.Get<RestReturn>("ChildManagement.svc/RegisterChildWithAppoitments",
+                        new KeyValuePair<string, object>("barcodeId", txtBarcode.Text),
+                        new KeyValuePair<string, object>("firstname1", txtGiven.Text),
+                        new KeyValuePair<string, object>("lastname1", txtFamily.Text),
+                        new KeyValuePair<string, object>("birthdate", dtpDob.Value.ToString("yyyy-MM-dd")),
+                        new KeyValuePair<string, object>("gender", cbxGender.SelectedIndex == 0 ? false : true),
+                        new KeyValuePair<string, object>("healthFacilityId", this.m_rowData.FacilityId),
+                        new KeyValuePair<string, object>("domicileId", selectedPlace.Id),
+                        new KeyValuePair<string, object>("statusId", 1),
+                        new KeyValuePair<string, object>("phone", txtTelephone.Text),
+                        new KeyValuePair<string, object>("motherFirstname", txtMotherFamily.Text),
+                        new KeyValuePair<string, object>("motherLastname", txtMotherGiven.Text),
+                        new KeyValuePair<string, object>("notes", "Updated by form scanning application"),
+                        new KeyValuePair<string, object>("userId", this.m_rowData.UserInfo.Id)
+                    );
+                else
+                {
+                    childResult = this.m_restUtil.Get<RestReturn>("ChildManagement.svc/UpdateChild",
+                        new KeyValuePair<string, object>("childId", childData[0].childEntity.Id),
+                        new KeyValuePair<string, object>("barcode", txtBarcode.Text),
+                        new KeyValuePair<string, object>("firstname1", txtGiven.Text),
+                        new KeyValuePair<string, object>("lastname1", txtFamily.Text),
+                        new KeyValuePair<string, object>("birthdate", dtpDob.Value.ToString("yyyy-MM-dd")),
+                        new KeyValuePair<string, object>("gender", cbxGender.SelectedIndex == 0 ? false : true),
+                        new KeyValuePair<string, object>("healthFacilityId", this.m_rowData.FacilityId),
+                        new KeyValuePair<string, object>("domicileId", selectedPlace.Id),
+                        new KeyValuePair<string, object>("statusId", 1),
+                        new KeyValuePair<string, object>("phone", txtTelephone.Text),
+                        new KeyValuePair<string, object>("motherFirstname", txtMotherFamily.Text),
+                        new KeyValuePair<string, object>("motherLastname", txtMotherGiven.Text),
+                        new KeyValuePair<string, object>("notes", "Updated by form scanning application"),
+                        new KeyValuePair<string, object>("userId", this.m_rowData.UserInfo.Id)
+                    );
+                    if (childResult.Id >= 0)
+                        childResult = new RestReturn() { Id = childData[0].childEntity.Id };
+                }
                 if (childResult.Id < 0)
                 {
                     MessageBox.Show("TIIS Service reported Error code. This is usually caused by a duplicate barcode sticker");
@@ -213,7 +237,10 @@ namespace GIIS.ScanForms.UserInterface
                     var ctl = this.grpHistoricalVacc.Controls.Find(String.Format("chk{0}", doseName), false).FirstOrDefault() as CheckBox;
                     evt.VaccinationDate = evt.ScheduledDate;
                     if (ctl != null && ctl.Checked)
+                    {
+                        evt.VaccinationStatus = true;
                         this.UpdateVaccination(evt, dose);
+                    }
                 }
 
                 // Re-fetch doses so we get new data from the system
@@ -261,8 +288,31 @@ namespace GIIS.ScanForms.UserInterface
                     else
                     {
                         // Find an event that suits us
-                        var evt = vaccinationEvent.First(o => o.DoseId == myDose.Id);
+                        var evt = vaccinationEvent.FirstOrDefault(o => o.DoseId == myDose.Id);
+                        if (evt == null)
+                        {
+                            // Is it because it is MR?
+                            if (antigenName == "Measles Rubella") // Maybe "measles"
+                            {
+                                antigenName = "Measles";
+                                vaccine = ReferenceData.Current.Vaccines.FirstOrDefault(o => o.Name == antigenName);
+                                // Find the scheduled vaccine for this
+                                sv = ReferenceData.Current.Doses.FindAll(o => o.ScheduledVaccinationId == vaccine.Id);
+                                lastVe = vaccinationEvent.Where(ve => sv.Exists(o => o.Id == ve.DoseId) && ve.VaccinationStatus == true).OrderByDescending(o => sv.Find(d => d.Id == o.DoseId).DoseNumber).FirstOrDefault();
+                                doseNumber = 0;
+                                if (lastVe != null)
+                                    doseNumber = sv.Find(d => d.Id == lastVe.DoseId).DoseNumber;
+                                myDose = sv.FirstOrDefault(o => o.DoseNumber == doseNumber + 1);
+                                evt = vaccinationEvent.FirstOrDefault(o => o.DoseId == myDose.Id);
+                            }
+                        }
+                        if(evt == null)
+                        { 
+                            MessageBox.Show(String.Format("Patient was never scheduled to receive {0} so can't update that dose", myDose.Fullname));
+                            return;
+                        }
                         evt.VaccinationDate = evt.ScheduledDate = dtpVaccDate.Value;
+                        evt.VaccinationStatus = true;
                         this.UpdateVaccination(evt, myDose);
 
                         if (chkOutreach.Checked)
@@ -295,14 +345,20 @@ namespace GIIS.ScanForms.UserInterface
         {
             RestUtil restUtil = new RestUtil(new Uri(ConfigurationManager.AppSettings["GIIS_URL"]));
 
-            var retVal = restUtil.Get<RestReturn>("VaccinationEvent.svc/UpdateVaccinationEventById",
+            var retVal = this.m_restUtil.Get<RestReturn>("VaccinationEvent.svc/UpdateVaccinationEvent",
                 new KeyValuePair<string, object>("vaccinationEventId", evt.Id),
-                new KeyValuePair<String, Object>("vaccinationDate", evt.VaccinationDate.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss Z")),
+                new KeyValuePair<String, Object>("vaccinationDate", evt.VaccinationDate.ToString("yyyy-MM-dd")),
                 new KeyValuePair<String, Object>("notes", "From form scanner"),
                 new KeyValuePair<String, Object>("userId", this.m_rowData.UserInfo.Id),
-                new KeyValuePair<String, Object>("vaccinationStatus", true));
-            if(retVal.Id < 0)
-                MessageBox.Show("Server returned error. Please manually reconcile data for " + dose.Fullname);
+                new KeyValuePair<String, Object>("healthFacilityId", evt.HealthFacilityId),
+                new KeyValuePair<String, Object>("vaccineLotId", evt.VaccineLotId),
+                new KeyValuePair<String, Object>("vaccinationStatus", evt.VaccinationStatus));
+            if (retVal.Id < 0)
+            {
+                MessageBox.Show("TIIS Service reported Error code, please attempt to submit again in a few moments");
+                return;
+            }
+
 
         }
 

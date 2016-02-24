@@ -43,7 +43,10 @@ namespace GIIS.ScanForms.UserInterface
 
                 var monthBubble = page.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "Month");
                 if (monthBubble == null)
-                    Err += "Must select month!; ";
+                {
+                    Err += "Form is missing month!; ";
+                    return;
+                }
 
                 // Now we want to upload the data 
                 WeighTallySubmission submission = new WeighTallySubmission()

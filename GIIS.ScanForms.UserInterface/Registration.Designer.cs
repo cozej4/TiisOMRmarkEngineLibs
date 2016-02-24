@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Registration));
             this.label1 = new System.Windows.Forms.Label();
             this.pbScan = new System.Windows.Forms.PictureBox();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -36,6 +37,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.txtBarcode = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label26 = new System.Windows.Forms.Label();
             this.txtTelephone = new System.Windows.Forms.TextBox();
             this.label11 = new System.Windows.Forms.Label();
             this.txtMotherGiven = new System.Windows.Forms.TextBox();
@@ -77,6 +79,7 @@
             this.label13 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
             this.grpVaccine = new System.Windows.Forms.GroupBox();
+            this.chkOutreach = new System.Windows.Forms.CheckBox();
             this.label19 = new System.Windows.Forms.Label();
             this.dtpVaccDate = new System.Windows.Forms.DateTimePicker();
             this.chkMR = new System.Windows.Forms.CheckBox();
@@ -93,9 +96,8 @@
             this.label25 = new System.Windows.Forms.Label();
             this.btnSubmit = new System.Windows.Forms.Button();
             this.btnSkip = new System.Windows.Forms.Button();
-            this.chkOutreach = new System.Windows.Forms.CheckBox();
             this.errBarcode = new System.Windows.Forms.ErrorProvider(this.components);
-            this.label26 = new System.Windows.Forms.Label();
+            this.label27 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pbScan)).BeginInit();
             this.panel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -135,7 +137,7 @@
             this.panel1.Location = new System.Drawing.Point(0, 13);
             this.panel1.Margin = new System.Windows.Forms.Padding(2);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(523, 226);
+            this.panel1.Size = new System.Drawing.Size(523, 199);
             this.panel1.TabIndex = 37;
             // 
             // label2
@@ -143,7 +145,7 @@
             this.label2.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.label2.Dock = System.Windows.Forms.DockStyle.Top;
             this.label2.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.label2.Location = new System.Drawing.Point(0, 239);
+            this.label2.Location = new System.Drawing.Point(0, 253);
             this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(523, 13);
@@ -177,7 +179,7 @@
             this.groupBox1.Controls.Add(this.txtMotherFamily);
             this.groupBox1.Controls.Add(this.label6);
             this.groupBox1.Controls.Add(this.label7);
-            this.groupBox1.Location = new System.Drawing.Point(9, 371);
+            this.groupBox1.Location = new System.Drawing.Point(9, 390);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(2);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(2);
@@ -185,6 +187,16 @@
             this.groupBox1.TabIndex = 35;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Mother\'s Information";
+            // 
+            // label26
+            // 
+            this.label26.AutoSize = true;
+            this.label26.Location = new System.Drawing.Point(-3, 43);
+            this.label26.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label26.Name = "label26";
+            this.label26.Size = new System.Drawing.Size(58, 13);
+            this.label26.TabIndex = 20;
+            this.label26.Text = "Telephone";
             // 
             // txtTelephone
             // 
@@ -253,7 +265,7 @@
             this.groupBox2.Controls.Add(this.label3);
             this.groupBox2.Controls.Add(this.label8);
             this.groupBox2.Controls.Add(this.label9);
-            this.groupBox2.Location = new System.Drawing.Point(9, 257);
+            this.groupBox2.Location = new System.Drawing.Point(9, 276);
             this.groupBox2.Margin = new System.Windows.Forms.Padding(2);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(2);
@@ -385,7 +397,7 @@
             this.grpHistoricalVacc.Controls.Add(this.label14);
             this.grpHistoricalVacc.Controls.Add(this.label13);
             this.grpHistoricalVacc.Controls.Add(this.label12);
-            this.grpHistoricalVacc.Location = new System.Drawing.Point(9, 440);
+            this.grpHistoricalVacc.Location = new System.Drawing.Point(9, 459);
             this.grpHistoricalVacc.Margin = new System.Windows.Forms.Padding(2);
             this.grpHistoricalVacc.Name = "grpHistoricalVacc";
             this.grpHistoricalVacc.Padding = new System.Windows.Forms.Padding(2);
@@ -631,7 +643,7 @@
             this.grpVaccine.Controls.Add(this.label23);
             this.grpVaccine.Controls.Add(this.label24);
             this.grpVaccine.Controls.Add(this.label25);
-            this.grpVaccine.Location = new System.Drawing.Point(149, 440);
+            this.grpVaccine.Location = new System.Drawing.Point(149, 459);
             this.grpVaccine.Margin = new System.Windows.Forms.Padding(2);
             this.grpVaccine.Name = "grpVaccine";
             this.grpVaccine.Padding = new System.Windows.Forms.Padding(2);
@@ -639,6 +651,16 @@
             this.grpVaccine.TabIndex = 32;
             this.grpVaccine.TabStop = false;
             this.grpVaccine.Text = "Vaccinations";
+            // 
+            // chkOutreach
+            // 
+            this.chkOutreach.AutoSize = true;
+            this.chkOutreach.Location = new System.Drawing.Point(82, 72);
+            this.chkOutreach.Name = "chkOutreach";
+            this.chkOutreach.Size = new System.Drawing.Size(70, 17);
+            this.chkOutreach.TabIndex = 37;
+            this.chkOutreach.Text = "Outreach";
+            this.chkOutreach.UseVisualStyleBackColor = true;
             // 
             // label19
             // 
@@ -780,7 +802,7 @@
             // 
             // btnSubmit
             // 
-            this.btnSubmit.Location = new System.Drawing.Point(403, 562);
+            this.btnSubmit.Location = new System.Drawing.Point(403, 581);
             this.btnSubmit.Margin = new System.Windows.Forms.Padding(2);
             this.btnSubmit.Name = "btnSubmit";
             this.btnSubmit.Size = new System.Drawing.Size(114, 21);
@@ -792,7 +814,7 @@
             // btnSkip
             // 
             this.btnSkip.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnSkip.Location = new System.Drawing.Point(403, 536);
+            this.btnSkip.Location = new System.Drawing.Point(403, 555);
             this.btnSkip.Margin = new System.Windows.Forms.Padding(2);
             this.btnSkip.Name = "btnSkip";
             this.btnSkip.Size = new System.Drawing.Size(114, 21);
@@ -801,29 +823,21 @@
             this.btnSkip.UseVisualStyleBackColor = true;
             this.btnSkip.Click += new System.EventHandler(this.btnSkip_Click);
             // 
-            // chkOutreach
-            // 
-            this.chkOutreach.AutoSize = true;
-            this.chkOutreach.Location = new System.Drawing.Point(82, 72);
-            this.chkOutreach.Name = "chkOutreach";
-            this.chkOutreach.Size = new System.Drawing.Size(70, 17);
-            this.chkOutreach.TabIndex = 37;
-            this.chkOutreach.Text = "Outreach";
-            this.chkOutreach.UseVisualStyleBackColor = true;
-            // 
             // errBarcode
             // 
             this.errBarcode.ContainerControl = this;
             // 
-            // label26
+            // label27
             // 
-            this.label26.AutoSize = true;
-            this.label26.Location = new System.Drawing.Point(-3, 43);
-            this.label26.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.label26.Name = "label26";
-            this.label26.Size = new System.Drawing.Size(58, 13);
-            this.label26.TabIndex = 20;
-            this.label26.Text = "Telephone";
+            this.label27.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.label27.Dock = System.Windows.Forms.DockStyle.Top;
+            this.label27.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.label27.Location = new System.Drawing.Point(0, 212);
+            this.label27.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label27.Name = "label27";
+            this.label27.Size = new System.Drawing.Size(523, 41);
+            this.label27.TabIndex = 39;
+            this.label27.Text = resources.GetString("label27.Text");
             // 
             // Registration
             // 
@@ -831,7 +845,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnSkip;
-            this.ClientSize = new System.Drawing.Size(523, 595);
+            this.ClientSize = new System.Drawing.Size(523, 610);
             this.Controls.Add(this.btnSkip);
             this.Controls.Add(this.btnSubmit);
             this.Controls.Add(this.grpVaccine);
@@ -839,6 +853,7 @@
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.label2);
+            this.Controls.Add(this.label27);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.label1);
             this.Margin = new System.Windows.Forms.Padding(2);
@@ -929,5 +944,6 @@
         private System.Windows.Forms.CheckBox chkOutreach;
         private System.Windows.Forms.ErrorProvider errBarcode;
         private System.Windows.Forms.Label label26;
+        private System.Windows.Forms.Label label27;
     }
 }

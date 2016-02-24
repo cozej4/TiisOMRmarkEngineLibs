@@ -118,7 +118,7 @@ namespace GIIS.ScanForms.UserInterface
 
             var retVal = this.m_restUtil.Get<RestReturn>("VaccinationEvent.svc/UpdateVaccinationEvent",
                 new KeyValuePair<string, object>("vaccinationEventId", evt.Id),
-                new KeyValuePair<String, Object>("vaccinationDate", evt.VaccinationDate.ToString("yyyy-MM-dd HH:mm:ss")),
+                new KeyValuePair<String, Object>("vaccinationDate", evt.VaccinationDate.ToString("yyyy-MM-dd")),
                 new KeyValuePair<String, Object>("notes", "From form scanner"),
                 new KeyValuePair<String, Object>("userId", this.m_rowData.UserInfo.Id),
                 new KeyValuePair<String, Object>("healthFacilityId", evt.HealthFacilityId),

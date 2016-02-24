@@ -120,4 +120,7 @@
   <metadata name="errBarcode.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
+  <data name="label27.Text" xml:space="preserve">
+    <value>Note: Data in the above image which was successfully detected by the scanner will appear with a green indicator. Data such as barcodes or bubbles which do not have a green indicator was not read by the scanner.</value>
+  </data>
 </root>

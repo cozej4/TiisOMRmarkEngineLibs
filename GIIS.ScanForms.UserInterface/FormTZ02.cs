@@ -225,9 +225,7 @@ namespace GIIS.ScanForms.UserInterface
                         rowData.VaccineDate = new DateTime(DateTime.Now.Month < monthBubble.ValueAsFloat ? DateTime.Now.Year - 1 : DateTime.Now.Year, (int)monthBubble.ValueAsFloat, (int)omrVaccDay10.ValueAsFloat + (int)omrVaccDay.ValueAsFloat);
 
                     // Determine what to do 
-                    if (omrUpdate?.Value == "T" &&
-                        BarcodeUtil.HasData(page, barcodeField) &&
-                        String.IsNullOrEmpty(rowData.Barcode))
+                    if (omrUpdate?.Value == "T")
                     {
                         ChildSearch bc = new ChildSearch(page, barcodeField);
                         if (bc.ShowDialog() == DialogResult.OK)

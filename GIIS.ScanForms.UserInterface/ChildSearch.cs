@@ -65,7 +65,7 @@ namespace GIIS.ScanForms.UserInterface
 
         private void txtBarcode_TextChanged(object sender, EventArgs e)
         {
-            btnSearch.Enabled = !String.IsNullOrEmpty(txtBarcode.Text);
+            btnOk.Enabled = btnSearch.Enabled = !String.IsNullOrEmpty(txtBarcode.Text);
         }
 
         private void btnOk_Click(object sender, EventArgs e)
@@ -81,12 +81,11 @@ namespace GIIS.ScanForms.UserInterface
         {
             // Show results
             var childData = this.m_restUtil.Get<List<FormTZ01.ChildEntity>>("ChildManagement.svc/SearchByBarcode", new KeyValuePair<string, object>("barcodeId", txtBarcode.Text));
+            lnkName.Links.Clear();
 
-            if(childData.Count == 0)
+            if (childData.Count == 0)
             {
-                btnSearch.Visible = false;
-                btnOk.Location = btnSearch.Location;
-                btnOk.Enabled = true;
+                lnkName.Text = "No Result Found - New Child will be created";
             }
             else
             {
@@ -94,11 +93,7 @@ namespace GIIS.ScanForms.UserInterface
                 lblDob.Text = childData[0].childEntity.Birthdate.ToString("yyyy-MMM-dd");
                 lnkName.Text = String.Format("{0} {1}", childData[0].childEntity.Firstname1, childData[0].childEntity.Lastname1);
                 lnkName.Tag = childData[0].childEntity.Id;
-                lnkName.Links.Clear();
                 lnkName.Links.Add(0, lnkName.Text.Length, ConfigurationManager.AppSettings["GIIS_URL"].Replace("/SVC", "/Pages/Child.aspx?id=" + childData[0].childEntity.Id.ToString()));
-                btnOk.Enabled = true;
-                btnSearch.Enabled = false;
-                txtBarcode.ReadOnly = true;
             }
 
         }
