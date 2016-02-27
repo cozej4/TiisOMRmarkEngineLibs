@@ -62,7 +62,7 @@ public partial class Pages_RunReport : System.Web.UI.Page
 
             bool noAuthorization = false;
             /// Command
-            command = "SELECT *, C.\"NAME\" AS ACTION FROM \"REPORT_PARAMETERS\" A INNER JOIN \"REPORT_PARAMETER_INPUT_TYPE\" B ON (A.\"INPUT_TYPE\" = B.\"ID\") INNER JOIN \"ACTIONS\" C ON (A.\"ACTION_ID\" = C.\"ID\") WHERE \"REPORT_ID\" = @Id ORDER BY \"PARM_ID\"";
+            command = "SELECT *, C.\"NAME\" AS ACTION FROM \"REPORT_PARAMETERS\" A INNER JOIN \"REPORT_PARAMETER_INPUT_TYPE\" B ON (A.\"INPUT_TYPE\" = B.\"ID\") INNER JOIN \"ACTIONS\" C ON (A.\"ACTION_ID\" = C.\"ID\") WHERE \"REPORT_ID\" = @Id ORDER BY \"ORDER\"";
             using (var dt = DBManager.ExecuteReaderCommand(command, System.Data.CommandType.Text, new List<Npgsql.NpgsqlParameter>() { new NpgsqlParameter("Id", NpgsqlTypes.NpgsqlDbType.Integer) { Value = id }}))
             {
                 using (var rdr = dt.CreateDataReader())

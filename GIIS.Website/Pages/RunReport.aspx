@@ -46,12 +46,12 @@
         </div>
     </div>
     </form>
-    <form target="_blank" onsubmit="scrubNullValues()" class="form" method="get" action="<%= this.jasperAction %>" id="launchReport" >
+    <form onsubmit="scrubNullValues()" class="form" method="get" action="RenderReport.aspx" id="launchReport" >
     <div class="row">
             <div class="col-md-12">
                     <asp:TextBox ID="hack" runat="server" Visible="false" />
-                    <input type="hidden" name="j_username" value="<%=ConfigurationManager.AppSettings["JasperUser"]%>" />
-                    <input type="hidden" name="j_password" value="<%=ConfigurationManager.AppSettings["JasperPassword"]%>" />
+                    <input type="hidden" name="reportId" value="<%=Request.QueryString["reportId"]%>" />
+                    <input type="hidden" id="reportFormat" name="format" value="html" />
                     <div class="container-fluid" runat="server" id="reportInputs">
                     </div>
             </div>
@@ -59,13 +59,54 @@
 
     <div class="row">
         <div class="col-md-12">
-            <input type="submit" class="btn btn-primary" value="View (HTML)" onclick="$('#launchReport').attr('action','<%=this.jasperAction%>.html');" />
-            <input type="submit" class="btn btn-success" value="Download (PDF)" onclick="$('#launchReport').attr('action','<%=this.jasperAction%>.pdf');" />
-            <input type="submit" class="btn btn-success" value="Download (XLS)" onclick="$('#launchReport').attr('action','<%=this.jasperAction%>.xls');" />
+            <a class="btn btn-primary" onclick="previewReport()" href="#preview-panel">Preview (HTML)</a>
+            <input type="submit" class="btn btn-success" value="Download (PDF)" onclick="$('#reportFormat').val('pdf')" />
+            <input type="submit" class="btn btn-success" value="Download (XLS)" onclick="$('#reportFormat').val('csv')" />
         </div>
     </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default" id="preview-panel">
+                    <div class="panel-heading"><h2 class="panel-title"><a data-toggle="collapse" href="#panel-collapse">Report Preview</a></h2></div>
+                    <div class="panel-collapse collapse" id="panel-collapse">
+                        <div class="panel-body" id="preview-body" style="height:400px; overflow:scroll">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </form>
     <script type="text/javascript">
+        function previewReport() {
+            $.ajaxSetup({ cache: false });
+            $("#panel-collapse").collapse(false);
+            $('#preview-body').html('<center><img src="/img/294.gif"/><br/>Generating Preview</center>');
+            setTimeout(function () {
+                var url = 'RenderReport.aspx?';
+                $("#reportFormat").val('html');
+                // Serialize the form as kv
+                $('#launchReport input').each(function (i) {
+                    if ($(this).val() != '')
+                        url += $(this).attr('name') + '=' + $(this).val() + "&";
+                });
+                $('#launchReport select').each(function (i) {
+                    if ($(this).val() != '')
+                        url += $(this).attr('name') + '=' + $(this).val() + "&";
+                });
+
+                $.ajax({
+                    url: url,
+                    async: true
+                }).success(function (e) {
+                    $('#preview-body').html(e);
+                }).error(function (x, s, e) {
+                    $('#preview-body').html('<div class="label label-danger center-block">An error occurred generating the report: ' + e + '</div>')
+                });
+            }, 500);
+                return false;
+        }
         function scrubNullValues() {
             $('input').each(function(i) {
                 var $input = $(this);

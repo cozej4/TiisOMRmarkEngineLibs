@@ -46,7 +46,7 @@ namespace GIIS.ScanForms.UserInterface
 
             this.m_rowData = rowData;
             this.m_vaccineEvents = vaccinationEvents;
-
+            
             // Crop the image
             String tPath = Path.GetTempFileName();
             using (Bitmap bmp = new Bitmap((int)rowData.RowBounds.Width / 2, (int)rowData.RowBounds.Height / 2))
@@ -186,7 +186,7 @@ namespace GIIS.ScanForms.UserInterface
                                 this.m_restUtil.Get<RestReturn>("VaccinationAppointmentManagement.svc/UpdateVaccinationApp",
                                     new KeyValuePair<String, Object>("outreach", true),
                                     new KeyValuePair<String, Object>("userId", this.m_rowData.UserInfo.Id),
-                                    new KeyValuePair<String, Object>("barcode", txtBarcode.Text),
+                                    new KeyValuePair<String, Object>("barcode", this.m_rowData.Barcode.StartsWith("T") ? txtBarcode.Text : this.m_rowData.Barcode),
                                     new KeyValuePair<String, Object>("doseId", vacc.Event.DoseId)
                                     );
                             }
