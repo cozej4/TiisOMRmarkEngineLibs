@@ -57,7 +57,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 193);
+            this.label2.Location = new System.Drawing.Point(12, 229);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(281, 13);
             this.label2.TabIndex = 2;
@@ -65,7 +65,7 @@
             // 
             // txtBarcode
             // 
-            this.txtBarcode.Location = new System.Drawing.Point(15, 210);
+            this.txtBarcode.Location = new System.Drawing.Point(15, 246);
             this.txtBarcode.Name = "txtBarcode";
             this.txtBarcode.Size = new System.Drawing.Size(305, 20);
             this.txtBarcode.TabIndex = 3;
@@ -74,7 +74,7 @@
             // btnOk
             // 
             this.btnOk.Enabled = false;
-            this.btnOk.Location = new System.Drawing.Point(321, 297);
+            this.btnOk.Location = new System.Drawing.Point(321, 333);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(75, 23);
             this.btnOk.TabIndex = 4;
@@ -97,13 +97,13 @@
             this.pnlView.Controls.Add(this.pbBarcode);
             this.pnlView.Location = new System.Drawing.Point(15, 25);
             this.pnlView.Name = "pnlView";
-            this.pnlView.Size = new System.Drawing.Size(381, 165);
+            this.pnlView.Size = new System.Drawing.Size(381, 201);
             this.pnlView.TabIndex = 5;
             // 
             // btnSearch
             // 
             this.btnSearch.Enabled = false;
-            this.btnSearch.Location = new System.Drawing.Point(321, 209);
+            this.btnSearch.Location = new System.Drawing.Point(321, 245);
             this.btnSearch.Name = "btnSearch";
             this.btnSearch.Size = new System.Drawing.Size(75, 23);
             this.btnSearch.TabIndex = 8;
@@ -154,7 +154,7 @@
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.lnkName);
             this.groupBox1.Controls.Add(this.label5);
-            this.groupBox1.Location = new System.Drawing.Point(15, 236);
+            this.groupBox1.Location = new System.Drawing.Point(15, 272);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(381, 53);
             this.groupBox1.TabIndex = 13;
@@ -165,7 +165,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(408, 324);
+            this.ClientSize = new System.Drawing.Size(408, 368);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btnSearch);
             this.Controls.Add(this.pnlView);

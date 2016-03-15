@@ -400,6 +400,8 @@ FROM
 
 
 -- FACILITY COVERAGESCREATE OR REPLACE VIEW facility_coverage AS 
+CREATE INDEX "VACCINATION_EVENT_HEALTH_FACILITY" ON "VACCINATION_EVENT"("HEALTH_FACILITY_ID");
+CREATE INDEX "VACCINATION_EVENT_HEALTH_DOSE" ON "VACCINATION_EVENT"("DOSE_ID");
 CREATE OR REPLACE VIEW facility_coverage AS
 WITH population AS (
          SELECT "CHILD"."CODE",
@@ -466,6 +468,7 @@ WITH population AS (
           GROUP BY "CHILD"."CODE", "CHILD"."DOB_MONTH", "CHILD"."DOB_YEAR"
         ),vaccinations AS (
          SELECT "HEALTH_FACILITY"."ID" AS "HF_ID",
+		 "DOSE"."ID" AS "DOSE_ID",
 	    "HEALTH_FACILITY"."NAME" AS "HF_NAME",
 		"SCHEDULED_VACCINATION"."ID" AS "ANTIGEN_ID",
             "SCHEDULED_VACCINATION"."NAME" AS "ANTIGEN",
@@ -489,18 +492,21 @@ WITH population AS (
         ), coverage AS (
 	SELECT 
 		vaccinations."FULLNAME" AS "DOSE_NAME",
+			vaccinations."DOSE_ID",
 		    vaccinations."DOSE_NUMBER",
 		    vaccinations."HF_ID",
 		    vaccinations."HF_NAME",
-		 vaccinations."ANTIGEN_ID",
-		vaccinations.parent_id,
+		    vaccinations."ANTIGEN_ID",
+		    vaccinations.parent_id,
 		    vaccinations."ANTIGEN",
 		    vaccinations."VACC_MONTH" + vaccinations."VACC_YEAR" * 12 AS sort,
 		    UPPER(to_char(to_timestamp (vaccinations."VACC_MONTH"::TEXT, 'MM'), 'TMmon')) || '-' || vaccinations."VACC_YEAR" AS period,
+		    vaccinations."VACC_YEAR" as year,
+		    vaccinations."VACC_MONTH" as month,
 		    SUM(CASE WHEN vaccinations.in_catchment AND vaccinations."VACCINATION_STATUS" THEN 1 ELSE 0 END) as GIVEN_IN_CATCHMENT,
 		    SUM(CASE WHEN NOT(vaccinations.in_catchment) AND vaccinations."VACCINATION_STATUS" THEN 1 ELSE 0 END) as GIVEN_OUT_CATCHMENT,
 		    count(*) AS target,
-		    max(vaccinations."COHORT") AS cohort,
+		    max(vaccinations."COHORT") / 12 AS cohort ,
 		    sum(
 			CASE
 			    WHEN vaccinations."VACCINATION_STATUS" = true THEN 1
@@ -512,11 +518,11 @@ WITH population AS (
 			    ELSE 0
 			END) AS skipped
 		   FROM vaccinations
-		  GROUP BY vaccinations."FULLNAME", vaccinations."ANTIGEN", vaccinations."ANTIGEN_ID", vaccinations."DOSE_NUMBER", vaccinations."HF_ID", vaccinations."HF_NAME", vaccinations."VACC_YEAR", vaccinations."VACC_MONTH",
+		  GROUP BY vaccinations."DOSE_ID", vaccinations."FULLNAME", vaccinations."ANTIGEN", vaccinations."ANTIGEN_ID", vaccinations."DOSE_NUMBER", vaccinations."HF_ID", vaccinations."HF_NAME", vaccinations."VACC_YEAR", vaccinations."VACC_MONTH",
 		  vaccinations.parent_id
 	)
 	SELECT 
-	*, (coverage.given::FLOAT / coverage.target) AS coverage_pct, CASE WHEN coverage.cohort = 0 THEN -1 ELSE (coverage.given::FLOAT / coverage.cohort) END AS admin_coverage_pct
+	*, (coverage.given::FLOAT / coverage.target) AS coverage_pct, CASE WHEN coverage.cohort = 0 THEN -1 ELSE (coverage.given::FLOAT / coverage.cohort::FLOAT) END AS admin_coverage_pct 
 	FROM coverage;
 
 CREATE OR REPLACE VIEW facility_stock_balance AS
@@ -699,8 +705,49 @@ $BODY$
   LANGUAGE sql VOLATILE;
   */
 
+-- VACCINATION SUMMARY 
+CREATE OR REPLACE VIEW child_vaccination_summary AS
+SELECT hfid, report_period,
+	SUM(CASE WHEN gender THEN 1 ELSE 0 END) AS male_total,
+	SUM(CASE WHEN NOT gender THEN 1 ELSE 0 END) AS female_total,
+	COUNT(gender) AS total,
+	SUM(CASE WHEN gender AND vaccinated THEN 1 ELSE 0 END) AS male_vaccinated,
+	SUM(CASE WHEN NOT gender AND vaccinated THEN 1 ELSE 0 END) AS female_vaccinated,
+	SUM(CASE WHEN vaccinated THEN 1 ELSE 0 END) AS total_vaccinated,
+	SUM(CASE WHEN gender AND NOT vaccinated THEN 1 ELSE 0 END) AS male_nonvaccinated,
+	SUM(CASE WHEN NOT gender AND NOT vaccinated THEN 1 ELSE 0 END) AS female_nonvaccinated,
+	SUM(CASE WHEN NOT vaccinated THEN 1 ELSE 0 END) AS total_nonvaccinated,
+	SUM(CASE WHEN gender AND outreach THEN 1 ELSE 0 END) AS male_outreach,
+	SUM(CASE WHEN NOT gender AND outreach THEN 1 ELSE 0 END) AS female_outreach,
+	SUM(CASE WHEN outreach THEN 1 ELSE 0 END) AS total_outreach,
+	SUM(CASE WHEN gender AND in_catchment THEN 1 ELSE 0 END) AS male_catchment,
+	SUM(CASE WHEN NOT gender AND in_catchment THEN 1 ELSE 0 END) AS female_catchment,
+	SUM(CASE WHEN in_catchment THEN 1 ELSE 0 END) AS total_catchment,
+	SUM(CASE WHEN gender AND NOT in_catchment THEN 1 ELSE 0 END) AS male_noncatchment,
+	SUM(CASE WHEN NOT gender AND NOT in_catchment THEN 1 ELSE 0 END) AS female_noncatchment,
+	SUM(CASE WHEN NOT in_catchment THEN 1 ELSE 0 END) AS total_noncatchment
+	
+ FROM (
+	SELECT DISTINCT hf."ID" AS hfid, 
+		CASE WHEN "TYPE_ID" >= 3 THEN hf."NAME" ELSE NULL END AS h_name,
+		CASE WHEN "TYPE_ID" = 2 THEN hf."NAME" ELSE (SELECT "NAME" FROM "HEALTH_FACILITY" WHERE "ID" = hf."PARENT_ID") END AS d_name,
+		CASE WHEN "TYPE_ID" = 1 THEN hf."NAME" WHEN "TYPE_ID" = 2 THEN (SELECT "NAME" FROM "HEALTH_FACILITY" WHERE "ID" = hf."PARENT_ID") ELSE
+			(SELECT "NAME" FROM "HEALTH_FACILITY" WHERE "ID" = (SELECT "PARENT_ID" FROM "HEALTH_FACILITY" WHERE "ID" = hf."PARENT_ID")) END AS r_name,
+		to_char(ve."VACCINATION_DATE", 'MON-YYYY') as report_period,
+		c."GENDER" AS gender,
+		c."ID" AS child_id,
+		ve."VACCINATION_STATUS" AS vaccinated,
+		va."OUTREACH" AS outreach,
+		c."HEALTHCENTER_ID" = ve."HEALTH_FACILITY_ID" AS in_catchment
+	FROM "VACCINATION_EVENT" ve
+		INNER JOIN "HEALTH_FACILITY" hf ON (hf."ID" = ve."HEALTH_FACILITY_ID")
+		INNER JOIN "VACCINATION_APPOINTMENT" va ON (va."ID" = ve."APPOINTMENT_ID")
+		INNER JOIN "CHILD" c ON (c."ID" = ve."CHILD_ID")
+	WHERE ve."SCHEDULED_DATE" < CURRENT_TIMESTAMP
+) AS I 
+GROUP BY hfid, report_period;
 -- CROSSTAB FOR VACCINATION DATES
-CREATE VIEW child_vaccination_date_crosstab AS
+CREATE OR REPLACE VIEW child_vaccination_date_crosstab AS
 SELECT * FROM crosstab(
 	'SELECT c."ID", c."LASTNAME1", c."FIRSTNAME1", c."HEALTHCENTER_ID", d."FULLNAME", CASE WHEN v."VACCINATION_STATUS" THEN v."VACCINATION_DATE" ELSE NULL END AS vacc_date FROM "VACCINATION_EVENT" v INNER JOIN "CHILD" c ON (v."CHILD_ID" = c."ID") INNER JOIN "DOSE" d ON (v."DOSE_ID" = d."ID") ORDER BY 1, d."FULLNAME"',
 	'SELECT "FULLNAME" FROM "DOSE" ORDER BY "FULLNAME"'
@@ -734,11 +781,47 @@ SELECT * FROM crosstab(
 		"TT5" DATE
 	) ;
 	
+-- DEFAULTERS
+CREATE OR REPLACE VIEW child_defaulters AS 
+SELECT 
+	row_number() OVER () AS row_num,
+	C."ID", 
+	C."FIRSTNAME1",
+	C."FIRSTNAME2",
+	C."LASTNAME1",
+	C."LASTNAME2",
+	C."GENDER",
+	C."BIRTHDATE",
+	C."MOTHER_FIRSTNAME",
+	C."MOTHER_LASTNAME",
+	C."PHONE",
+	C."MOBILE",
+	ve."SCHEDULED_DATE",
+	D."FULLNAME",
+	P."NAME" AS place_name,
+	to_char(ve."SCHEDULED_DATE", 'MON-YYYY') AS report_period,
+	hf."ID" as hf_id,
+	nv."NAME" AS nv_reason
+	FROM "VACCINATION_EVENT" ve 
+	INNER JOIN "CHILD" c ON (ve."CHILD_ID" = c."ID")
+	INNER JOIN "DOSE" d ON (ve."DOSE_ID" = d."ID")
+	INNER JOIN "VACCINATION_APPOINTMENT" va ON (ve."APPOINTMENT_ID" = va."ID")
+	INNER JOIN "PLACE" p ON (p."ID" = c."DOMICILE_ID")
+	INNER JOIN "HEALTH_FACILITY" hf ON (hf."ID" = ve."HEALTH_FACILITY_ID")
+	LEFT JOIN "NONVACCINATION_REASON" nv ON (ve."NONVACCINATION_REASON_ID" = nv."ID")
+WHERE 
+	"VACCINATION_STATUS" = FALSE AND ve."IS_ACTIVE" = TRUE AND c."IS_ACTIVE" = TRUE
+	AND va."SCHEDULED_DATE" < CURRENT_TIMESTAMP;
+	
+
 ALTER TABLE "WEIGHT_TALLY" ADD EBF INT;
 ALTER TABLE "WEIGHT_TALLY" ADD RF INT;
 
 --CREATE INDEX "VACCINATION_EVENT_ACTIVE" ON "VACCINATION_EVENT"("IS_ACTIVE");
-CREATE INDEX "VACCINATION_EVENT_VACCINE_DATE" ON "VACCINATION_EVENT"("VACCINATION_DATE")
+CREATE INDEX "VACCINATION_EVENT_VACCINE_DATE" ON "VACCINATION_EVENT"("VACCINATION_DATE");
+CREATE INDEX "VACCINATION_EVENT_SCHEDULE_DATE" ON "VACCINATION_EVENT"("SCHEDULED_DATE");
+CREATE INDEX "VACCINATION_EVENT_STATUS" ON "VACCINATION_EVENT"("VACCINATION_STATUS");
+CREATE INDEX "HEALTH_FACILITY_PARENT_ID" ON "HEALTH_FACILITY"("PARENT_ID")
 
 CREATE OR REPLACE FUNCTION insert_new_weight(
     hf_in integer,
@@ -823,14 +906,15 @@ INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (16, 'REPORT_PERIOD', 'select',
 -- REPORTS
 INSERT INTO "REPORT" VALUES (1, 'Adverse_Effects', 'Non-Vaccinations', 482, 2, 'A list of non-vaccination events due to adverse reactions, refusal, etc.', 'R');
 INSERT INTO "REPORT" VALUES (2, 'All_Children', 'All Children', 482, 2, 'A list of all children by facility, district, etc.', 'R');
-INSERT INTO "REPORT" VALUES (4, 'Defaulter_Report', 'Defaulters', 482, 2, NULL, 'R');
+INSERT INTO "REPORT" VALUES (4, 'defaulter_report', 'Defaulters', 482, 2, NULL, 'R');
 INSERT INTO "REPORT" VALUES (6, 'Child_Vaccinations', 'Child Vaccinations', 482, 2, NULL, 'R');
 
 -- MONTHLY REPORTS
 INSERT INTO "REPORT" VALUES (8, 'DVDMT_Report', 'DVDMT Worksheet', 481, 3, NULL, 'R');
 INSERT INTO "REPORT" VALUES (14, 'drp_divo_overview', 'Forecasted Consumption', 481, 3, NULL, 'R');
 --INSERT INTO "REPORT" VALUES (15, 'Facility_Coverage_Admin', 'Facility Coverage (targets)', 482, 3, 'Review the coverage rates of facilities based on coverage targets', 'R');
-INSERT INTO "REPORT" VALUES (18, 'Facility_Coverage_Actual', 'Facility Coverage', 482, 3, 'Review the coverage rates of facilities as a function of those who were expected to show up (appointment data) and administrative targets', 'R');
+INSERT INTO "REPORT" VALUES (17, 'Facility_Coverage_Actual', 'Facility Coverage', 482, 3, 'Review the coverage rates of facilities as a function of those who were expected to show up (appointment data) and administrative targets', 'R');
+INSERT INTO "REPORT" VALUES (20, 'facility_droupout', 'Facility Dropout', 482, 3, 'Review the dropout rates of facilities as a function of those who received the very first dose of a series but not the last', 'R');
 
 -- VACCINATIONS
 INSERT INTO "REPORT" VALUES (5, 'Vaccines_Administered', 'Health Facility Consumption', 481, 1, NULL, 'R');
@@ -856,6 +940,7 @@ INSERT INTO "REPORT_PARAMETERS" SELECT 6, 'dobTo', 'DOB (To)', 'Identifies the u
 INSERT INTO "REPORT_PARAMETERS" SELECT 6, 'facilityId', 'Health Facility', 'Identifies the current facility for the child', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
 INSERT INTO "REPORT_PARAMETERS" SELECT 6, 'districtId', 'District', 'Identifies the district (nb: facilities are not filtered when this value changes)', true, 13, "ID", 1 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
 INSERT INTO "REPORT_PARAMETERS" SELECT 6, 'regionId', 'Region', 'Identifies the region (nb: district is not filtered when this value changes)', true, 14, "ID", 0 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 6, 'reportPeriod', 'Report Period', 'Identifies the reporting period for which the report should be generated', true, 16, "ID", 6 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
 
 INSERT INTO "REPORT_PARAMETERS" SELECT 8, 'reportPeriod', 'Report Period', 'Identifies the reporting period for which the DVDMT should be generated', true, 16, "ID", 4 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
 INSERT INTO "REPORT_PARAMETERS" SELECT 8, 'facilityId', 'Health Facility', 'Identifies the current facility for the child', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
@@ -882,13 +967,25 @@ INSERT INTO "REPORT_PARAMETERS" SELECT 15, 'facilityId', 'Health Facility', 'Ide
 INSERT INTO "REPORT_PARAMETERS" SELECT 15, 'districtId', 'District', 'Identifies the district (nb: facilities are not filtered when this value changes)', true, 13, "ID", 1 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
 INSERT INTO "REPORT_PARAMETERS" SELECT 15, 'regionId', 'Region', 'Identifies the region (nb: district is not filtered when this value changes)', true, 14, "ID", 0 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
 
-INSERT INTO "REPORT_PARAMETERS" SELECT 18, 'fromDate', 'Reporting Period', '', true, 16, "ID", 0 FROM "ACTIONS" WHERE "NAME" = 'VaccinatorReportParms';
-INSERT INTO "REPORT_PARAMETERS" SELECT 18, 'antigenId', 'Antigen', 'Identifies the antigen which should be displayed', true, 15, "ID", 2 FROM "ACTIONS" WHERE "NAME" = 'VaccinatorReportParms';
-INSERT INTO "REPORT_PARAMETERS" SELECT 18, 'facilityId', 'Health Facility', 'Identifies the current facility for the facility balance report', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
-INSERT INTO "REPORT_PARAMETERS" SELECT 18, 'districtId', 'District', 'Identifies the district (nb: facilities are not filtered when this value changes)', true, 13, "ID", 4 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
-INSERT INTO "REPORT_PARAMETERS" SELECT 18, 'regionId', 'Region', 'Identifies the region (nb: district is not filtered when this value changes)', true, 14, "ID", 5 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 17, 'reportPeriod', 'Reporting Period', '', true, 16, "ID", 4 FROM "ACTIONS" WHERE "NAME" = 'VaccinatorReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 17, 'antigenId', 'Antigen', 'Identifies the antigen which should be displayed', true, 15, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'VaccinatorReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 17, 'facilityId', 'Health Facility', 'Identifies the current facility for the facility balance report', true, 2, "ID", 2 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 17, 'districtId', 'District', 'Identifies the district (nb: facilities are not filtered when this value changes)', true, 13, "ID", 1 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 17, 'regionId', 'Region', 'Identifies the region (nb: district is not filtered when this value changes)', true, 14, "ID", 0 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
 
 INSERT INTO "REPORT_PARAMETERS" SELECT 9, 'facilityId', 'Health Facility', 'Identifies the current facility for the facility balance report', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
 INSERT INTO "REPORT_PARAMETERS" SELECT 9, 'districtId', 'District', 'Identifies the district (nb: facilities are not filtered when this value changes)', true, 13, "ID", 1 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
 INSERT INTO "REPORT_PARAMETERS" SELECT 9, 'regionId', 'Region', 'Identifies the region (nb: district is not filtered when this value changes)', true, 14, "ID", 0 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 9, 'reportPeriod', 'Report Period', 'Identifies the reporting period for which the report should be generated', true, 16, "ID", 4 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
 
+INSERT INTO "REPORT_PARAMETERS" SELECT 4, 'facilityId', 'Health Facility', 'Identifies the current facility for the facility balance report', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 4, 'districtId', 'District', 'Identifies the district (nb: facilities are not filtered when this value changes)', true, 13, "ID", 1 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 4, 'regionId', 'Region', 'Identifies the region (nb: district is not filtered when this value changes)', true, 14, "ID", 0 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 4, 'reportPeriod', 'Report Period', 'Identifies the reporting period for which the report should be generated', true, 16, "ID", 4 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+
+
+
+INSERT INTO "REPORT_PARAMETERS" SELECT 20, 'facilityId', 'Health Facility', 'Identifies the current facility for the facility balance report', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 20, 'districtId', 'District', 'Identifies the district (nb: facilities are not filtered when this value changes)', true, 13, "ID", 1 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 20, 'regionId', 'Region', 'Identifies the region (nb: district is not filtered when this value changes)', true, 14, "ID", 0 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 20, 'reportPeriod', 'Year', 'Identifies the year which should be generated', true, 7, "ID", 5 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';

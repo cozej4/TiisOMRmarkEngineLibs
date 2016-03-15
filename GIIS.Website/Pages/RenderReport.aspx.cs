@@ -60,12 +60,32 @@ public partial class Pages_RenderReport : System.Web.UI.Page
             Response.ClearContent();
             Stream reportStream = response.GetResponseStream();
             int br = 0;
-            byte[] buffer = new byte[1024];
-            while (br < response.ContentLength)
+            if (Request.QueryString["format"] == "html")
             {
-                int bufferBytes = reportStream.Read(buffer, 0, 1024);
-                br += bufferBytes;
-                Response.BinaryWrite(buffer.Take(bufferBytes).ToArray());
+                using (var sr = new StreamReader(reportStream))
+                {
+                    // Re-write URLS/jasperserver/rest_v2/reportExecutions/18004216_1457408214657_10/exports/html/attachments/img_0_0_4
+                    string html = sr.ReadToEnd();
+                    try
+                    {
+                        int startRepId = html.IndexOf("/reportExecutions/") + 18,
+                            endRepId = html.IndexOf("/exports", startRepId); // HACK: Re-write jasper assets
+                        String repId = html.Substring(startRepId, endRepId - startRepId + 1);
+                        html = html.Replace(repId, "").Replace("/jasperserver/rest_v2/reportExecutions/exports/html/attachments", "/img").Replace("img_0_0_4", "report_logo.gif");
+                    }
+                    catch { }
+                    Response.Write(html);
+                }
+            }
+            else
+            {
+                byte[] buffer = new byte[1024];
+                while (br < response.ContentLength)
+                {
+                    int bufferBytes = reportStream.Read(buffer, 0, 1024);
+                    br += bufferBytes;
+                    Response.BinaryWrite(buffer.Take(bufferBytes).ToArray());
+                }
             }
 
         }
