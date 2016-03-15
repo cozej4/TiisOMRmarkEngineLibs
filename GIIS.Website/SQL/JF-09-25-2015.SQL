@@ -120,43 +120,49 @@ SELECT * FROM crosstab(
 		"TT5-12-17" INT,
 		"TT5-18+" INT
 	);
-	
-CREATE OR REPLACE VIEW dvdmt_stock_column_names AS
-SELECT DISTINCT
-	"ITEM"."NAME" || CASE WHEN "TRANSACTION_TYPE"."ID" = 4 THEN "ADJUSTMENT_REASON"."NAME" ELSE "TRANSACTION_TYPE"."NAME" END AS name 
-	FROM "ITEM" CROSS JOIN "TRANSACTION_TYPE"
-	CROSS JOIN "ADJUSTMENT_REASON" 
-	WHERE "ITEM"."NAME" IN ('BCG', 'OPV', 'Measles', 'Measles Rubella', 'PCV-13','ROTA','Tetanus', 'DTP-HepB-Hib') 
-	AND "ADJUSTMENT_REASON"."ID" IN (25, 24, 32) AND "TRANSACTION_TYPE"."ID" IN (1,2,3,4,5)
-	
-	
-CREATE OR REPLACE VIEW dvdmt_facility_stock AS
-SELECT id, name, date, itm_name, reason, sum(qty) as qty FROM 
+
+CREATE OR REPLACE VIEW dvdmt_facility_stock_source AS
+SELECT id, gtin, lot, expiry, adjustment_reason, transaction_name, name, date, itm_name, sum(qty) as qty FROM 
 (
 WITH item_transaction_dtl AS (
 SELECT 
 	to_char("TRANSACTION_DATE", 'MON-YYYY') as date, 
 	"HEALTH_FACILITY_CODE" as hf_code, 
-	"GTIN" as gtin, 
+	it."GTIN" as gtin, 
 	"GTIN_LOT" as lot, 
+	il."EXPIRE_DATE" as expiry,
 	tt."NAME" as transaction_name, 
 	ar."NAME" as adjustment_reason, 
 	"TRANSACTION_QTY_IN_BASE_UOM" AS qty
 	FROM "ITEM_TRANSACTION" it 
 		INNER JOIN "TRANSACTION_TYPE" tt ON (it."TRANSACTION_TYPE_ID" = tt."ID") 
+		INNER JOIN "ITEM_LOT" il ON (il."GTIN" = it."GTIN" AND it."GTIN_LOT" = il."LOT_NUMBER")
 		LEFT JOIN "ADJUSTMENT_REASON" ar ON (ar."ID" = it."ADJUSTMENT_ID")
 	
 ), item_transaction_sum AS
-( SELECT date, hf_code, gtin, lot, transaction_name, adjustment_reason, SUM(qty) qty FROM item_transaction_dtl
-	GROUP BY date, hf_code, gtin, lot, transaction_name, adjustment_reason)
-SELECT hf."ID" id, hf."NAME" AS name, date, i."NAME" itm_name, COALESCE(adjustment_reason, transaction_name) reason, qty 
+( SELECT date, hf_code, gtin, lot, expiry, transaction_name, adjustment_reason, SUM(qty) qty FROM item_transaction_dtl
+	GROUP BY date, hf_code, gtin, lot, expiry, transaction_name, adjustment_reason)
+SELECT hf."ID" id, hf."NAME" AS name, date, i."NAME" itm_name, adjustment_reason, transaction_name, qty, gtin, lot, expiry 
 	FROM item_transaction_sum its INNER JOIN "HEALTH_FACILITY" hf ON (its.hf_code = hf."CODE")
 		INNER JOIN "ITEM_MANUFACTURER" im ON (its.gtin = im."GTIN") 	
 		INNER JOIN "ITEM" i ON (i."ID" = im."ITEM_ID")
 		WHERE i."NAME" IN ('BCG', 'OPV', 'Measles', 'Measles Rubella', 'PCV-13','ROTA','Tetanus', 'DTP-HepB-Hib')
-) AS internal GROUP BY id, name, date, itm_name, reason
+) AS internal GROUP BY id, name, gtin, lot, expiry, adjustment_reason, transaction_name, date, itm_name
 		;
 
+CREATE OR REPLACE VIEW dvdmt_facility_stock AS
+SELECT id, name, date, itm_name, CASE WHEN transaction_name = 'Adjustment' AND adjustment_reason <> 'Stock Count' THEN adjustment_reason ELSE transaction_name END AS reason, sum(qty) as qty FROM dvdmt_facility_stock_source
+GROUP BY id, name, date, itm_name, reason;
+
+CREATE OR REPLACE VIEW dvdmt_stock_column_names AS
+SELECT DISTINCT
+	"ITEM"."NAME" || CASE WHEN "TRANSACTION_TYPE"."ID" = 4 AND "ADJUSTMENT_REASON"."ID" <> 99 THEN "ADJUSTMENT_REASON"."NAME" WHEN "TRANSACTION_TYPE"."ID" = 4 THEN 'Adjustment' ELSE "TRANSACTION_TYPE"."NAME" END AS name 
+	FROM "ITEM" CROSS JOIN "TRANSACTION_TYPE"
+	CROSS JOIN "ADJUSTMENT_REASON" 
+	WHERE "ITEM"."NAME" IN ('BCG', 'OPV', 'Measles', 'Measles Rubella', 'PCV-13','ROTA','Tetanus', 'DTP-HepB-Hib') 
+	AND "ADJUSTMENT_REASON"."ID" IN (25, 24, 32, 99) AND "TRANSACTION_TYPE"."ID" IN (1,2,3,4,5);
+
+DROP VIEW dvdmt_facility_stock_crosstab CASCADE;
 CREATE OR REPLACE VIEW dvdmt_facility_stock_crosstab AS
 SELECT * FROM crosstab(
 	'SELECT id::TEXT||name||date, id, name, date, itm_name || reason, qty FROM dvdmt_facility_stock ORDER BY 1, itm_name',
@@ -167,6 +173,7 @@ SELECT * FROM crosstab(
 	id INT,
 	name TEXT,
 	date TEXT,
+	"BCGAdjustment" INT,
 	"BCGArrival" INT,
 	"BCGDispatch" INT,
 	"BCGKuisha muda wa matumizi" INT,
@@ -174,6 +181,7 @@ SELECT * FROM crosstab(
 	"BCGStock Count" INT,
 	"BCGVaccination" INT,
 	"BCGZimevunjika" INT,
+	"DTP-HepB-HibAdjustment" INT,
 	"DTP-HepB-HibArrival" INT,
 	"DTP-HepB-HibDispatch" INT,
 	"DTP-HepB-HibKuisha muda wa matumizi" INT,
@@ -181,10 +189,12 @@ SELECT * FROM crosstab(
 	"DTP-HepB-HibStock Count" INT,
 	"DTP-HepB-HibVaccination" INT,
 	"DTP-HepB-HibZimevunjika" INT,
+	"MeaslesAdjustment" INT,
 	"MeaslesArrival" INT,
 	"MeaslesDispatch" INT,
 	"MeaslesKuisha muda wa matumizi" INT,
 	"MeaslesMabadiliko ya VVM" INT,
+	"Measles RubellaAdjustment" INT,
 	"Measles RubellaArrival" INT,
 	"Measles RubellaDispatch" INT,
 	"Measles RubellaKuisha muda wa matumizi" INT,
@@ -195,6 +205,7 @@ SELECT * FROM crosstab(
 	"MeaslesStock Count" INT,
 	"MeaslesVaccination" INT,
 	"MeaslesZimevunjika" INT,
+	"OPVAdjustment" INT,
 	"OPVArrival" INT,
 	"OPVDispatch" INT,
 	"OPVKuisha muda wa matumizi" INT,
@@ -202,6 +213,7 @@ SELECT * FROM crosstab(
 	"OPVStock Count" INT,
 	"OPVVaccination" INT,
 	"OPVZimevunjika" INT,
+	"PCV-13Adjustment" INT,
 	"PCV-13Arrival" INT,
 	"PCV-13Dispatch" INT,
 	"PCV-13Kuisha muda wa matumizi" INT,
@@ -209,6 +221,7 @@ SELECT * FROM crosstab(
 	"PCV-13Stock Count" INT,
 	"PCV-13Vaccination" INT,
 	"PCV-13Zimevunjika" INT,
+	"ROTAAdjustment" INT,
 	"ROTAArrival" INT,
 	"ROTADispatch" INT,
 	"ROTAKuisha muda wa matumizi" INT,
@@ -216,6 +229,7 @@ SELECT * FROM crosstab(
 	"ROTAStock Count" INT,
 	"ROTAVaccination" INT,
 	"ROTAZimevunjika" INT,
+	"TetanusAdjustment" INT,
 	"TetanusArrival" INT,
 	"TetanusDispatch" INT,
 	"TetanusKuisha muda wa matumizi" INT,
@@ -224,6 +238,8 @@ SELECT * FROM crosstab(
 	"TetanusVaccination" INT,
 	"TetanusZimevunjika" INT
 	);
+
+
 
 CREATE OR REPLACE  VIEW dvdmt_facility_dose_stock_tally AS
 WITH facility_stock_tally AS(
@@ -531,22 +547,24 @@ SELECT ct.*, stk.qty as last_month_stock_count FROM crosstab(
 	itm_name TEXT,
 	date TEXT,
 	"Adjustment" INT,
-	"Allocation" INT,
-	"Arrival" INT,
-	"Dispatch" INT,
-	"Kuisha muda wa matumizi" INT,
-	"Kutoka kituo kingine" INT,
-	"Kwenda kituo kingine" INT,
-	"Mabadiliko ya VVM" INT,
-	"Receipt" INT,
-	"Stock Count" INT,
-	"Transfer" INT,
-	"Vaccination" INT,
-	"Ziliingizwa chache kimakosa" INT,
-	"Ziliingizwa zaidi kimakosa" INT,
-	"Zilizobaki kwa campaign" INT,
-	"Zimepotea" INT,
-	"Zimevunjika" INT
+"Allocation" INT,
+"Arrival" INT,
+"Chanjo Kuganda" INT,
+"Dispatch" INT,
+"Kuisha muda wa matumizi" INT,
+"Kutoka kituo kingine" INT,
+"Kwenda kituo kingine" INT,
+"Mabadiliko ya VVM" INT,
+"Receipt" INT,
+"Stock Count" INT,
+"Transfer" INT,
+"Vaccination" INT,
+"Ziliingizwa chache kimakosa" INT,
+"Ziliingizwa zaidi kimakosa" INT,
+"Zilizobaki kwa campaign" INT,
+"Zimepotea" INT,
+"Zimevunjika" INT
+
 	) 
 LEFT JOIN dvdmt_facility_stock stk ON (ct.id = stk.id AND stk.reason = 'Stock Count' AND stk.itm_name = ct.itm_name AND to_char((to_timestamp(ct.date, 'MON-YYYY') - '1 MONTH'::INTERVAL), 'MON-YYYY') = stk.date);
 /****
