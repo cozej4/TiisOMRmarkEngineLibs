@@ -124,7 +124,7 @@ public partial class _Report : System.Web.UI.Page
                                 li.Controls.Add(new HyperLink()
                                 {
                                     Text = rdr["REPORT_NAME"].ToString(),
-                                    NavigateUrl = "~/Pages/RunReport.aspx?reportId=" + rdr["ID"].ToString()
+                                    NavigateUrl = "~/Pages/RunReportv2.aspx?reportId=" + rdr["ID"].ToString()
                                 }
                             );
                             

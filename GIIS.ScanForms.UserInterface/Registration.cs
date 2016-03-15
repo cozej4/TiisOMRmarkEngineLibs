@@ -350,8 +350,8 @@ namespace GIIS.ScanForms.UserInterface
                 new KeyValuePair<String, Object>("vaccinationDate", evt.VaccinationDate.ToString("yyyy-MM-dd")),
                 new KeyValuePair<String, Object>("notes", "From form scanner"),
                 new KeyValuePair<String, Object>("userId", this.m_rowData.UserInfo.Id),
-                new KeyValuePair<String, Object>("healthFacilityId", evt.HealthFacilityId),
-                new KeyValuePair<String, Object>("vaccineLotId", evt.VaccineLotId),
+                new KeyValuePair<String, Object>("healthFacilityId", this.m_rowData.FacilityId),
+                new KeyValuePair<String, Object>("vaccineLotId", -2),
                 new KeyValuePair<String, Object>("vaccinationStatus", evt.VaccinationStatus));
             if (retVal.Id < 0)
             {

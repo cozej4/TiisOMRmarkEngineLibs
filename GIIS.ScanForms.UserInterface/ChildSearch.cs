@@ -38,7 +38,7 @@ namespace GIIS.ScanForms.UserInterface
 
             // Crop the image
             String tPath = Path.GetTempFileName();
-            using (Bitmap bmp = new Bitmap((int)barcode.TopRight.X - (int)barcode.TopLeft.X, (int)barcode.BottomLeft.Y - (int)barcode.TopLeft.Y, PixelFormat.Format24bppRgb))
+            using (Bitmap bmp = new Bitmap(2*((int)barcode.TopRight.X - (int)barcode.TopLeft.X),  ((int)barcode.BottomLeft.Y - (int)barcode.TopLeft.Y), PixelFormat.Format24bppRgb))
             using (Graphics g = Graphics.FromImage(bmp))
             using (Image img = Image.FromFile(this.m_page.AnalyzedImage))
             {
