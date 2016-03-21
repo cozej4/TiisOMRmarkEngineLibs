@@ -989,3 +989,56 @@ INSERT INTO "REPORT_PARAMETERS" SELECT 20, 'facilityId', 'Health Facility', 'Ide
 INSERT INTO "REPORT_PARAMETERS" SELECT 20, 'districtId', 'District', 'Identifies the district (nb: facilities are not filtered when this value changes)', true, 13, "ID", 1 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
 INSERT INTO "REPORT_PARAMETERS" SELECT 20, 'regionId', 'Region', 'Identifies the region (nb: district is not filtered when this value changes)', true, 14, "ID", 0 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
 INSERT INTO "REPORT_PARAMETERS" SELECT 20, 'reportPeriod', 'Year', 'Identifies the year which should be generated', true, 7, "ID", 5 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+
+CREATE TABLE dropout_doses (
+	id SERIAL NOT NULL,
+	start_dose_id INT NOT NULL,
+	end_dose_id INT NOT NULL,
+	display TEXT NOT NULL,
+	CONSTRAINT PK_dropout_doses PRIMARY KEY (id),
+	CONSTRAINT FK_start_dose_id FOREIGN KEY (start_dose_id) REFERENCES "DOSE"("ID"),
+	CONSTRAINT FK_end_dose_id FOREIGN KEY (end_dose_id) REFERENCES "DOSE"("ID")
+);
+
+INSERT INTO dropout_doses (START_DOSE_ID, END_DOSE_ID, DISPLAY) VALUES (61, 72, 'BCG > MEASLES 1');
+INSERT INTO dropout_doses (START_DOSE_ID, END_DOSE_ID, DISPLAY) VALUES (61, 77, 'BCG > MR1');
+INSERT INTO dropout_doses (START_DOSE_ID, END_DOSE_ID, DISPLAY) VALUES (66, 68, 'PENTA1 > PENTA3');
+	
+CREATE OR REPLACE FUNCTION get_facility_dropout(hfid_in IN INTEGER, report_period_in IN VARCHAR) RETURNS TABLE(
+	hfid INTEGER,
+	dose_name text,
+	mon text,
+	numerator bigint,
+	denominator bigint
+)
+AS 
+$$
+BEGIN
+RETURN QUERY
+WITH RECURSIVE facility(hfid) AS (
+			SELECT "ID" as hfid , "CODE" as hfcode, "PARENT_ID", "NAME", "TYPE_ID" FROM "HEALTH_FACILITY" WHERE "ID" = hfid_in
+			UNION
+			SELECT "ID", "CODE" as hfcode, facility.hfid, "HEALTH_FACILITY"."NAME", "HEALTH_FACILITY"."TYPE_ID" FROM facility, "HEALTH_FACILITY" WHERE "HEALTH_FACILITY"."PARENT_ID" = facility.hfid
+		)
+SELECT
+	hfid_in as hfid,
+	dr.display as dose_name,
+	to_char(ve."SCHEDULED_DATE", 'MON') as month,
+	SUM(CASE WHEN
+		(SELECT "VACCINATION_STATUS" FROM "VACCINATION_EVENT" ive WHERE ive."CHILD_ID" = ve."CHILD_ID" AND ive."DOSE_ID" = dr.START_DOSE_ID LIMIT 1)
+		AND NOT ve."VACCINATION_STATUS"
+		THEN
+			1
+		ELSE
+			0
+		END) AS numerator,
+	(SUM(CASE WHEN (SELECT "VACCINATION_STATUS" FROM "VACCINATION_EVENT" ive WHERE ive."CHILD_ID" = ve."CHILD_ID" AND ive."DOSE_ID" = dr.START_DOSE_ID LIMIT 1) THEN 1 ELSE 0 END)) AS denominator
+	FROM "VACCINATION_EVENT" ve
+	INNER JOIN DROPOUT_DOSES dR ON (dr.END_DOSE_ID = ve."DOSE_ID")
+	INNER JOIN "DOSE" d ON (ve."DOSE_ID" = d."ID")
+	INNER JOIN facility f ON (f.hfid = ve."HEALTH_FACILITY_ID")
+	WHERE
+	ve."SCHEDULED_DATE" < CURRENT_TIMESTAMP
+	AND ve."SCHEDULED_DATE" BETWEEN (report_period_in || '-01-01')::DATE AND (report_period_in || '-12-31')::DATE
+	GROUP BY month, dr.display;
+END $$ LANGUAGE PLPGSQL;
