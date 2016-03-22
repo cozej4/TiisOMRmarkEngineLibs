@@ -183,10 +183,10 @@ namespace GIIS.DataLayer
             try
             {
 
-                string query = string.Format(@"SELECT -1 as  ""ID"", '-----' as ""LOT_NUMBER"", now() as ""EXPIRE_DATE"" UNION Select -2 as ""ID"", 'I don''t know the lot' AS ""LOT_NUMBER"", now() as ""EXPIRE_DATE"" " +
-                                            "UNION" +
-                                            @" SELECT ""ITEM_LOT"".""ID"", ""LOT_NUMBER"", ""EXPIRE_DATE"" FROM ""ITEM_LOT"" join ""HEALTH_FACILITY_BALANCE"" using (""LOT_NUMBER"") join ""ITEM_MANUFACTURER"" on ""HEALTH_FACILITY_BALANCE"".""GTIN"" = ""ITEM_MANUFACTURER"".""GTIN"" AND ""ITEM_LOT"".""GTIN"" = ""ITEM_MANUFACTURER"".""GTIN"" WHERE ""ITEM_LOT"".""ITEM_ID"" = {0}  AND ""HEALTH_FACILITY_CODE"" = '{1}' AND  ""EXPIRE_DATE"" > '{2}' and ""ITEM_MANUFACTURER"".""IS_ACTIVE"" = true AND ""ITEM_LOT"".""IS_ACTIVE"" = true ORDER BY ""EXPIRE_DATE"" " +
-                                            "", itemId, hfId, DateTime.Today.Date.ToString("yyyy-MM-dd"));
+                string query = string.Format(@"SELECT -1 as  ""ID"", '-----' as ""LOT_NUMBER"", now() as ""EXPIRE_DATE"",0 as ""BALANCE"", true as ""ORDER"" UNION Select -2 as ""ID"", 'I don''t know the lot' AS ""LOT_NUMBER"", now() as ""EXPIRE_DATE"", 0 as ""BALANCE"", true as ""ORDER"" " +
+                                       "UNION" +
+                                       @" SELECT ""ITEM_LOT"".""ID"", ""LOT_NUMBER"", ""EXPIRE_DATE"", ""BALANCE"", (""BALANCE"" > 0) as ""ORDER"" FROM ""ITEM_LOT"" join ""HEALTH_FACILITY_BALANCE"" using (""LOT_NUMBER"") join ""ITEM_MANUFACTURER"" on ""HEALTH_FACILITY_BALANCE"".""GTIN"" = ""ITEM_MANUFACTURER"".""GTIN"" AND ""ITEM_LOT"".""GTIN"" = ""ITEM_MANUFACTURER"".""GTIN"" WHERE ""ITEM_LOT"".""ITEM_ID"" = {0}  AND ""HEALTH_FACILITY_CODE"" = '{1}' AND  ""EXPIRE_DATE"" > '{2}' and ""ITEM_MANUFACTURER"".""IS_ACTIVE"" = true AND ""ITEM_LOT"".""IS_ACTIVE"" = true ORDER BY ""ORDER"" DESC, ""EXPIRE_DATE"" " +
+                                       "", itemId, hfId, DateTime.Today.Date.ToString("yyyy-MM-dd"));
                 DataTable dt = DBManager.ExecuteReaderCommand(query, CommandType.Text, null);
                 return dt;
             }

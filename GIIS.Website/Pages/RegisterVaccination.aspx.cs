@@ -115,26 +115,41 @@ public partial class Pages_RegisterVaccination : System.Web.UI.Page
     /// Populate controls on the page by vaccination event 
     /// </summary>
     /// <param name="v">The vaccination event that is being called</param>
-    private void PopulateControls (VaccinationEvent v)
+    private void PopulateControls(VaccinationEvent v)
     {
         lnkChild.Text = v.Child.Name;
         lnkChild.PostBackUrl = "Child.aspx?id=" + v.Child.Id;
         lblChildBirthdate.Text = v.Child.Birthdate.ToString("dd-MMM-yyyy");
         chbxOutreach.Checked = v.Appointment.Outreach;
         string doses = v.Dose.Fullname;
-        lblVaccineDose.Text = doses; 
+        lblVaccineDose.Text = doses;
         lblScheduledDate.Text = v.ScheduledDate.ToString("dd-MMM-yyyy");
         lblHealthCenter.Text = v.HealthFacility.Name;
 
         if (v.VaccinationStatus || v.NonvaccinationReasonId != 0)
         {
-            string s = HealthFacility.GetAllChildsForOneHealthFacility(CurrentEnvironment.LoggedUser.HealthFacilityId, true);
-            string where = string.Format(@"AND ""ID"" in ( {0})", s);
-            odsHealthF.SelectParameters.Clear();
-            odsHealthF.SelectParameters.Add("ids", where);
-            odsHealthF.DataBind();
+            if (v.HealthFacilityId == CurrentEnvironment.LoggedUser.HealthFacilityId || v.HealthFacility.ParentId == CurrentEnvironment.LoggedUser.HealthFacilityId || CurrentEnvironment.LoggedUser.HealthFacility.ParentId == 0)
+            {
+                string s = HealthFacility.GetAllChildsForOneHealthFacility(CurrentEnvironment.LoggedUser.HealthFacilityId, true);
+                string where = string.Format(@"AND ""ID"" in ( {0})", s);
+                odsHealthF.SelectParameters.Clear();
+                odsHealthF.SelectParameters.Add("ids", where);
+                odsHealthF.DataBind();
 
-            ddlHealthFacility.SelectedValue = v.HealthFacilityId.ToString();
+                ddlHealthFacility.SelectedValue = v.HealthFacilityId.ToString();
+            }
+            else
+            {
+                lblWarning.Text = "You can not modify this record!";
+                lblWarning.Visible = true;
+                ddlHealthFacility.Visible = false;
+                gvVaccinationEvent.Visible = false;
+                btnEdit.Visible = false;
+                btnRemove.Visible = false;
+                lblHealthFacilityId.Visible = false;
+                chbxOutreach.Visible = false;
+            }
+
         }
         odsVaccinationEvent.SelectParameters.Clear();
         odsVaccinationEvent.SelectParameters.Add("appId", v.AppointmentId.ToString());
