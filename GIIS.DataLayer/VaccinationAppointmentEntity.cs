@@ -52,6 +52,7 @@ namespace GIIS.DataLayer
                 throw ex;
             }
         }
+
         public static List<VaccinationAppointment> GetVaccinationAppointmentsByChild(int childId)
         {
             try
@@ -66,15 +67,41 @@ namespace GIIS.DataLayer
                 throw ex;
             }
         }
-        public static List<VaccinationAppointment> GetVaccinationAppointmentsByChild(int childId, DateTime modifiedOn, int userId)
+        public static List<VaccinationAppointment> GetVaccinationAppointmentsByChild(DateTime modifiedOn, int userId)
         {
             try
             {
-                string query = @"SELECT VA.* FROM ""VACCINATION_APPOINTMENT"" VA WHERE VA.""CHILD_ID"" = @ChildId AND VA.""MODIFIEDON"" >= @ModifiedOn AND VA.""MODIFIED_BY"" <> @UserId ;";
+                User user = User.GetUserById(userId);
+                //string query = @"SELECT VA.* FROM ""VACCINATION_APPOINTMENT"" VA WHERE VA.""CHILD_ID"" = @ChildId AND VA.""MODIFIEDON"" >= @ModifiedOn AND VA.""MODIFIED_BY"" <> @UserId ;";
+                string query = @"SELECT VA.* FROM ""VACCINATION_APPOINTMENT"" VA WHERE VA.""CHILD_ID"" in (Select ""ID"" from ""CHILD"" where ""HEALTHCENTER_ID"" = @hfId ) AND VA.""MODIFIEDON"" >= @ModifiedOn  AND VA.""MODIFIED_BY"" <> @UserId;";
 
                 List<NpgsqlParameter> parameters = new List<NpgsqlParameter>()
                 {
-                    new NpgsqlParameter("@ChildId", DbType.Int32) { Value = childId },
+                    //new NpgsqlParameter("@ChildId", DbType.Int32) { Value = childId },
+                    new NpgsqlParameter("@ModifiedOn", DbType.DateTime) { Value = modifiedOn },
+                     new NpgsqlParameter("@hfId", DbType.Int32) { Value = user.HealthFacilityId.ToString()},
+                       new NpgsqlParameter("@UserId", DbType.Int32) { Value = userId }
+                };
+
+                DataTable dt = DBManager.ExecuteReaderCommand(query, CommandType.Text, parameters);
+                return GetVaccinationAppointmentAsList(dt);
+            }
+            catch (Exception ex)
+            {
+                Log.InsertEntity("VaccinationAppointment", "GetVaccinationAppointmentsByChild", 4, ex.StackTrace.Replace("'", ""), ex.Message.Replace("'", ""));
+                throw ex;
+            }
+        }
+        public static List<VaccinationAppointment> GetVaccinationAppointmentsByChild(string childIdList, DateTime modifiedOn, int userId)
+        {
+            try
+            {
+                //string query = @"SELECT VA.* FROM ""VACCINATION_APPOINTMENT"" VA WHERE VA.""CHILD_ID"" = @ChildId AND VA.""MODIFIEDON"" >= @ModifiedOn AND VA.""MODIFIED_BY"" <> @UserId ;";
+                string query = @"SELECT VA.* FROM ""VACCINATION_APPOINTMENT"" VA WHERE VA.""CHILD_ID"" = ANY( CAST( string_to_array(@ChildList, ',' ) AS INTEGER[] )) AND VA.""MODIFIEDON"" >= @ModifiedOn  AND VA.""MODIFIED_BY"" <> @UserId;";
+
+                List<NpgsqlParameter> parameters = new List<NpgsqlParameter>()
+                {
+                   new NpgsqlParameter("@ChildList", DbType.String) { Value = childIdList },
                     new NpgsqlParameter("@ModifiedOn", DbType.DateTime) { Value = modifiedOn },
                        new NpgsqlParameter("@UserId", DbType.Int32) { Value = userId }
                 };
@@ -88,15 +115,44 @@ namespace GIIS.DataLayer
                 throw ex;
             }
         }
-        public static List<VaccinationAppointment> GetVaccinationAppointmentsByChildBefore(int childId, DateTime modifiedOn, int userId)
+        public static List<VaccinationAppointment> GetVaccinationAppointmentsByChildBefore(DateTime modifiedOn, DateTime prevlogin, int userId)
         {
             try
             {
-                string query = @"SELECT VA.* FROM ""VACCINATION_APPOINTMENT"" VA WHERE VA.""CHILD_ID"" = @ChildId AND VA.""MODIFIEDON"" < @ModifiedOn  AND VA.""MODIFIED_BY"" <> @UserId ;";
+                User user = User.GetUserById(userId);
+                //string query = @"SELECT VA.* FROM ""VACCINATION_APPOINTMENT"" VA WHERE VA.""CHILD_ID"" = @ChildId AND VA.""MODIFIEDON"" < @ModifiedOn  AND VA.""MODIFIED_BY"" <> @UserId ;";
+                string query = @"SELECT VA.* FROM ""VACCINATION_APPOINTMENT"" VA WHERE VA.""CHILD_ID"" in (Select ""ID"" from ""CHILD"" where ""HEALTHCENTER_ID"" = @hfId ) AND VA.""MODIFIEDON"" < @ModifiedOn AND ""MODIFIEDON"" > @PrevLogin AND VA.""MODIFIED_BY"" <> @UserId;";
 
                 List<NpgsqlParameter> parameters = new List<NpgsqlParameter>()
                 {
-                    new NpgsqlParameter("@ChildId", DbType.Int32) { Value = childId },
+                    //new NpgsqlParameter("@ChildId", DbType.Int32) { Value = childId },
+                    new NpgsqlParameter("@ModifiedOn", DbType.DateTime) { Value = modifiedOn },
+                      new NpgsqlParameter("@PrevLogin", DbType.DateTime) { Value = prevlogin },
+                     new NpgsqlParameter("@hfId", DbType.Int32) { Value = user.HealthFacilityId.ToString()},
+                     new NpgsqlParameter("@UserId", DbType.Int32) { Value = userId }
+                };
+
+                DataTable dt = DBManager.ExecuteReaderCommand(query, CommandType.Text, parameters);
+                return GetVaccinationAppointmentAsList(dt);
+            }
+            catch (Exception ex)
+            {
+                Log.InsertEntity("VaccinationAppointment", "GetVaccinationAppointmentsByChild", 4, ex.StackTrace.Replace("'", ""), ex.Message.Replace("'", ""));
+                throw ex;
+            }
+        }
+        public static List<VaccinationAppointment> GetVaccinationAppointmentsByChildBefore(string childIdList, DateTime modifiedOn, DateTime prevlogin, int userId)
+        {
+            try
+            {
+
+                //string query = @"SELECT VA.* FROM ""VACCINATION_APPOINTMENT"" VA WHERE VA.""CHILD_ID"" = @ChildId AND VA.""MODIFIEDON"" < @ModifiedOn  AND VA.""MODIFIED_BY"" <> @UserId ;";
+                string query = @"SELECT VA.* FROM ""VACCINATION_APPOINTMENT"" VA WHERE VA.""CHILD_ID"" = ANY( CAST( string_to_array(@ChildList, ',' ) AS INTEGER[] )) AND VA.""MODIFIEDON"" < @ModifiedOn AND ""MODIFIEDON"" > @PrevLogin AND VA.""MODIFIED_BY"" <> @UserId;";
+
+                List<NpgsqlParameter> parameters = new List<NpgsqlParameter>()
+                {
+                    new NpgsqlParameter("@ChildList", DbType.String) { Value = childIdList },
+                     new NpgsqlParameter("@PrevLogin", DbType.DateTime) { Value = prevlogin },
                     new NpgsqlParameter("@ModifiedOn", DbType.DateTime) { Value = modifiedOn },
                      new NpgsqlParameter("@UserId", DbType.Int32) { Value = userId }
                 };
@@ -110,16 +166,19 @@ namespace GIIS.DataLayer
                 throw ex;
             }
         }
-        public static List<VaccinationAppointment> GetVaccinationAppointmentsByChildDayFirstLogin(int childId, DateTime modifiedOn)
+        public static List<VaccinationAppointment> GetVaccinationAppointmentsByChildDayFirstLogin(DateTime modifiedOn, int userId)
         {
             try
             {
-                string query = @"SELECT VA.* FROM ""VACCINATION_APPOINTMENT"" VA WHERE VA.""CHILD_ID"" = @ChildId AND VA.""MODIFIEDON""::date = @ModifiedOn::date  ;";
+                User user = User.GetUserById(userId);
+                //string query = @"SELECT VA.* FROM ""VACCINATION_APPOINTMENT"" VA WHERE VA.""CHILD_ID"" = @ChildId AND VA.""MODIFIEDON""::date = @ModifiedOn::date  ;";
+                string query = @"SELECT VA.* FROM ""VACCINATION_APPOINTMENT"" VA WHERE VA.""CHILD_ID"" in (Select ""ID"" from ""CHILD"" where ""HEALTHCENTER_ID"" = @hfId ) AND VA.""MODIFIEDON""::date = @ModifiedOn::date ;";
 
                 List<NpgsqlParameter> parameters = new List<NpgsqlParameter>()
                 {
-                    new NpgsqlParameter("@ChildId", DbType.Int32) { Value = childId },
-                    new NpgsqlParameter("@ModifiedOn", DbType.DateTime) { Value = modifiedOn }
+                    //new NpgsqlParameter("@ChildId", DbType.Int32) { Value = childId },
+                   new NpgsqlParameter("@hfId", DbType.Int32) { Value = user.HealthFacilityId.ToString()},
+                     new NpgsqlParameter("@ModifiedOn", DbType.DateTime) { Value = user.Lastlogin.AddDays(-1)}
                 };
 
                 DataTable dt = DBManager.ExecuteReaderCommand(query, CommandType.Text, parameters);
@@ -128,6 +187,30 @@ namespace GIIS.DataLayer
             catch (Exception ex)
             {
                 Log.InsertEntity("VaccinationAppointment", "GetVaccinationAppointmentsByChild", 4, ex.StackTrace.Replace("'", ""), ex.Message.Replace("'", ""));
+                throw ex;
+            }
+        }
+
+        public static List<VaccinationAppointment> GetVaccinationAppointmentsByHealthFacility(int hfId)
+        {
+            try
+            {
+                int year = DateTime.Today.Date.Year;
+                string query = @"SELECT VA.* FROM ""VACCINATION_APPOINTMENT"" VA WHERE VA.""CHILD_ID"" in (Select ""ID"" from ""CHILD"" where ""HEALTHCENTER_ID"" = @hfId AND EXTRACT(YEAR from ""BIRTHDATE"") = @year );";
+
+                List<NpgsqlParameter> parameters = new List<NpgsqlParameter>()
+                {
+                    new NpgsqlParameter("@hfId", DbType.Int32) { Value = hfId },
+                    new NpgsqlParameter("@year", DbType.Int32) {Value = year}
+
+                };
+
+                DataTable dt = DBManager.ExecuteReaderCommand(query, CommandType.Text, parameters);
+                return GetVaccinationAppointmentAsList(dt);
+            }
+            catch (Exception ex)
+            {
+                Log.InsertEntity("VaccinationAppointment", "GetVaccinationAppointmentsByHealthFacility", 4, ex.StackTrace.Replace("'", ""), ex.Message.Replace("'", ""));
                 throw ex;
             }
         }
