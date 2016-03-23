@@ -1007,3 +1007,26 @@ INSERT INTO "REPORT_PARAMETERS" SELECT 20, 'facilityId', 'Health Facility', 'Ide
 INSERT INTO "REPORT_PARAMETERS" SELECT 20, 'districtId', 'District', 'Identifies the district (nb: facilities are not filtered when this value changes)', true, 13, "ID", 1 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
 INSERT INTO "REPORT_PARAMETERS" SELECT 20, 'regionId', 'Region', 'Identifies the region (nb: district is not filtered when this value changes)', true, 14, "ID", 0 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
 INSERT INTO "REPORT_PARAMETERS" SELECT 20, 'reportPeriod', 'Year', 'Identifies the year which should be generated', true, 7, "ID", 5 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+
+CREATE OR REPLACE VIEW facility_balance_source AS
+select id::TEXT || gtin || lot || date, id, gtin, lot, expiry, name, date, coalesce(adjustment_reason, transaction_name) as tx, qty from 
+	dvdmt_facility_stock_source 
+WHERE transaction_name in ('Stock Count') or adjustment_reason in ('Mabadiliko ya VVM','Kuisha muda wa matumizi','Zimevunjika') order by 1, tx;
+
+CREATE OR REPLACE VIEW facility_balance_crosstab AS 
+SELECT * FROM crosstab('SELECT * FROM facility_balance_source ORDER BY 1, tx', 
+	'select * from unnest(array[''Stock Count'',''Zimevunjika'',''Mabadiliko ya VVM'',''Kuisha muda wa matumizi'']) ORDER BY 1') AS ct (
+
+	rowid TEXT,
+	id INT,
+	gtin TEXT,
+	lot TEXT,
+	expiry DATE,
+	name TEXT,
+	date TEXT,
+	"Kuisha muda wa matumizi" INT,
+"Mabadiliko ya VVM" INT,
+"Stock Count" INT,
+"Zimevunjika" INT
+
+	);
