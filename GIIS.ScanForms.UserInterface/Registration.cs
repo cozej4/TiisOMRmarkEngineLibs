@@ -114,8 +114,8 @@ namespace GIIS.ScanForms.UserInterface
             }
 
             // Get existing data?
-            if (this.m_rowData.Barcode != null)
-                this.PopulatePatientDetails(this.m_rowData.Barcode);
+            if (this.m_rowData.Barcode != null || this.m_rowData.ChildId != 0)
+                this.PopulatePatientDetails(this.m_rowData);
 
             this.ValidateForm();
         }
@@ -123,25 +123,38 @@ namespace GIIS.ScanForms.UserInterface
         /// <summary>
         /// Populate patient details
         /// </summary>
-        private void PopulatePatientDetails(string barcode)
+        private void PopulatePatientDetails(FormTZ02.Tz02RowData rowData)
         {
-            var childData = this.m_restUtil.Get<List<FormTZ01.ChildEntity>>("ChildManagement.svc/SearchByBarcode", new KeyValuePair<string, object>("barcodeId", barcode));
-            if (childData.Count == 0)
-                return;
-            var child = childData[0];
+            Child child = null;
 
-            this.txtBarcode.Text = child.childEntity.BarcodeId;
-            this.txtFamily.Text = child.childEntity.Lastname1;
-            this.txtGiven.Text = child.childEntity.Firstname1;
-            this.txtMotherFamily.Text = child.childEntity.MotherLastname;
-            this.txtMotherGiven.Text = child.childEntity.MotherFirstname;
-            this.txtTelephone.Text = child.childEntity.Phone;
+            if (!String.IsNullOrEmpty(rowData.Barcode))
+            {
+                var childData = this.m_restUtil.Get<List<FormTZ01.ChildEntity>>("ChildManagement.svc/SearchByBarcode", new KeyValuePair<string, object>("barcodeId", rowData.Barcode));
+                if (childData.Count == 0)
+                    return;
+                child = childData[0].childEntity;
+            }
+            else
+            {
+                var childData = this.m_restUtil.Get<List<FormTZ01.ChildEntity>>("ChildManagement.svc/GetChildById", new KeyValuePair<string, object>("childid", rowData.ChildId));
+                if (childData.Count == 0)
+                    return;
+                child = childData[0].childEntity;
+
+            }
+
+            this.txtBarcode.Text = child.BarcodeId;
+            this.txtFamily.Text = child.Lastname1;
+            this.txtGiven.Text = child.Firstname1;
+            this.txtMotherFamily.Text = child.MotherLastname;
+            this.txtMotherGiven.Text = child.MotherFirstname;
+            this.txtTelephone.Text = child.Phone;
 
             if(!this.m_rowData.DateOfBirth.HasValue)
-                this.dtpDob.Value = child.childEntity.Birthdate;
+                this.dtpDob.Value = child.Birthdate;
 
-            this.cbxGender.SelectedIndex = child.childEntity.Gender ? 1 : 0;
-            this.cbxVillage.SelectedItem = this.cbxVillage.Items.OfType<PlaceListItem>().SingleOrDefault(o => o.Place.Id == child.childEntity.DomicileId);
+            this.cbxGender.SelectedIndex = child.Gender ? 1 : 0;
+            this.cbxVillage.SelectedItem = this.cbxVillage.Items.OfType<PlaceListItem>().SingleOrDefault(o => o.Place.Id == child.DomicileId);
 
         }
 

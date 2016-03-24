@@ -71,7 +71,7 @@ namespace GIIS.ScanForms.UserInterface
             /// Outreach indicator
             /// </summary>
             public bool Outreach { get; set; }
-
+            public int ChildId { get; internal set; }
         }
 
         /// <summary>
@@ -227,9 +227,12 @@ namespace GIIS.ScanForms.UserInterface
                     // Determine what to do 
                     if (omrUpdate?.Value == "T")
                     {
-                        ChildSearch bc = new ChildSearch(page, barcodeField);
+                        ChildSearch bc = new ChildSearch(rowData);
                         if (bc.ShowDialog() == DialogResult.OK)
-                            rowData.Barcode = bc.BarcodeId;
+                        {
+                            rowData.Barcode = bc.Child.BarcodeId;
+                            rowData.ChildId = bc.Child.Id;
+                        }
                         else
                             continue;
                     }
