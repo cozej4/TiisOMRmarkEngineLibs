@@ -1061,11 +1061,13 @@ SELECT
 	GROUP BY month, dr.display;
 END $$ LANGUAGE PLPGSQL;
 
+DROP VIEW facility_balance_source ;
 CREATE OR REPLACE VIEW facility_balance_source AS
 select id::TEXT || gtin || lot || date, id, gtin, lot, expiry, name, date, coalesce(adjustment_reason, transaction_name) as tx, qty from 
 	dvdmt_facility_stock_source 
 WHERE transaction_name in ('Stock Count') or adjustment_reason in ('Mabadiliko ya VVM','Kuisha muda wa matumizi','Zimevunjika') order by 1, tx;
 
+DROP VIEW facility_balance_crosstab ;
 CREATE OR REPLACE VIEW facility_balance_crosstab AS 
 SELECT * FROM crosstab('SELECT * FROM facility_balance_source ORDER BY 1, tx', 
 	'select * from unnest(array[''Stock Count'',''Zimevunjika'',''Mabadiliko ya VVM'',''Kuisha muda wa matumizi'']) ORDER BY 1') AS ct (
@@ -1083,3 +1085,13 @@ SELECT * FROM crosstab('SELECT * FROM facility_balance_source ORDER BY 1, tx',
 "Zimevunjika" INT
 
 	);
+
+
+	
+CREATE OR REPLACE FUNCTION get_facility_balance_at(hfcode_in TEXT, gtin_in TEXT, lot_in TEXT, reported_date_in DATE) RETURNS SETOF "JRNL_HEALTH_FACILITY_BALANCE" AS
+$$
+BEGIN
+	RETURN QUERY SELECT * FROM "JRNL_HEALTH_FACILITY_BALANCE" WHERE "HEALTH_FACILITY_CODE" = hfcode_in AND jrnl_timestamp < reported_date_in AND "GTIN" = gtin_in AND "LOT_NUMBER" = lot_in ORDER BY jrnl_timestamp DESC LIMIT 1;
+END;
+$$ LANGUAGE PLPGSQL;
+

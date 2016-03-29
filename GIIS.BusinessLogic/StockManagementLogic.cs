@@ -339,6 +339,7 @@ namespace GIIS.BusinessLogic
                     HealthFacilityCode = facility.Code,
                     ModifiedBy = vaccination.ModifiedBy,
                     ModifiedOn = vaccination.ModifiedOn,
+                    RefIdNum = vaccination.Id,
                     TransactionDate = vaccination.VaccinationDate,
                     TransactionQtyInBaseUom = -1,
                     TransactionTypeId = vaccinationType.Id
