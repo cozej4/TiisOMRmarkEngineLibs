@@ -904,7 +904,7 @@ TRUNCATE TABLE "REPORT" CASCADE;
 TRUNCATE TABLE "REPORT_PARAMETER_INPUT_TYPE" CASCADE;
 
 -- PARAMETERS AS DEFINED IN THE SPREADSHEET
-INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (1, 'DATE', 'input', NULL, 'text', 'System.DateTime', null);
+INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (1, 'DATE', 'input', NULL, 'text', 'System.DateTime', 'select to_char(CURRENT_TIMESTAMP, ''DD-MM-YYYY'')');
 INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (2, 'FACILITY', 'select', 'SELECT "ID","NAME" FROM (WITH RECURSIVE facility(hfid) AS ( SELECT "ID" as hfid, "PARENT_ID" FROM "HEALTH_FACILITY" WHERE "ID" = @FacilityId UNION SELECT "ID", facility.hfid FROM facility, "HEALTH_FACILITY" WHERE "HEALTH_FACILITY"."PARENT_ID" = facility.hfid) SELECT "ID", "NAME", "NAME" as SORT FROM "HEALTH_FACILITY" WHERE "ID" IN (SELECT hfid FROM facility) AND "LEAF" = TRUE UNION SELECT NULL, ''All'', ''AAAAAAAAA'') AS H ORDER BY sort ', '1', 'System.Int32', 'SELECT @FacilityId');
 INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (3, 'CHILD', 'select', 'SELECT "ID", "LASTNAME1" || '','' || "FIRSTNAME1" FROM "CHILD" WHERE "HEALTHCENTER_ID" IN (WITH RECURSIVE facility(hfid) AS ( SELECT "ID" as hfid, "PARENT_ID" FROM "HEALTH_FACILITY" WHERE "ID" = @FacilityId UNION SELECT "ID", facility.hfid FROM facility, "HEALTH_FACILITY" WHERE "HEALTH_FACILITY"."PARENT_ID" = facility.hfid) SELECT HFID FROM FACILITY)', '1', 'System.Int32', null);
 INSERT INTO "REPORT_PARAMETER_INPUT_TYPE" VALUES (4, 'HIDDEN', 'input', 'SELECT @FacilityId', 'hidden', 'System.Int32', null);
@@ -958,7 +958,9 @@ INSERT INTO "REPORT_PARAMETERS" SELECT 6, 'dobTo', 'DOB (To)', 'Identifies the u
 INSERT INTO "REPORT_PARAMETERS" SELECT 6, 'facilityId', 'Health Facility', 'Identifies the current facility for the child', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
 INSERT INTO "REPORT_PARAMETERS" SELECT 6, 'districtId', 'District', 'Identifies the district (nb: facilities are not filtered when this value changes)', true, 13, "ID", 1 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
 INSERT INTO "REPORT_PARAMETERS" SELECT 6, 'regionId', 'Region', 'Identifies the region (nb: district is not filtered when this value changes)', true, 14, "ID", 0 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
-INSERT INTO "REPORT_PARAMETERS" SELECT 6, 'reportPeriod', 'Report Period', 'Identifies the reporting period for which the report should be generated', true, 16, "ID", 6 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 6, 'reportPeriodFrom', 'Report Period (From)', 'Identifies the reporting period for which the report should be generated', true, 1, "ID", 6 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 6, 'reportPeriodTo', 'Report Period (To)', 'Identifies the reporting period for which the report should be generated', true, 1, "ID", 7 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+
 
 INSERT INTO "REPORT_PARAMETERS" SELECT 8, 'reportPeriod', 'Report Period', 'Identifies the reporting period for which the DVDMT should be generated', true, 16, "ID", 4 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
 INSERT INTO "REPORT_PARAMETERS" SELECT 8, 'facilityId', 'Health Facility', 'Identifies the current facility for the child', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
@@ -999,7 +1001,8 @@ INSERT INTO "REPORT_PARAMETERS" SELECT 9, 'reportPeriod', 'Report Period', 'Iden
 INSERT INTO "REPORT_PARAMETERS" SELECT 4, 'facilityId', 'Health Facility', 'Identifies the current facility for the facility balance report', true, 2, "ID", 3 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
 INSERT INTO "REPORT_PARAMETERS" SELECT 4, 'districtId', 'District', 'Identifies the district (nb: facilities are not filtered when this value changes)', true, 13, "ID", 1 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
 INSERT INTO "REPORT_PARAMETERS" SELECT 4, 'regionId', 'Region', 'Identifies the region (nb: district is not filtered when this value changes)', true, 14, "ID", 0 FROM "ACTIONS" WHERE "NAME" = 'RegionalReportParms';
-INSERT INTO "REPORT_PARAMETERS" SELECT 4, 'reportPeriod', 'Report Period', 'Identifies the reporting period for which the report should be generated', true, 16, "ID", 4 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 4, 'reportPeriodFrom', 'Report Period (From)', 'Identifies the reporting period for which the report should be generated', true, 1, "ID", 4 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
+INSERT INTO "REPORT_PARAMETERS" SELECT 4, 'reportPeriodTo', 'Report Period (To)', 'Identifies the reporting period for which the report should be generated', true, 1, "ID", 5 FROM "ACTIONS" WHERE "NAME" = 'DistrictReportParms';
 
 
 

@@ -90,25 +90,26 @@ public partial class Pages_RunReport : System.Web.UI.Page
                         inputControl.Attributes.Add("id", rdr["PARM_ID"].ToString());
                         inputControl.Attributes.Add("style", "z-index:8");
 
-                        // Value?
-                        if (rdr["COMPLETE_SOURCE"] != DBNull.Value)
-                        {
-                            List<NpgsqlParameter> contextParms = new List<NpgsqlParameter>() {
+                        List<NpgsqlParameter> contextParms = new List<NpgsqlParameter>() {
                                 new NpgsqlParameter("@FacilityId", NpgsqlTypes.NpgsqlDbType.Integer) { Value = CurrentEnvironment.LoggedUser.HealthFacilityId },
                                 new NpgsqlParameter("@FacilityCode", NpgsqlTypes.NpgsqlDbType.Integer) { Value = CurrentEnvironment.LoggedUser.HealthFacility.Code },
                                 new NpgsqlParameter("@UserId", NpgsqlTypes.NpgsqlDbType.Integer) { Value = CurrentEnvironment.LoggedUser.Id }
                             },
-                            contextParms2 = new List<NpgsqlParameter>() {
+                           contextParms2 = new List<NpgsqlParameter>() {
                                 new NpgsqlParameter("@FacilityId", NpgsqlTypes.NpgsqlDbType.Integer) { Value = CurrentEnvironment.LoggedUser.HealthFacilityId },
                                 new NpgsqlParameter("@FacilityCode", NpgsqlTypes.NpgsqlDbType.Integer) { Value = CurrentEnvironment.LoggedUser.HealthFacility.Code },
                                 new NpgsqlParameter("@UserId", NpgsqlTypes.NpgsqlDbType.Integer) { Value = CurrentEnvironment.LoggedUser.Id }
-                            };
+                           };
 
+                        // Value?
+                        if (rdr["COMPLETE_SOURCE"] != DBNull.Value)
+                        {
+                           
                             // Hidden value or input is just a value
                             if (rdr["TAG"].ToString() == "input" || inputControl.Attributes["type"] == "hidden")
                             {
                                 
-                                if(noAuthorization && rdr["DEFAULT"] != DBNull.Value)
+                                if(noAuthorization && rdr["DEFAULT"] != DBNull.Value )
                                     inputControl.Attributes.Add("value", DBManager.ExecuteScalarCommand(rdr["DEFAULT"].ToString(), System.Data.CommandType.Text, contextParms).ToString());
                                 else
                                     inputControl.Attributes.Add("value", DBManager.ExecuteScalarCommand(rdr["COMPLETE_SOURCE"].ToString(), System.Data.CommandType.Text, contextParms).ToString());
@@ -147,8 +148,10 @@ public partial class Pages_RunReport : System.Web.UI.Page
                                 }
                             }
                         }
+                        else if(rdr["TAG"].ToString() == "input" && rdr["DEFAULT"] != DBNull.Value)
+                            inputControl.Attributes.Add("value", DBManager.ExecuteScalarCommand(rdr["DEFAULT"].ToString(), System.Data.CommandType.Text, contextParms).ToString());
 
-                        inputControl.Attributes.Add("name", rdr["PARM_ID"].ToString());
+                    inputControl.Attributes.Add("name", rdr["PARM_ID"].ToString());
                         inputControl.Attributes.Add("title", rdr["DESCRIPTION"].ToString());
                         // Hidden
                         if (inputControl.Attributes["type"]  == "hidden")
