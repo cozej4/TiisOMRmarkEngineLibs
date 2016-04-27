@@ -283,7 +283,11 @@ namespace GIIS.BusinessLogic
         /// <returns>The <see cref="T:GIIS.DataLayer.ItemTransaction"/> representing the transfer</returns>
         public ItemTransaction Vaccinate(HealthFacility facility, VaccinationEvent vaccination)
         {
-            
+
+            // Vaccination not given = no transaction
+            if (!vaccination.VaccinationStatus)
+                return null;
+
             List<ItemLot> lots = new List<ItemLot>();
 
             // Verify 
