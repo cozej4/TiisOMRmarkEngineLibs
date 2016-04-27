@@ -322,15 +322,45 @@ namespace GIIS.DataLayer
             }
         }
 
+        public static List<Child> GetChildByHealthFacilityIdForWebService(int healthFacilityId)
+        {
+            try
+            {
+                int year = DateTime.Today.Date.Year;
+
+                string query = @"SELECT * FROM ""CHILD"" WHERE ""HEALTHCENTER_ID"" = @HealthFacilityId AND EXTRACT(YEAR from ""BIRTHDATE"") = @year";
+
+                List<NpgsqlParameter> parameters = new List<NpgsqlParameter>()
+                {
+                    new NpgsqlParameter("@HealthFacilityId", DbType.Int32) { Value = healthFacilityId.ToString() },
+                    new NpgsqlParameter("@year", DbType.Int32) {Value = year}
+                };
+
+                DataTable dt = DBManager.ExecuteReaderCommand(query, CommandType.Text, parameters);
+                return GetChildAsList(dt);
+            }
+            catch (Exception ex)
+            {
+                Log.InsertEntity("Child", "GetChildByHealthFacilityIdForWebService", 4, ex.StackTrace.Replace("'", ""), ex.Message.Replace("'", ""));
+                throw ex;
+            }
+        }
+
         public static List<Child> GetChildByHealthFacilityIdSinceLastLogin(int userId)
         {
             try
             {
                 User user = User.GetUserById(userId);
-                string query = string.Format(@"select distinct C.* from ""CHILD"" C join ""VACCINATION_EVENT"" V on V.""CHILD_ID"" = C.""ID"" 
+                //                string query = string.Format(@"select distinct C.* from ""CHILD"" C join ""VACCINATION_EVENT"" V on V.""CHILD_ID"" = C.""ID"" 
+                //                                                WHERE C.""HEALTHCENTER_ID"" = @hfId 
+                //                                                AND ((C.""MODIFIED_ON"" >= @lastlogin
+                //                                                AND C.""MODIFIED_BY"" <> @UserId) OR  (""MODIFIEDON"" >= @lastlogin  AND V.""MODIFIED_BY"" <> @UserId)) ");
+
+                string query = string.Format(@"select distinct C.* from ""CHILD"" C 
                                                 WHERE C.""HEALTHCENTER_ID"" = @hfId 
-                                                AND ((C.""MODIFIED_ON"" >= @lastlogin
-                                                AND C.""MODIFIED_BY"" <> @UserId) OR  (""MODIFIEDON"" >= @lastlogin  AND V.""MODIFIED_BY"" <> @UserId)) ");
+                                                AND C.""MODIFIED_ON"" >= @lastlogin
+                                                AND C.""MODIFIED_BY"" <> @UserId ");
+
 
                 List<NpgsqlParameter> parameters = new List<NpgsqlParameter>()
                 {
@@ -356,10 +386,15 @@ namespace GIIS.DataLayer
             try
             {
                 User user = User.GetUserById(userId);
-                string query = string.Format(@"select distinct C.* from ""CHILD"" C join ""VACCINATION_EVENT"" V on V.""CHILD_ID"" = C.""ID""
+                //                string query = string.Format(@"select distinct C.* from ""CHILD"" C join ""VACCINATION_EVENT"" V on V.""CHILD_ID"" = C.""ID""
+                //                                                WHERE C.""HEALTHCENTER_ID"" = @hfId 
+                //                                                AND ((C.""MODIFIED_ON"" < @lastlogin AND C.""MODIFIED_ON"" > @PrevLogin
+                //                                                AND C.""MODIFIED_BY"" <> @UserId) OR (""MODIFIEDON"" < @lastlogin AND ""MODIFIEDON"" > @PrevLogin  AND V.""MODIFIED_BY"" <> @UserId)) ");
+
+                string query = string.Format(@"select distinct C.* from ""CHILD"" C
                                                 WHERE C.""HEALTHCENTER_ID"" = @hfId 
-                                                AND ((C.""MODIFIED_ON"" < @lastlogin AND C.""MODIFIED_ON"" > @PrevLogin
-                                                AND C.""MODIFIED_BY"" <> @UserId) OR (""MODIFIEDON"" < @lastlogin AND ""MODIFIEDON"" > @PrevLogin  AND V.""MODIFIED_BY"" <> @UserId)) ");
+                                                AND (C.""MODIFIED_ON"" < @lastlogin AND C.""MODIFIED_ON"" > @PrevLogin
+                                                AND C.""MODIFIED_BY"" <> @UserId)  ");
 
                 List<NpgsqlParameter> parameters = new List<NpgsqlParameter>()
                 {
@@ -386,9 +421,12 @@ namespace GIIS.DataLayer
             try
             {
                 User user = User.GetUserById(userId);
-                string query = string.Format(@"select distinct C.* from ""CHILD"" C join ""VACCINATION_EVENT"" V on V.""CHILD_ID"" = C.""ID""
+                //                string query = string.Format(@"select distinct C.* from ""CHILD"" C join ""VACCINATION_EVENT"" V on V.""CHILD_ID"" = C.""ID""
+                //                                                WHERE C.""HEALTHCENTER_ID"" = @hfId 
+                //                                                AND (C.""MODIFIED_ON""::date = @lastlogin::date OR ""MODIFIEDON""::date = @lastlogin::date) ");
+                string query = string.Format(@"select C.* from ""CHILD"" C 
                                                 WHERE C.""HEALTHCENTER_ID"" = @hfId 
-                                                AND (C.""MODIFIED_ON""::date = @lastlogin::date OR ""MODIFIEDON""::date = @lastlogin::date) ");
+                                                AND C.""MODIFIED_ON""::date = @lastlogin::date  ");
 
                 List<NpgsqlParameter> parameters = new List<NpgsqlParameter>()
                 {
@@ -407,6 +445,7 @@ namespace GIIS.DataLayer
                 throw ex;
             }
         }
+
         public static List<Child> GetPagedChildList(int statusId, DateTime birthdateFrom, DateTime birthdateTo, string firstname1, string lastname1,
             string idFields, string healthFacilityId, int birthplaceId, int communityId, int domicileId,
             string motherFirstname, string motherLastname, string systemId, string barcodeId, string tempId,
@@ -565,16 +604,21 @@ namespace GIIS.DataLayer
 
         public static List<Child> GetChildByIdList(string childIdList, int userId)
         {
-           //tring[] childList = childIdList.Split(',');
+            //tring[] childList = childIdList.Split(',');
 
             try
             {
                 User user = User.GetUserById(userId);
-                string query = string.Format(@"select distinct C.* from ""CHILD"" C join ""VACCINATION_EVENT"" V on V.""CHILD_ID"" = C.""ID""
+                //                string query = string.Format(@"select distinct C.* from ""CHILD"" C join ""VACCINATION_EVENT"" V on V.""CHILD_ID"" = C.""ID""
+                //                                                WHERE C.""ID"" = ANY( CAST( string_to_array(@ChildList, ',' ) AS INTEGER[] ))
+                //                                                AND ((C.""MODIFIED_ON"" <= @lastlogin AND C.""MODIFIED_ON"" > @PrevLogin
+                //                                                AND C.""MODIFIED_BY"" <> @UserId) 
+                //                                                OR (""MODIFIEDON"" < @lastlogin AND ""MODIFIEDON"" > @PrevLogin  AND V.""MODIFIED_BY"" <> @UserId)) ");
+
+                string query = string.Format(@"select distinct C.* from ""CHILD"" C 
                                                 WHERE C.""ID"" = ANY( CAST( string_to_array(@ChildList, ',' ) AS INTEGER[] ))
-                                                AND ((C.""MODIFIED_ON"" <= @lastlogin AND C.""MODIFIED_ON"" > @PrevLogin
-                                                AND C.""MODIFIED_BY"" <> @UserId) 
-                                                OR (""MODIFIEDON"" < @lastlogin AND ""MODIFIEDON"" > @PrevLogin  AND V.""MODIFIED_BY"" <> @UserId)) ");
+                                                AND (C.""MODIFIED_ON"" <= @lastlogin AND C.""MODIFIED_ON"" > @PrevLogin
+                                                AND C.""MODIFIED_BY"" <> @UserId)  ");
 
                 List<NpgsqlParameter> parameters = new List<NpgsqlParameter>()
                 {
@@ -601,11 +645,16 @@ namespace GIIS.DataLayer
             try
             {
                 User user = User.GetUserById(userId);
-                string query = string.Format(@"select distinct C.* from ""CHILD"" C join ""VACCINATION_EVENT"" V on V.""CHILD_ID"" = C.""ID"" 
+                //                string query = string.Format(@"select distinct C.* from ""CHILD"" C join ""VACCINATION_EVENT"" V on V.""CHILD_ID"" = C.""ID"" 
+                //                                                WHERE C.""ID"" = ANY( CAST( string_to_array(@ChildList, ',' ) AS INTEGER[] ))
+                //                                                AND ((C.""MODIFIED_ON"" >= @lastlogin
+                //                                                AND C.""MODIFIED_BY"" <> @UserId)
+                //                                                OR  (""MODIFIEDON"" >= @lastlogin  AND V.""MODIFIED_BY"" <> @UserId))  ");
+
+                string query = string.Format(@"select distinct C.* from ""CHILD"" C  
                                                 WHERE C.""ID"" = ANY( CAST( string_to_array(@ChildList, ',' ) AS INTEGER[] ))
-                                                AND ((C.""MODIFIED_ON"" >= @lastlogin
-                                                AND C.""MODIFIED_BY"" <> @UserId)
-                                                OR  (""MODIFIEDON"" >= @lastlogin  AND V.""MODIFIED_BY"" <> @UserId))  ");
+                                                AND (C.""MODIFIED_ON"" >= @lastlogin
+                                                AND C.""MODIFIED_BY"" <> @UserId) ");
 
                 List<NpgsqlParameter> parameters = new List<NpgsqlParameter>()
                 {
