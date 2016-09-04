@@ -1,36 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GIIS.DataLayer", "GIIS.DataLayer\GIIS.DataLayer.csproj", "{241F7080-2919-4084-AD56-DACFD85DD65E}"
-EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "GIIS.Website", "http://localhost:15043", "{B42FB531-9F3C-4871-B578-675C57943A52}"
-	ProjectSection(WebsiteProperties) = preProject
-		SccProjectName = "SAK"
-		SccAuxPath = "SAK"
-		SccLocalPath = "SAK"
-		SccProvider = "SAK"
-		UseIISExpress = "true"
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5"
-		ProjectReferences = "{241f7080-2919-4084-ad56-dacfd85dd65e}|GIIS.DataLayer.dll;{f2a29378-fea6-4064-ba43-a6a06c6981cf}|GIIS.BusinessLogic.dll;"
-		Debug.AspNetCompiler.VirtualPath = "/localhost_15043"
-		Debug.AspNetCompiler.PhysicalPath = "GIIS.Website\"
-		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_15043\"
-		Debug.AspNetCompiler.Updateable = "true"
-		Debug.AspNetCompiler.ForceOverwrite = "true"
-		Debug.AspNetCompiler.FixedNames = "false"
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.VirtualPath = "/localhost_15043"
-		Release.AspNetCompiler.PhysicalPath = "GIIS.Website\"
-		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_15043\"
-		Release.AspNetCompiler.Updateable = "true"
-		Release.AspNetCompiler.ForceOverwrite = "true"
-		Release.AspNetCompiler.FixedNames = "false"
-		Release.AspNetCompiler.Debug = "False"
-		SlnRelativePath = "GIIS.Website\"
-		DefaultWebSiteLanguage = "Visual C#"
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GIIS.BusinessLogic", "GIIS.BusinessLogic\GIIS.BusinessLogic.csproj", "{F2A29378-FEA6-4064-BA43-A6A06C6981CF}"
 EndProject
@@ -67,6 +40,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GIIS.ScanForms.UserInterfac
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GIIS.DataLayer.Contract", "GIIS.DataLayer.Contract\GIIS.DataLayer.Contract.csproj", "{2C2E16EE-A1E5-437A-9E99-7F28B395E532}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Exporter", "Exporter\Exporter.csproj", "{411C2399-2402-4FC5-8421-12A2C8AB4DE6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,10 +52,6 @@ Global
 		{241F7080-2919-4084-AD56-DACFD85DD65E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{241F7080-2919-4084-AD56-DACFD85DD65E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{241F7080-2919-4084-AD56-DACFD85DD65E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B42FB531-9F3C-4871-B578-675C57943A52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B42FB531-9F3C-4871-B578-675C57943A52}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B42FB531-9F3C-4871-B578-675C57943A52}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{B42FB531-9F3C-4871-B578-675C57943A52}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{F2A29378-FEA6-4064-BA43-A6A06C6981CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F2A29378-FEA6-4064-BA43-A6A06C6981CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2A29378-FEA6-4064-BA43-A6A06C6981CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -105,6 +76,10 @@ Global
 		{2C2E16EE-A1E5-437A-9E99-7F28B395E532}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C2E16EE-A1E5-437A-9E99-7F28B395E532}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C2E16EE-A1E5-437A-9E99-7F28B395E532}.Release|Any CPU.Build.0 = Release|Any CPU
+		{411C2399-2402-4FC5-8421-12A2C8AB4DE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{411C2399-2402-4FC5-8421-12A2C8AB4DE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{411C2399-2402-4FC5-8421-12A2C8AB4DE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{411C2399-2402-4FC5-8421-12A2C8AB4DE6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

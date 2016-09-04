@@ -8,3 +8,13 @@
 bin/*
 obj/*
 packages/*
+/Exporter/bin
+/.vs/GIIS/v14
+/Exporter/obj
+/GIIS.DataLayer
+/GIIS.DataLayer.Contract/bin/Debug
+/GIIS.DataLayer.Contract/obj/Debug
+/GIIS.DataLayer.Tests/obj/Debug
+/GIIS.ScanForms.UserInterface/obj
+/HIESync/bin/Debug
+/HIESync/obj
