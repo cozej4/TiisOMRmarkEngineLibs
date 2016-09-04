@@ -80,15 +80,41 @@ namespace GIIS.DataLayer
                 throw ex;
             }
         }
-        public static List<VaccinationEvent> GetChildVaccinationEvent(int childId, DateTime modifiedOn, int userId)
+        public static List<VaccinationEvent> GetChildVaccinationEvent(DateTime modifiedOn, int userId)
         {
             try
             {
-                string query = @"SELECT * FROM ""VACCINATION_EVENT"" WHERE ""CHILD_ID""= @ChildId AND ""MODIFIEDON"" > @ModifiedOn AND ""MODIFIED_BY"" <> @UserId ORDER BY ""SCHEDULED_DATE"";  ";
+                User user = User.GetUserById(userId);
+                //string query = @"SELECT * FROM ""VACCINATION_EVENT"" WHERE ""CHILD_ID""= @ChildId AND ""MODIFIEDON"" > @ModifiedOn AND ""MODIFIED_BY"" <> @UserId ORDER BY ""SCHEDULED_DATE"";  ";
+                string query = @"SELECT VE.* FROM ""VACCINATION_EVENT"" VE WHERE VE.""CHILD_ID"" in (Select ""ID"" from ""CHILD"" where ""HEALTHCENTER_ID"" = @hfId ) AND ""MODIFIEDON"" > @ModifiedOn  AND ""MODIFIED_BY"" <> @UserId ORDER BY ""SCHEDULED_DATE"" ;";
 
                 List<NpgsqlParameter> parameters = new List<NpgsqlParameter>()
                 {
-                    new NpgsqlParameter("@ChildId", DbType.Int32) { Value = childId },
+                    //new NpgsqlParameter("@ChildId", DbType.Int32) { Value = childId },
+                    new NpgsqlParameter("@ModifiedOn", DbType.DateTime) { Value = modifiedOn },
+                     new NpgsqlParameter("@hfId", DbType.Int32) { Value = user.HealthFacilityId.ToString()},
+                       new NpgsqlParameter("@UserId", DbType.Int32) { Value = userId }
+                };
+
+                DataTable dt = DBManager.ExecuteReaderCommand(query, CommandType.Text, parameters);
+                return GetVaccinationEventAsList(dt);
+            }
+            catch (Exception ex)
+            {
+                Log.InsertEntity("VaccinationEvent", "GetChildVaccinationEvent", 4, ex.StackTrace.Replace("'", ""), ex.Message.Replace("'", ""));
+                throw ex;
+            }
+        }
+        public static List<VaccinationEvent> GetChildVaccinationEvent(string childIdList, DateTime modifiedOn, int userId)
+        {
+            try
+            {
+                //string query = @"SELECT * FROM ""VACCINATION_EVENT"" WHERE ""CHILD_ID""= @ChildId AND ""MODIFIEDON"" > @ModifiedOn AND ""MODIFIED_BY"" <> @UserId ORDER BY ""SCHEDULED_DATE"";  ";
+                string query = @"SELECT VE.* FROM ""VACCINATION_EVENT"" VE WHERE VE.""CHILD_ID"" = ANY( CAST( string_to_array(@ChildList, ',' ) AS INTEGER[] )) AND ""MODIFIEDON"" > @ModifiedOn  AND ""MODIFIED_BY"" <> @UserId ORDER BY ""SCHEDULED_DATE"" ;";
+
+                List<NpgsqlParameter> parameters = new List<NpgsqlParameter>()
+                {
+                   new NpgsqlParameter("@ChildList", DbType.String) { Value = childIdList },
                     new NpgsqlParameter("@ModifiedOn", DbType.DateTime) { Value = modifiedOn },
                        new NpgsqlParameter("@UserId", DbType.Int32) { Value = userId }
                 };
@@ -102,20 +128,23 @@ namespace GIIS.DataLayer
                 throw ex;
             }
         }
-        public static List<VaccinationEvent> GetChildVaccinationEventBefore(int childId, DateTime modifiedOn, DateTime prevlogin, int userId)
+        public static List<VaccinationEvent> GetChildVaccinationEventBefore(DateTime modifiedOn, DateTime prevlogin, int userId)
         {
             try
             {
-                string query = @"SELECT * FROM ""VACCINATION_EVENT"" WHERE ""CHILD_ID""= @ChildId AND ""MODIFIEDON"" < @ModifiedOn AND ""MODIFIEDON"" > @PrevLogin AND ""MODIFIED_BY"" <> @UserId ORDER BY ""SCHEDULED_DATE"";  ";
+                User user = User.GetUserById(userId);
+                //  string query = @"SELECT * FROM ""VACCINATION_EVENT"" WHERE ""CHILD_ID""= @ChildId AND ""MODIFIEDON"" < @ModifiedOn AND ""MODIFIEDON"" > @PrevLogin AND ""MODIFIED_BY"" <> @UserId ORDER BY ""SCHEDULED_DATE"";  ";
+                string query = @"SELECT VE.* FROM ""VACCINATION_EVENT"" VE WHERE VE.""CHILD_ID"" in (Select ""ID"" from ""CHILD"" where ""HEALTHCENTER_ID"" = @hfId ) AND ""MODIFIEDON"" < @ModifiedOn AND ""MODIFIEDON"" > @PrevLogin AND ""MODIFIED_BY"" <> @UserId ORDER BY ""SCHEDULED_DATE"" ;";
 
                 List<NpgsqlParameter> parameters = new List<NpgsqlParameter>()
                 {
-                    new NpgsqlParameter("@ChildId", DbType.Int32) { Value = childId },
+                    //new NpgsqlParameter("@ChildId", DbType.Int32) { Value = childId },
                     new NpgsqlParameter("@ModifiedOn", DbType.DateTime) { Value = modifiedOn },
                      new NpgsqlParameter("@PrevLogin", DbType.DateTime) { Value = prevlogin },
+                      new NpgsqlParameter("@hfId", DbType.Int32) { Value = user.HealthFacilityId.ToString()},
                        new NpgsqlParameter("@UserId", DbType.Int32) { Value = userId }
                 };
-                
+
                 DataTable dt = DBManager.ExecuteReaderCommand(query, CommandType.Text, parameters);
                 return GetVaccinationEventAsList(dt);
             }
@@ -125,16 +154,20 @@ namespace GIIS.DataLayer
                 throw ex;
             }
         }
-        public static List<VaccinationEvent> GetChildVaccinationEventDayFirstLogin(int childId, DateTime modifiedOn, int userId)
+
+        public static List<VaccinationEvent> GetChildVaccinationEventBefore(string childIdList, DateTime modifiedOn, DateTime prevlogin, int userId)
         {
             try
             {
-                string query = @"SELECT * FROM ""VACCINATION_EVENT"" WHERE ""CHILD_ID""= @ChildId AND ""MODIFIEDON""::date = @ModifiedOn::date ORDER BY ""SCHEDULED_DATE"";  ";
+                //  string query = @"SELECT * FROM ""VACCINATION_EVENT"" WHERE ""CHILD_ID""= @ChildId AND ""MODIFIEDON"" < @ModifiedOn AND ""MODIFIEDON"" > @PrevLogin AND ""MODIFIED_BY"" <> @UserId ORDER BY ""SCHEDULED_DATE"";  ";
+                string query = @"SELECT VE.* FROM ""VACCINATION_EVENT"" VE WHERE VE.""CHILD_ID"" = ANY( CAST( string_to_array(@ChildList, ',' ) AS INTEGER[] )) AND ""MODIFIEDON"" < @ModifiedOn AND ""MODIFIEDON"" > @PrevLogin AND ""MODIFIED_BY"" <> @UserId ORDER BY ""SCHEDULED_DATE"" ;";
 
                 List<NpgsqlParameter> parameters = new List<NpgsqlParameter>()
                 {
-                    new NpgsqlParameter("@ChildId", DbType.Int32) { Value = childId },
-                    new NpgsqlParameter("@ModifiedOn", DbType.DateTime) { Value = modifiedOn }
+                   new NpgsqlParameter("@ChildList", DbType.String) { Value = childIdList },
+                    new NpgsqlParameter("@ModifiedOn", DbType.DateTime) { Value = modifiedOn },
+                     new NpgsqlParameter("@PrevLogin", DbType.DateTime) { Value = prevlogin },
+                       new NpgsqlParameter("@UserId", DbType.Int32) { Value = userId }
                 };
 
                 DataTable dt = DBManager.ExecuteReaderCommand(query, CommandType.Text, parameters);
@@ -143,6 +176,54 @@ namespace GIIS.DataLayer
             catch (Exception ex)
             {
                 Log.InsertEntity("VaccinationEvent", "GetChildVaccinationEventBefore", 4, ex.StackTrace.Replace("'", ""), ex.Message.Replace("'", ""));
+                throw ex;
+            }
+        }
+        public static List<VaccinationEvent> GetChildVaccinationEventDayFirstLogin(DateTime modifiedOn, int userId)
+        {
+            try
+            {
+                User user = User.GetUserById(userId);
+                //string query = @"SELECT * FROM ""VACCINATION_EVENT"" WHERE ""CHILD_ID""= @ChildId AND ""MODIFIEDON""::date = @ModifiedOn::date ORDER BY ""SCHEDULED_DATE"";  ";
+                string query = @"SELECT VE.* FROM ""VACCINATION_EVENT"" VE WHERE VE.""CHILD_ID"" in (Select ""ID"" from ""CHILD"" where ""HEALTHCENTER_ID"" = @hfId ) AND ""MODIFIEDON""::date = @ModifiedOn::date ORDER BY ""SCHEDULED_DATE"" ;";
+
+
+                List<NpgsqlParameter> parameters = new List<NpgsqlParameter>()
+                {
+                    //new NpgsqlParameter("@ChildId", DbType.Int32) { Value = childId },
+                   new NpgsqlParameter("@hfId", DbType.Int32) { Value = user.HealthFacilityId.ToString()},
+                     new NpgsqlParameter("@ModifiedOn", DbType.DateTime) { Value = user.Lastlogin.AddDays(-1)}
+                };
+
+                DataTable dt = DBManager.ExecuteReaderCommand(query, CommandType.Text, parameters);
+                return GetVaccinationEventAsList(dt);
+            }
+            catch (Exception ex)
+            {
+                Log.InsertEntity("VaccinationEvent", "GetChildVaccinationEventBefore", 4, ex.StackTrace.Replace("'", ""), ex.Message.Replace("'", ""));
+                throw ex;
+            }
+        }
+
+        public static List<VaccinationEvent> GetVaccinationEventByHealthFacility(int hfId)
+        {
+            try
+            {
+                int year = DateTime.Today.Date.Year;
+                string query = @"SELECT VE.* FROM ""VACCINATION_EVENT"" VE WHERE VE.""CHILD_ID"" in (Select ""ID"" from ""CHILD"" where ""HEALTHCENTER_ID"" = @hfId AND EXTRACT(YEAR from ""BIRTHDATE"") = @year);";
+
+                List<NpgsqlParameter> parameters = new List<NpgsqlParameter>()
+                {
+                    new NpgsqlParameter("@hfId", DbType.Int32) { Value = hfId },
+                    new NpgsqlParameter("@year", DbType.Int32) {Value = year}
+                };
+
+                DataTable dt = DBManager.ExecuteReaderCommand(query, CommandType.Text, parameters);
+                return GetVaccinationEventAsList(dt);
+            }
+            catch (Exception ex)
+            {
+                Log.InsertEntity("VaccinationAppointment", "GetVaccinationEventByHealthFacility", 4, ex.StackTrace.Replace("'", ""), ex.Message.Replace("'", ""));
                 throw ex;
             }
         }
@@ -266,7 +347,7 @@ namespace GIIS.DataLayer
             }
             return -1;
         }
-        public static int UpdateEvent(int vId, DateTime date)
+        public static int UpdateEvent(int vId, DateTime date, int userId)
         {
             try
             {
