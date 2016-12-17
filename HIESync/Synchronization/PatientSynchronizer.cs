@@ -84,8 +84,7 @@ namespace HIESync.Synchronization
                 string[] parts = remoteCertHash.Split(',');
                 StoreLocation loc = (StoreLocation)Enum.Parse(typeof(StoreLocation), parts[0]);
                 StoreName name = (StoreName)Enum.Parse(typeof(StoreName), parts[1]);
-
-
+                
                 remoteCert = MllpMessageSender.FindCertificate(name, loc, X509FindType.FindByThumbprint, parts[2]);
 
             }
@@ -113,11 +112,20 @@ namespace HIESync.Synchronization
                 {
                     Trace.TraceInformation("{0}: Last sync was on {1}", this.m_context.JobId, lastModifiedFilter.Value
                         );
+                    //request = this.CreatePDQSearch(new KeyValuePair<string, string>("@PID.33", new TS(lastModifiedFilter.Value))) as QBP_Q21;
+                    ////Trace.TraceInformation("{0}: Only PULL patients modified on {1:yyyy-MMM-dd}", this.m_context.JobId, new TS(this.m_context.StartTime.AddDays(-i), DatePrecision.Day).DateValue);
+                    //this.m_waitThread.QueueUserWorkItem(this.PullPatientsAsync, request);
+
                     // Create a series of OR parameters representing days we're out of sync
                     for (int i = 0; i <= this.m_context.StartTime.Subtract(lastModifiedFilter.Value).TotalDays; i++)
                     {
-                        request = this.CreatePDQSearch(new KeyValuePair<string, string>("@PID.33", new TS(this.m_context.StartTime.AddDays(-i), DatePrecision.Day))) as QBP_Q21;
-                        Trace.TraceInformation("{0}: Only PULL patients modified on {1:yyyy-MMM-dd}", this.m_context.JobId, new TS(this.m_context.StartTime.AddDays(-i), DatePrecision.Day).DateValue);
+                        request = this.CreatePDQSearch(new KeyValuePair<string, string>("@PID.33", new TS(this.m_context.StartTime.AddDays(-i), DatePrecision.Day)),
+                            new KeyValuePair<string, string>("@PID.8","M")) as QBP_Q21;
+                        Trace.TraceInformation("{0}: Only PULL MALE patients modified on {1:yyyy-MMM-dd}", this.m_context.JobId, new TS(this.m_context.StartTime.AddDays(-i), DatePrecision.Day).DateValue);
+                        this.m_waitThread.QueueUserWorkItem(this.PullPatientsAsync, request);
+                        request = this.CreatePDQSearch(new KeyValuePair<string, string>("@PID.33", new TS(this.m_context.StartTime.AddDays(-i), DatePrecision.Day)),
+                            new KeyValuePair<string, string>("@PID.8", "F")) as QBP_Q21;
+                        Trace.TraceInformation("{0}: Only PULL FEMALE patients modified on {1:yyyy-MMM-dd}", this.m_context.JobId, new TS(this.m_context.StartTime.AddDays(-i), DatePrecision.Day).DateValue);
                         this.m_waitThread.QueueUserWorkItem(this.PullPatientsAsync, request);
                     }
                 }
@@ -332,7 +340,7 @@ namespace HIESync.Synchronization
 
                 // Relieve memorypressure 
                 lock (this.m_syncState)
-                    while (this.m_workerItems.Count > 2048)
+                    while (this.m_workerItems.Count > 0)
                     {
                         this.m_waitThread.QueueUserWorkItem(this.ProcessPIDAsync, this.m_workerItems.Pop());
                     }

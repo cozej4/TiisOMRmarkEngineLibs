@@ -201,7 +201,8 @@ namespace GIIS.ScanForms.UserInterface
                             rowData.Doses.Add(ReferenceData.Current.Doses.Find(d => d.Fullname == String.Format("Rota {0}", bub.Value)));
                     if (omrMr != null)
                         foreach (var bub in omrMr)
-                            rowData.Doses.Add(ReferenceData.Current.Doses.Find(d => d.Fullname == String.Format("Measles {0}", bub.Value)));
+                            rowData.Doses.Add(ReferenceData.Current.Doses.Find(d => d.Fullname == String.Format("Measles Rubella {0}", bub.Value)) ??
+                                ReferenceData.Current.Doses.Find(d => d.Fullname == String.Format("Measles {0}", bub.Value)));
 
                     // Given vaccines
                     rowData.VaccineGiven = new List<ScheduledVaccination>();
@@ -216,7 +217,11 @@ namespace GIIS.ScanForms.UserInterface
                             antigenName = "Measles Rubella";
                         else if (antigenName == "PCV")
                             antigenName = "PCV-13";
-                        rowData.VaccineGiven.Add(ReferenceData.Current.Vaccines.First(v => v.Name == antigenName));
+                        var refData = ReferenceData.Current.Vaccines.FirstOrDefault(v => v.Name == antigenName);
+                        if (refData != null)
+                            rowData.VaccineGiven.Add(refData);
+                        else
+                            MessageBox.Show(String.Format("The form expected a vaccination named {0} but the server did not respond with such a vaccine. Server vaccinations: [{1}]", antigenName, String.Join(",", ReferenceData.Current.Vaccines.Select(o=>o.Name).ToArray())));
                     }
 
                     // Date of vaccination

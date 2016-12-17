@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<template xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="BID03" topLeft="118.5,118.5" bottomLeft="118.5,2359.5" topRight="3389.5,118.5" bottomRight="3389.5,2359.5" scanThreshold="120" xmlns="urn:scan-omr:template">
+  <sourcePath>BID03.jpg</sourcePath>
+  <barcodeQuestion id="PatientID1_TempId" topLeft="131,241" bottomLeft="131,337" topRight="718,241" bottomRight="718,337" row="PatientID1" isRequiredForRow="false" />
+  <barcodeQuestion id="PatientID1_Barcode" topLeft="126,366" bottomLeft="126,548" topRight="738,366" bottomRight="738,548" row="PatientID1" isRequiredForRow="false" />
+  <barcodeQuestion id="PatientID2_TempId" topLeft="131,592" bottomLeft="131,688" topRight="718,592" bottomRight="718,688" row="PatientID2" isRequiredForRow="false" />
+  <barcodeQuestion id="PatientID2_Barcode" topLeft="126,717" bottomLeft="126,899" topRight="738,717" bottomRight="738,899" row="PatientID2" isRequiredForRow="false" />
+  <barcodeQuestion id="PatientID3_Barcode" topLeft="127,1068" bottomLeft="127,1250" topRight="739,1068" bottomRight="739,1250" row="PatientID3" isRequiredForRow="false" />
+  <barcodeQuestion id="PatientID3_TempId" topLeft="132,943" bottomLeft="132,1039" topRight="719,943" bottomRight="719,1039" row="PatientID3" isRequiredForRow="false" />
+  <barcodeQuestion id="PatientID4_Barcode" topLeft="124,1417" bottomLeft="124,1599" topRight="736,1417" bottomRight="736,1599" row="PatientID4" isRequiredForRow="false" />
+  <barcodeQuestion id="PatientID4_TempId" topLeft="129,1292" bottomLeft="129,1388" topRight="734,1292" bottomRight="734,1388" row="PatientID4" isRequiredForRow="false" />
+  <barcodeQuestion id="PatientID5_TempId" topLeft="132,1642" bottomLeft="132,1738" topRight="719,1642" bottomRight="719,1738" row="PatientID5" isRequiredForRow="false" />
+  <barcodeQuestion id="PatientID5_Barcode" topLeft="127,1767" bottomLeft="127,1949" topRight="739,1767" bottomRight="739,1949" row="PatientID5" isRequiredForRow="false" />
+  <barcodeQuestion id="PatientID6_Barcode" topLeft="127,2117" bottomLeft="127,2299" topRight="707,2117" bottomRight="707,2299" row="PatientID6" isRequiredForRow="false" />
+  <barcodeQuestion id="PatientID6_TempId" topLeft="130,1996" bottomLeft="130,2092" topRight="698,1996" bottomRight="698,2092" row="PatientID6" isRequiredForRow="false" />
+  <script>
+  <reference>GIIS.DataLayer.dll</reference>
+  <reference>GIIS.ScanForms.UserInterface.dll</reference>
+	var formProcessor = new GIIS.ScanForms.UserInterface.FormBID03();
+	formProcessor.UploadData(page);
+	Err = formProcessor.Err;
+  </script>
+</template>

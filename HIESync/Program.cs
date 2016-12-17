@@ -47,7 +47,7 @@ namespace HIESync
 
             Trace.AutoFlush = true;
             Trace.Listeners.Add(new TextWriterTraceListener(Path.Combine(logDir, "lastrun.log")) { TraceOutputOptions = TraceOptions.DateTime, Filter = new EventTypeFilter(SourceLevels.Error | SourceLevels.Warning | SourceLevels.Critical)});
-            Trace.Listeners.Add(new TextWriterTraceListener(Path.ChangeExtension(Path.Combine(logDir, DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")), "log")) { TraceOutputOptions = TraceOptions.DateTime });
+            Trace.Listeners.Add(new TextWriterTraceListener(Path.ChangeExtension(Path.Combine(logDir, DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")), "log")) { TraceOutputOptions = TraceOptions.DateTime, Filter = new EventTypeFilter(SourceLevels.Information | SourceLevels.Error | SourceLevels.Warning | SourceLevels.Verbose | SourceLevels.Critical ) });
             Trace.Listeners.Add(new ConsoleTraceListener(false));
             SynchronizationContext context = SynchronizationContext.CreateContext();
 

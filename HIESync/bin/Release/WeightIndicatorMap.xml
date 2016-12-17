@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<!--
+ -	TIIS HIE Synchronization Program, Copyright (C) 2015 ecGroup
+ -  Development services by Fyfe Software Inc.
+ - 
+ -    Licensed under the Apache License, Version 2.0 (the "License");
+ -    you may not use this file except in compliance with the License.
+ -    You may obtain a copy of the License at
+ -
+ -        http://www.apache.org/licenses/LICENSE-2.0
+ -
+ -    Unless required by applicable law or agreed to in writing, software
+ -    distributed under the License is distributed on an "AS IS" BASIS,
+ -    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ -    See the License for the specific language governing permissions and
+ -    limitations under the License.
+ -->
+
+<map id="PVpWPS5xDsL">
+
+  <indicator id="K0uJn2cD0fq" name="24 Month Weight for Age &lt; 60%" ageGroup="6" column="underweight"/>
+  <indicator id="q9oJBWPHPiC" name="24 Month Weight for Age 60% - 80%" ageGroup="6" column="normal"/>
+  <indicator id="d4aCXxcHblX" name="24 Month Weight for Age over 80%" ageGroup="6" column="overweight"/>
+
+  <indicator id="TTzLvdt6MaK" name="18 Month Weight for Age &lt; 60% " ageGroup="5" column="underweight"/>
+  <indicator id="eqcgrh0x3pQ" name="18 Month Weight for Age 60% - 80%" ageGroup="5" column="normal"/>
+  <indicator id="YUj5aJX6Em4" name="18 Month Weight for Age over 80%" ageGroup="5" column="overweight"/>
+  
+  <indicator id="r4nqwuijK2F" name="12 Month Weight for Age under 60%" ageGroup="4" column="underweight"/>
+  <indicator id="h5UHhEUD8Lx" name="12 Month Weight for Age 60% - 80%" ageGroup="4" column="normal"/>
+  <indicator id="FUYNucegvqz" name="12 Month Weight for Age 80%" ageGroup="4" column="overweight"/>
+  
+  <indicator id="saCzjdj7tgE" name="9 Month Weight for Age &lt; 60%" ageGroup="3" column="underweight"/>
+  <indicator id="C3WYtidnV0q" name="9 Month Weight for Age 60% - 80%" ageGroup="3" column="normal"/>
+
+  <indicator id="iMXkvUGHdKB" name="6 Month Weight for Age under 60%" ageGroup="2" column="underweight"/>
+  <indicator id="DNuhdxCs3XZ" name="6 Month Weight for Age 60% - 80%" ageGroup="2" column="normal"/>
+  <indicator id="CuohivAltyW" name="6 Month Weight for Age over 80%" ageGroup="2" column="overweight"/>
+
+  <indicator id="LqjPwI20pLH" name="3 Month Weight for Age under 60%" ageGroup="1" column="underweight"/>
+  <indicator id="lBT5hXDpVVd" name="3 Month Weight for Age 60% - 80%" ageGroup="1" column="normal"/>
+  <indicator id="eYr1EEKmWUO" name="3 Month Weight for Age over 80%" ageGroup="1" column="overweight"/>
+
+</map>

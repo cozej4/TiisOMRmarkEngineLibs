@@ -12,12 +12,13 @@
 //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
- //******************************************************************************
+//******************************************************************************
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Data;
 using Npgsql;
+using System.Diagnostics;
 
 namespace GIIS.DataLayer
 {
@@ -178,7 +179,7 @@ namespace GIIS.DataLayer
         {
             try
             {
-                string query = @"INSERT INTO ""CHILD"" (""SYSTEM_ID"", ""FIRSTNAME1"", ""FIRSTNAME2"", ""LASTNAME1"", ""LASTNAME2"", ""BIRTHDATE"", ""GENDER"", ""HEALTHCENTER_ID"", ""BIRTHPLACE_ID"", ""COMMUNITY_ID"", ""DOMICILE_ID"", ""STATUS_ID"", ""ADDRESS"", ""PHONE"", ""MOBILE"", ""EMAIL"", ""MOTHER_ID"", ""MOTHER_FIRSTNAME"", ""MOTHER_LASTNAME"", ""FATHER_ID"", ""FATHER_FIRSTNAME"", ""FATHER_LASTNAME"", ""CARETAKER_ID"", ""CARETAKER_FIRSTNAME"", ""CARETAKER_LASTNAME"", ""NOTES"", ""IS_ACTIVE"", ""MODIFIED_ON"", ""MODIFIED_BY"", ""IDENTIFICATION_NO1"", ""IDENTIFICATION_NO2"", ""IDENTIFICATION_NO3"", ""BARCODE_ID"", ""TEMP_ID"") VALUES (@SystemId, @Firstname1, @Firstname2, @Lastname1, @Lastname2, @Birthdate, @Gender, @HealthcenterId, @BirthplaceId, @CommunityId, @DomicileId, @StatusId, @Address, @Phone, @Mobile, @Email, @MotherId, @MotherFirstname, @MotherLastname, @FatherId, @FatherFirstname, @FatherLastname, @CaretakerId, @CaretakerFirstname, @CaretakerLastname, @Notes, @IsActive, @ModifiedOn, @ModifiedBy, @IdentificationNo1, @IdentificationNo2, @IdentificationNo3, @BarcodeId, @TempId) returning ""ID"" ";
+                string query = @"INSERT INTO ""CHILD"" (""SYSTEM_ID"", ""FIRSTNAME1"", ""FIRSTNAME2"", ""LASTNAME1"", ""LASTNAME2"", ""BIRTHDATE"", ""GENDER"", ""HEALTHCENTER_ID"", ""BIRTHPLACE_ID"", ""COMMUNITY_ID"", ""DOMICILE_ID"", ""STATUS_ID"", ""ADDRESS"", ""PHONE"", ""MOBILE"", ""EMAIL"", ""MOTHER_FIRSTNAME"", ""MOTHER_LASTNAME"", ""FATHER_ID"", ""FATHER_FIRSTNAME"", ""FATHER_LASTNAME"", ""CARETAKER_ID"", ""CARETAKER_FIRSTNAME"", ""CARETAKER_LASTNAME"", ""NOTES"", ""IS_ACTIVE"", ""MODIFIED_ON"", ""MODIFIED_BY"", ""BARCODE_ID"", ""TEMP_ID"") VALUES (@SystemId, @Firstname1, @Firstname2, @Lastname1, @Lastname2, @Birthdate, @Gender, @HealthcenterId, @BirthplaceId, @CommunityId, @DomicileId, @StatusId, @Address, @Phone, @Mobile, @Email, @MotherFirstname, @MotherLastname, @FatherId, @FatherFirstname, @FatherLastname, @CaretakerId, @CaretakerFirstname, @CaretakerLastname, @Notes, @IsActive, @ModifiedOn, @ModifiedBy, @BarcodeId, @TempId) returning ""ID"" ";
                 List<Npgsql.NpgsqlParameter> parameters = new List<NpgsqlParameter>()
 {
 new NpgsqlParameter("@SystemId", DbType.String)  { Value = o.SystemId },
@@ -197,7 +198,6 @@ new NpgsqlParameter("@Address", DbType.String)  { Value = (object)o.Address ?? D
 new NpgsqlParameter("@Phone", DbType.String)  { Value = (object)o.Phone ?? DBNull.Value },
 new NpgsqlParameter("@Mobile", DbType.String)  { Value = (object)o.Mobile ?? DBNull.Value },
 new NpgsqlParameter("@Email", DbType.String)  { Value = (object)o.Email ?? DBNull.Value },
-new NpgsqlParameter("@MotherId", DbType.String)  { Value = (object)o.MotherId ?? DBNull.Value },
 new NpgsqlParameter("@MotherFirstname", DbType.String)  { Value = (object)o.MotherFirstname ?? DBNull.Value },
 new NpgsqlParameter("@MotherLastname", DbType.String)  { Value = (object)o.MotherLastname ?? DBNull.Value },
 new NpgsqlParameter("@FatherId", DbType.String)  { Value = (object)o.FatherId ?? DBNull.Value },
@@ -207,21 +207,24 @@ new NpgsqlParameter("@CaretakerId", DbType.String)  { Value = (object)o.Caretake
 new NpgsqlParameter("@CaretakerFirstname", DbType.String)  { Value = (object)o.CaretakerFirstname ?? DBNull.Value },
 new NpgsqlParameter("@CaretakerLastname", DbType.String)  { Value = (object)o.CaretakerLastname ?? DBNull.Value },
 new NpgsqlParameter("@Notes", DbType.String)  { Value = (object)o.Notes ?? DBNull.Value },
-new NpgsqlParameter("@IsActive", DbType.Boolean)  { Value = o.IsActive }
-,
+new NpgsqlParameter("@IsActive", DbType.Boolean)  { Value = o.IsActive },
 new NpgsqlParameter("@ModifiedOn", DbType.DateTime)  { Value = o.ModifiedOn },
 new NpgsqlParameter("@ModifiedBy", DbType.Int32)  { Value = o.ModifiedBy },
-new NpgsqlParameter("@IdentificationNo1", DbType.String)  { Value = (object)o.IdentificationNo1 ?? DBNull.Value },
-new NpgsqlParameter("@IdentificationNo2", DbType.String)  { Value = (object)o.IdentificationNo2 ?? DBNull.Value },
-new NpgsqlParameter("@IdentificationNo3", DbType.String)  { Value = (object)o.IdentificationNo3 ?? DBNull.Value },
 new NpgsqlParameter("@BarcodeId", DbType.String)  { Value = (object)o.BarcodeId ?? DBNull.Value },
 new NpgsqlParameter("@TempId", DbType.String)  { Value = (object)o.TempId ?? DBNull.Value }};
+
+                // TODO: Delete all of GIIS
+                var debugString = query;
+                foreach (var p in parameters)
+                    debugString = debugString.Replace(p.ParameterName, (p.Value == DBNull.Value) ? "NULL" : p.Value.ToString());
+                Trace.TraceInformation(debugString);
                 object id = DBManager.ExecuteScalarCommand(query, CommandType.Text, parameters);
                 AuditTable.InsertEntity("Child", id.ToString(), 1, DateTime.Now, o.ModifiedBy);
                 return int.Parse(id.ToString());
             }
             catch (Exception ex)
             {
+                Trace.TraceError(ex.ToString());
                 Log.InsertEntity("Child", "Insert", 1, ex.StackTrace.Replace("'", ""), ex.Message.Replace("'", ""));
             }
             return -1;
@@ -231,7 +234,7 @@ new NpgsqlParameter("@TempId", DbType.String)  { Value = (object)o.TempId ?? DBN
         {
             try
             {
-                string query = @"UPDATE ""CHILD"" SET ""ID"" = @Id, ""SYSTEM_ID"" = @SystemId, ""FIRSTNAME1"" = @Firstname1, ""FIRSTNAME2"" = @Firstname2, ""LASTNAME1"" = @Lastname1, ""LASTNAME2"" = @Lastname2, ""BIRTHDATE"" = @Birthdate, ""GENDER"" = @Gender, ""HEALTHCENTER_ID"" = @HealthcenterId, ""BIRTHPLACE_ID"" = @BirthplaceId, ""COMMUNITY_ID"" = @CommunityId, ""DOMICILE_ID"" = @DomicileId, ""STATUS_ID"" = @StatusId, ""ADDRESS"" = @Address, ""PHONE"" = @Phone, ""MOBILE"" = @Mobile, ""EMAIL"" = @Email, ""MOTHER_ID"" = @MotherId, ""MOTHER_FIRSTNAME"" = @MotherFirstname, ""MOTHER_LASTNAME"" = @MotherLastname, ""FATHER_ID"" = @FatherId, ""FATHER_FIRSTNAME"" = @FatherFirstname, ""FATHER_LASTNAME"" = @FatherLastname, ""CARETAKER_ID"" = @CaretakerId, ""CARETAKER_FIRSTNAME"" = @CaretakerFirstname, ""CARETAKER_LASTNAME"" = @CaretakerLastname, ""NOTES"" = @Notes, ""IS_ACTIVE"" = @IsActive, ""MODIFIED_ON"" = @ModifiedOn, ""MODIFIED_BY"" = @ModifiedBy, ""IDENTIFICATION_NO1"" = @IdentificationNo1, ""IDENTIFICATION_NO2"" = @IdentificationNo2, ""IDENTIFICATION_NO3"" = @IdentificationNo3, ""BARCODE_ID"" = @BarcodeId, ""TEMP_ID"" = @TempId WHERE ""ID"" = @Id ";
+                string query = @"UPDATE ""CHILD"" SET ""ID"" = @Id, ""SYSTEM_ID"" = @SystemId, ""FIRSTNAME1"" = @Firstname1, ""FIRSTNAME2"" = @Firstname2, ""LASTNAME1"" = @Lastname1, ""LASTNAME2"" = @Lastname2, ""BIRTHDATE"" = @Birthdate, ""GENDER"" = @Gender, ""HEALTHCENTER_ID"" = @HealthcenterId, ""BIRTHPLACE_ID"" = @BirthplaceId, ""COMMUNITY_ID"" = @CommunityId, ""DOMICILE_ID"" = @DomicileId, ""STATUS_ID"" = @StatusId, ""ADDRESS"" = @Address, ""PHONE"" = @Phone, ""MOBILE"" = @Mobile, ""EMAIL"" = @Email, ""MOTHER_FIRSTNAME"" = @MotherFirstname, ""MOTHER_LASTNAME"" = @MotherLastname, ""FATHER_ID"" = @FatherId, ""FATHER_FIRSTNAME"" = @FatherFirstname, ""FATHER_LASTNAME"" = @FatherLastname, ""CARETAKER_ID"" = @CaretakerId, ""CARETAKER_FIRSTNAME"" = @CaretakerFirstname, ""CARETAKER_LASTNAME"" = @CaretakerLastname, ""NOTES"" = @Notes, ""IS_ACTIVE"" = @IsActive, ""MODIFIED_ON"" = @ModifiedOn, ""MODIFIED_BY"" = @ModifiedBy, ""BARCODE_ID"" = @BarcodeId, ""TEMP_ID"" = @TempId WHERE ""ID"" = @Id ";
                 List<Npgsql.NpgsqlParameter> parameters = new List<NpgsqlParameter>()
 {
 new NpgsqlParameter("@SystemId", DbType.String)  { Value = o.SystemId },
@@ -347,7 +350,7 @@ new NpgsqlParameter("@Id", DbType.Int32) { Value = id }
                     o.Phone = row["PHONE"].ToString();
                     o.Mobile = row["MOBILE"].ToString();
                     o.Email = row["EMAIL"].ToString();
-                    o.MotherId = row["MOTHER_ID"].ToString();
+                    //o.MotherId = row["MOTHER_ID"].ToString();
                     o.MotherFirstname = row["MOTHER_FIRSTNAME"].ToString();
                     o.MotherLastname = row["MOTHER_LASTNAME"].ToString();
                     o.FatherId = row["FATHER_ID"].ToString();
@@ -360,9 +363,9 @@ new NpgsqlParameter("@Id", DbType.Int32) { Value = id }
                     o.IsActive = Helper.ConvertToBoolean(row["IS_ACTIVE"]);
                     o.ModifiedOn = Helper.ConvertToDate(row["MODIFIED_ON"]);
                     o.ModifiedBy = Helper.ConvertToInt(row["MODIFIED_BY"]);
-                    o.IdentificationNo1 = row["IDENTIFICATION_NO1"].ToString();
-                    o.IdentificationNo2 = row["IDENTIFICATION_NO2"].ToString();
-                    o.IdentificationNo3 = row["IDENTIFICATION_NO3"].ToString();
+                    //o.IdentificationNo1 = row["IDENTIFICATION_NO1"].ToString();
+                    //o.IdentificationNo2 = row["IDENTIFICATION_NO2"].ToString();
+                    //o.IdentificationNo3 = row["IDENTIFICATION_NO3"].ToString();
                     o.BarcodeId = row["BARCODE_ID"].ToString();
                     o.TempId = row["TEMP_ID"].ToString();
                     return o;
@@ -401,7 +404,7 @@ new NpgsqlParameter("@Id", DbType.Int32) { Value = id }
                     o.Phone = row["PHONE"].ToString();
                     o.Mobile = row["MOBILE"].ToString();
                     o.Email = row["EMAIL"].ToString();
-                    o.MotherId = row["MOTHER_ID"].ToString();
+                    //o.MotherId = row["MOTHER_ID"].ToString();
                     o.MotherFirstname = row["MOTHER_FIRSTNAME"].ToString();
                     o.MotherLastname = row["MOTHER_LASTNAME"].ToString();
                     o.FatherId = row["FATHER_ID"].ToString();
@@ -414,9 +417,9 @@ new NpgsqlParameter("@Id", DbType.Int32) { Value = id }
                     o.IsActive = Helper.ConvertToBoolean(row["IS_ACTIVE"]);
                     o.ModifiedOn = Helper.ConvertToDate(row["MODIFIED_ON"]);
                     o.ModifiedBy = Helper.ConvertToInt(row["MODIFIED_BY"]);
-                    o.IdentificationNo1 = row["IDENTIFICATION_NO1"].ToString();
-                    o.IdentificationNo2 = row["IDENTIFICATION_NO2"].ToString();
-                    o.IdentificationNo3 = row["IDENTIFICATION_NO3"].ToString();
+                    //o.IdentificationNo1 = row["IDENTIFICATION_NO1"].ToString();
+                    //o.IdentificationNo2 = row["IDENTIFICATION_NO2"].ToString();
+                    //o.IdentificationNo3 = row["IDENTIFICATION_NO3"].ToString();
                     o.BarcodeId = row["BARCODE_ID"].ToString();
                     o.TempId = row["TEMP_ID"].ToString();
                     oList.Add(o);

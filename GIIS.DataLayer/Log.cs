@@ -106,7 +106,7 @@ string query = @"INSERT INTO ""LOG"" (""LOG_CATEGORY_ID"", ""CREATED"", ""TITLE"
 List<Npgsql.NpgsqlParameter> parameters = new List<NpgsqlParameter>()
 {
 new NpgsqlParameter("@LogCategoryId", DbType.Int32)  { Value = o.LogCategoryId },
-new NpgsqlParameter("@Created", DbType.Date)  { Value = (object)o.Created ?? DBNull.Value },
+new NpgsqlParameter("@Created", DbType.DateTime)  { Value = (object)o.Created ?? DBNull.Value },
 new NpgsqlParameter("@Title", DbType.String)  { Value = (object)o.Title ?? DBNull.Value },
 new NpgsqlParameter("@Message", DbType.String)  { Value = (object)o.Message ?? DBNull.Value },
 new NpgsqlParameter("@Class", DbType.String)  { Value = (object)o.Class ?? DBNull.Value },

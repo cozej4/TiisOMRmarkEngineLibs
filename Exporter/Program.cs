@@ -641,7 +641,7 @@ namespace Exporter
                 {
                     Key = entityId,
                     Names = new List<EntityName>() { new EntityName(NameUseKeys.OfficialRecord, itm.Lastname, itm.Firstname) },
-                    Telecoms = new List<EntityTelecomAddress>() { new EntityTelecomAddress(TelecomAddressUseKeys.WorkPlace, "mailto:" + itm.Email) },
+
                     SecurityUserKey = userId,
                     Identifiers = new List<EntityIdentifier>()
                             {
@@ -654,6 +654,8 @@ namespace Exporter
                     StatusConceptKey = itm.IsActive ? StatusKeys.Active : StatusKeys.Obsolete
 
                 };
+                if (!String.IsNullOrEmpty(itm.Email))
+                    userEntity.Telecoms = new List<EntityTelecomAddress>() { new EntityTelecomAddress(TelecomAddressUseKeys.WorkPlace, itm.Email) };
 
                 Guid facilityId = Guid.Empty;
                 if (facilityMap.TryGetValue(itm.HealthFacilityId, out facilityId))

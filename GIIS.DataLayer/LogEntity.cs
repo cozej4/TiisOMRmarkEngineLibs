@@ -83,7 +83,7 @@ namespace GIIS.DataLayer
                 o.Method = method;
                 o.Title = title;
 
-                Trace.TraceInformation("LOG: {0}", o.Message);
+                Trace.TraceInformation("LOG: {0} : {1}", title, message);
 
                 int inserted = Insert(o);
                 return inserted;
