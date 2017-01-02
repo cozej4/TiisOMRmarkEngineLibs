@@ -1,5 +1,0 @@
-C:\Users\justi\Source\Repos\tiis\GIIS.DataLayer.Contract\bin\Release\GIIS.DataLayer.Contract.dll
-C:\Users\justi\Source\Repos\tiis\GIIS.DataLayer.Contract\bin\Release\GIIS.DataLayer.Contract.pdb
-C:\Users\justi\Source\Repos\tiis\GIIS.DataLayer.Contract\obj\Release\GIIS.DataLayer.Contract.dll
-C:\Users\justi\Source\Repos\tiis\GIIS.DataLayer.Contract\obj\Release\GIIS.DataLayer.Contract.pdb
-C:\Users\justi\Source\Repos\tiis\GIIS.DataLayer.Contract\obj\Release\GIIS.DataLayer.Contract.csprojResolveAssemblyReference.cache

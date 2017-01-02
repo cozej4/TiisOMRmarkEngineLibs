@@ -180,29 +180,28 @@ namespace GIIS.ScanForms.UserInterface
                     // Doses
                     rowData.Doses = new List<Dose>();
                     if (omrBcg != null && omrBcg.Length > 0)
-                        rowData.Doses.Add(ReferenceData.Current.Doses.Find(d => d.Fullname == "BCG"));
+                        rowData.Doses.Add(this.FindDoseOrThrow("BCG"));
                     if (omrOpv != null)
                         foreach (var bub in omrOpv)
                         {
                             VaccinationEvent opvEvent = null;
                             if (bub.Value == "0")
-                                rowData.Doses.Add(ReferenceData.Current.Doses.Find(d => d.Fullname == "OPV0"));
+                                rowData.Doses.Add(this.FindDoseOrThrow("OPV0"));
                             else
-                                rowData.Doses.Add(ReferenceData.Current.Doses.Find(d => d.Fullname == String.Format("OPV {0}", bub.Value)));
+                                rowData.Doses.Add(this.FindDoseOrThrow(String.Format("OPV {0}", bub.Value)));
                         }
                     if (omrPenta != null)
                         foreach (var bub in omrPenta)
-                            rowData.Doses.Add(ReferenceData.Current.Doses.Find(d => d.Fullname == String.Format("DTP-HepB-Hib {0}", bub.Value)));
+                            rowData.Doses.Add(this.FindDoseOrThrow(String.Format("DTP-HepB-Hib {0}", bub.Value)));
                     if (omrPcv != null)
                         foreach (var bub in omrPcv)
-                            rowData.Doses.Add(ReferenceData.Current.Doses.Find(d => d.Fullname == String.Format("PCV {0}", bub.Value)));
+                            rowData.Doses.Add(this.FindDoseOrThrow(String.Format("PCV-13 {0}", bub.Value)));
                     if (omrRota != null)
                         foreach (var bub in omrRota)
-                            rowData.Doses.Add(ReferenceData.Current.Doses.Find(d => d.Fullname == String.Format("Rota {0}", bub.Value)));
+                            rowData.Doses.Add(this.FindDoseOrThrow(String.Format("Rota {0}", bub.Value)));
                     if (omrMr != null)
                         foreach (var bub in omrMr)
-                            rowData.Doses.Add(ReferenceData.Current.Doses.Find(d => d.Fullname == String.Format("Measles Rubella {0}", bub.Value)) ??
-                                ReferenceData.Current.Doses.Find(d => d.Fullname == String.Format("Measles {0}", bub.Value)));
+                            rowData.Doses.Add(this.FindDoseOrThrow(String.Format("Measles Rubella {0}", bub.Value), String.Format("Measles {0}", bub.Value)));
 
                     // Given vaccines
                     rowData.VaccineGiven = new List<ScheduledVaccination>();
@@ -264,7 +263,20 @@ namespace GIIS.ScanForms.UserInterface
             }
         }
 
+        /// <summary>
+        /// Find dose or throw
+        /// </summary>
+        private Dose FindDoseOrThrow(params string[] doseName)
+        {
+            Dose retVal = null;
 
-       
+            foreach (var itm in doseName)
+                retVal = retVal ?? ReferenceData.Current.Doses.Find(o => o.Fullname == itm);
+
+            if (retVal == null)
+                throw new KeyNotFoundException($"Dose {String.Join(",", doseName)} could not be found on server");
+
+            return retVal;
+        }
     }
 }
