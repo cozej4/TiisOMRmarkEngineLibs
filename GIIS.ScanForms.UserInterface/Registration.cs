@@ -1,16 +1,13 @@
-﻿using GIIS.DataLayer;
-using OmrMarkEngine.Template.Scripting.Util;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Configuration;
-using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using AForge.Imaging.Filters;
+using GIIS.DataLayer;
+using OmrMarkEngine.Template.Scripting.Util;
 
 namespace GIIS.ScanForms.UserInterface
 {
@@ -43,8 +40,8 @@ namespace GIIS.ScanForms.UserInterface
             using (Bitmap bmp = new Bitmap((int)rowData.Page.BottomRight.Y / 3, (int)rowData.RowBounds.Width / 3))
             using (Graphics g = Graphics.FromImage(bmp))
             using (Image img = Image.FromFile(rowData.Page.AnalyzedImage))
-            using (Image scaled = (Image)new AForge.Imaging.Filters.ResizeNearestNeighbor(img.Width / 3, img.Height / 3).Apply((Bitmap)img))
-            using (Image rotated = (Image)new AForge.Imaging.Filters.RotateBilinear(-90).Apply((Bitmap)scaled))
+            using (Image scaled = (Image)new ResizeNearestNeighbor(img.Width / 3, img.Height / 3).Apply((Bitmap)img))
+            using (Image rotated = (Image)new RotateBilinear(-90).Apply((Bitmap)scaled))
             {
 
                 g.DrawImage(rotated, 0, 0, new Rectangle(0, (int)rowData.RowBounds.X / 3, (int)rowData.Page.BottomRight.Y / 3, (int)rowData.RowBounds.Width / 3), GraphicsUnit.Pixel);
@@ -88,13 +85,34 @@ namespace GIIS.ScanForms.UserInterface
             foreach(var itm in rowData.VaccineGiven)
             {
                 String antigenName = itm.Name;
-                if (antigenName == "DTP-HepB-Hib")
-                    antigenName = "PENTA";
-                else if (antigenName == "Measles Rubella")
-                    antigenName = "MR";
-                else if (antigenName == "PCV-13")
-                    antigenName = "PCV";
-
+                if (antigenName == "ROTA")
+                {
+                    antigenName = ReferenceData.Current.Vaccines
+                        .Single(d => d.Name.ToLower().Contains("rota")).Name;
+                }
+                else if (antigenName == "PENTA")
+                {
+                    antigenName = ReferenceData.Current.Vaccines
+                        .Single(d => (d.Name.ToLower().Contains("dtp") || d.Name.ToLower().Contains("penta")))
+                        .Name;
+                }
+                else if (antigenName == "MR")
+                {
+                    antigenName = ReferenceData.Current.Vaccines
+                        .Single(d => (d.Name.ToLower().Contains("mr")))
+                        .Name;
+                }
+                else if (antigenName == "PCV")
+                {
+                    antigenName = ReferenceData.Current.Vaccines
+                        .Single(d => d.Name.ToLower().Contains("pcv")).Name;
+                }
+                else if (antigenName == "OPV")
+                {
+                    antigenName = ReferenceData.Current.Vaccines
+                        .Single(d => d.Name.ToLower().Contains("opv")).Name;
+                }
+                
                 var ctl = this.grpVaccine.Controls.Find(String.Format("chk{0}", antigenName.ToUpper()), false).FirstOrDefault() as CheckBox;
                 if(ctl != null)
                     ctl.Checked = true;
@@ -240,6 +258,7 @@ namespace GIIS.ScanForms.UserInterface
 
                 // Update doses
                 var vaccinationEvent = this.m_restUtil.Get<VaccinationEvent[]>("VaccinationEvent.svc/GetVaccinationEventListByChildId", new KeyValuePair<string, object>("childId", childResult.Id));
+               
                 foreach (var evt in vaccinationEvent)
                 {
                     var dose = ReferenceData.Current.Doses.FirstOrDefault(o => o.Id == evt.DoseId);
@@ -256,8 +275,11 @@ namespace GIIS.ScanForms.UserInterface
                     }
                 }
 
+                
                 // Re-fetch doses so we get new data from the system
                 vaccinationEvent = this.m_restUtil.Get<VaccinationEvent[]>("VaccinationEvent.svc/GetVaccinationEventListByChildId", new KeyValuePair<string, object>("childId", childResult.Id));
+                
+               
                 // Give doses
                 foreach (var ctl in grpVaccine.Controls)
                 {
@@ -269,31 +291,70 @@ namespace GIIS.ScanForms.UserInterface
                     if (!checkbox.Checked)
                         continue;
 
+                    
                     string antigenName = checkbox.Name.Substring(3);
+                    
                     if (antigenName == "ROTA")
-                        antigenName = "Rota";
+                    {
+                        antigenName = ReferenceData.Current.Vaccines
+                            .Single(d => d.Name.ToLower().Contains("rota")).Name;
+                    }
                     else if (antigenName == "PENTA")
-                        antigenName = "DTP-HepB-Hib";
+                    {
+                        antigenName = ReferenceData.Current.Vaccines
+                            .Single(d => (d.Name.ToLower().Contains("dtp") || d.Name.ToLower().Contains("penta")))
+                            .Name;
+                    }
                     else if (antigenName == "MR")
-                        antigenName = "Measles Rubella";
+                    {
+                        antigenName = ReferenceData.Current.Vaccines
+                            .Single(d => (d.Name.ToLower().Contains("mr")))
+                            .Name;
+                    }
                     else if (antigenName == "PCV")
-                        antigenName = "PCV-13";
+                    {
+                        antigenName = ReferenceData.Current.Vaccines
+                            .Single(d => d.Name.ToLower().Contains("pcv")).Name;
+                    }
+                    else if (antigenName == "OPV")
+                    {
+                        antigenName = ReferenceData.Current.Vaccines
+                            .Single(d => d.Name.ToLower().Contains("opv")).Name;
+                    }
                     else if (antigenName == "Outreach")
                         continue;
-
-                    var vaccine = ReferenceData.Current.Vaccines.FirstOrDefault(o => o.Name == antigenName);
+                    
+                    
+                    
+                    var vaccine = ReferenceData.Current.Vaccines.FirstOrDefault(o => o.Name.Equals(antigenName));
+                    
+                  
 
                     // Find the scheduled vaccine for this
                     List<Dose> sv = ReferenceData.Current.Doses.FindAll(o => o.ScheduledVaccinationId == vaccine.Id);
+                    
+                   
                     // Find the current dose we're on
-                    var lastVe = vaccinationEvent.Where(ve => sv.Exists(o => o.Id == ve.DoseId) && ve.VaccinationStatus == true).OrderByDescending(o => sv.Find(d => d.Id == o.DoseId).DoseNumber).FirstOrDefault();
+                    var lastVe = vaccinationEvent
+                        .Where(ve => sv.Exists(o => o.Id == ve.DoseId) && ve.VaccinationStatus == true)
+                        .OrderByDescending(o => sv.Find(d => d.Id == o.DoseId).DoseNumber).FirstOrDefault();
+                    
+                    
                     int doseNumber = 0;
                     // hack: OPV is odd
-                    if (antigenName == "OPV")
+                    if (antigenName == ReferenceData.Current.Vaccines
+                            .Single(d => d.Name.ToLower().Contains("opv")).Name)
+                    {
                         doseNumber--;
+                    }
                     if (lastVe != null)
+                    {
                         doseNumber = sv.Find(d => d.Id == lastVe.DoseId).DoseNumber;
+                    }
 
+
+                    
+                    
                     // Next we want to get the next dose
                     Dose myDose = sv.FirstOrDefault(o => o.DoseNumber == doseNumber + 1);
                     if (myDose == null)

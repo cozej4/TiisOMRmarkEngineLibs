@@ -110,7 +110,7 @@ namespace GIIS.ScanForms.UserInterface
                 RestUtil restUtil = new RestUtil(new Uri(ConfigurationManager.AppSettings["GIIS_URL"]));
                 var userInfo = restUtil.Get<User>("UserManagement.svc/GetUserInfo", new KeyValuePair<string, object>("username", restUtil.GetCurrentUserName));
                 var placeInfo = restUtil.Get<Place[]>("PlaceManagement.svc/GetPlaceByHealthFacilityId", new KeyValuePair<string, object>("hf_id", facilityId));
-               
+
                 foreach (var dtl in page.Details.OfType<OmrRowData>())
                 {
 
@@ -123,7 +123,8 @@ namespace GIIS.ScanForms.UserInterface
                     // int healthFacilityId, int birthplaceId, int domicileId, string address, string phone, string motherFirstname,
                     // string motherLastname, string notes, int userId, DateTime modifiedOn)
                     OmrBarcodeData omrBarcode = dtl.Details.OfType<OmrBarcodeData>().FirstOrDefault();
-                    OmrBubbleData omrDobDay = dtl.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "dobDay"),
+                    OmrBubbleData omrDobDay =
+                            dtl.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "dobDay"),
                         omrDobDay10 = dtl.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "dobDay10"),
                         omrDobMonth = dtl.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "dobMonth"),
                         omrDobYear = dtl.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "dobYear"),
@@ -131,7 +132,7 @@ namespace GIIS.ScanForms.UserInterface
                         omrOutreach = dtl.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "Outreach"),
                         omrVaccDay10 = dtl.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "vaccDay10"),
                         omrVaccDay = dtl.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "vaccDay"),
-                        omrNew =  dtl.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "newInfo"),
+                        omrNew = dtl.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "newInfo"),
                         omrUpdate = dtl.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "correct"),
                         omrIgnore = dtl.Details.OfType<OmrBubbleData>().FirstOrDefault(o => o.Key == "moved");
                     OmrBubbleData[] omrBcg = dtl.Details.OfType<OmrBubbleData>().Where(o => o.Key == "BCG").ToArray(),
@@ -144,9 +145,14 @@ namespace GIIS.ScanForms.UserInterface
 
                     // From WCF Call
                     // Create row data for the verification form
-                    OmrBarcodeField barcodeField = page.Template.FlatFields.Find(o => o.Id == String.Format("{0}Barcode", dtl.Id)) as OmrBarcodeField;
-                    OmrBubbleField outreachField = page.Template.FlatFields.OfType<OmrBubbleField>().SingleOrDefault(o => o.AnswerRowGroup == dtl.Id && o.Question == "Outreach"),
-                        monthField = page.Template.FlatFields.OfType<OmrBubbleField>().SingleOrDefault(o => o.AnswerRowGroup == dtl.Id && o.Question == "dobMonth" && o.Value == "12");
+                    OmrBarcodeField barcodeField =
+                        page.Template.FlatFields.Find(o => o.Id == String.Format("{0}Barcode", dtl.Id)) as
+                            OmrBarcodeField;
+                    OmrBubbleField outreachField = page.Template.FlatFields.OfType<OmrBubbleField>()
+                            .SingleOrDefault(o => o.AnswerRowGroup == dtl.Id && o.Question == "Outreach"),
+                        monthField = page.Template.FlatFields.OfType<OmrBubbleField>()
+                            .SingleOrDefault(o => o.AnswerRowGroup == dtl.Id && o.Question == "dobMonth" &&
+                                                  o.Value == "12");
 
                     // Barcode bounds
                     Tz02RowData rowData = new Tz02RowData()
@@ -169,9 +175,13 @@ namespace GIIS.ScanForms.UserInterface
                         omrDobMonth != null && omrDobYear != null)
                         try
                         {
-                            rowData.DateOfBirth = new DateTime((int)omrDobYear.ValueAsFloat, (int)omrDobMonth.ValueAsFloat, (int)omrDobDay10.ValueAsFloat + (int)omrDobDay.ValueAsFloat);
+                            rowData.DateOfBirth = new DateTime((int) omrDobYear.ValueAsFloat,
+                                (int) omrDobMonth.ValueAsFloat,
+                                (int) omrDobDay10.ValueAsFloat + (int) omrDobDay.ValueAsFloat);
                         }
-                        catch { }
+                        catch
+                        {
+                        }
                     if (omrGender != null)
                         rowData.Gender = omrGender.Value == "M" ? true : false;
                     if (omrOutreach != null)
@@ -180,42 +190,95 @@ namespace GIIS.ScanForms.UserInterface
                     // Doses
                     rowData.Doses = new List<Dose>();
                     if (omrBcg != null && omrBcg.Length > 0)
+                    {
                         rowData.Doses.Add(this.FindDoseOrThrow("BCG"));
+
+                    }
                     if (omrOpv != null)
+                    {
                         foreach (var bub in omrOpv)
                         {
                             VaccinationEvent opvEvent = null;
-                            if (bub.Value == "0")
-                                rowData.Doses.Add(this.FindDoseOrThrow("OPV0"));
-                            else
-                                rowData.Doses.Add(this.FindDoseOrThrow(String.Format("OPV {0}", bub.Value)));
-                        }
-                    if (omrPenta != null)
-                        foreach (var bub in omrPenta)
-                            rowData.Doses.Add(this.FindDoseOrThrow(String.Format("DTP-HepB-Hib {0}", bub.Value)));
-                    if (omrPcv != null)
-                        foreach (var bub in omrPcv)
-                            rowData.Doses.Add(this.FindDoseOrThrow(String.Format("PCV-13 {0}", bub.Value)));
-                    if (omrRota != null)
-                        foreach (var bub in omrRota)
-                            rowData.Doses.Add(this.FindDoseOrThrow(String.Format("Rota {0}", bub.Value)));
-                    if (omrMr != null)
-                        foreach (var bub in omrMr)
-                            rowData.Doses.Add(this.FindDoseOrThrow(String.Format("Measles Rubella {0}", bub.Value), String.Format("Measles {0}", bub.Value)));
 
-                    // Given vaccines
+                            rowData.Doses.Add(ReferenceData.Current.Doses
+                                .Single(d => (d.DoseNumber == Helper.ConvertToInt(bub.Value) &&
+                                              d.ScheduledVaccinationId == (ReferenceData.Current.Vaccines
+                                                  .Single(v => v.Name.ToLower().Contains("opv")).Id))));
+                        }
+                    }
+                    if (omrPenta != null)
+                    {
+                        foreach (var bub in omrPenta)
+                        {
+                            rowData.Doses.Add(ReferenceData.Current.Doses
+                                .Single(d => (d.DoseNumber == Helper.ConvertToInt(bub.Value) &&
+                                              d.ScheduledVaccinationId == (ReferenceData.Current.Vaccines
+                                                  .Single(v => (v.Name.ToLower().Contains("dtp") ||
+                                                                v.Name.ToLower().Contains("penta"))).Id))));
+                        }
+                    }
+                    if (omrPcv != null)
+                    {
+                        foreach (var bub in omrPcv)
+                        {
+                            rowData.Doses.Add(ReferenceData.Current.Doses
+                                .Single(d => (d.DoseNumber == Helper.ConvertToInt(bub.Value) &&
+                                              d.ScheduledVaccinationId == (ReferenceData.Current.Vaccines
+                                                  .Single(v => v.Name.ToLower().Contains("pcv")).Id))));
+                        }
+                    }
+                    if (omrRota != null)
+                    {
+                        foreach (var bub in omrRota)
+                        {
+                            rowData.Doses.Add(ReferenceData.Current.Doses
+                                .Single(d => (d.DoseNumber == Helper.ConvertToInt(bub.Value) &&
+                                              d.ScheduledVaccinationId == (ReferenceData.Current.Vaccines
+                                                  .Single(v => v.Name.ToLower().Contains("rota")).Id))));
+                        }
+                    }
+                    if (omrMr != null)
+                    {
+                        foreach (var bub in omrMr)
+                        {
+                            rowData.Doses.Add(ReferenceData.Current.Doses
+                                .Single(d => (d.DoseNumber == Helper.ConvertToInt(bub.Value) &&
+                                              d.ScheduledVaccinationId == (ReferenceData.Current.Vaccines
+                                                .Single(v =>  v.Name.ToLower().Contains("mr"))
+                                                  .Id))));
+                        }
+                    }
+                // Given vaccines
                     rowData.VaccineGiven = new List<ScheduledVaccination>();
                     foreach (var vacc in omrVaccine)
                     {
                         string antigenName = vacc.Value;
                         if (antigenName == "ROTA")
-                            antigenName = "Rota";
+                        {
+                            antigenName = ReferenceData.Current.Vaccines
+                                .Single(d => d.Name.ToLower().Contains("rota")).Name;
+                        }
                         else if (antigenName == "PENTA")
-                            antigenName = "DTP-HepB-Hib";
+                        {
+                            antigenName = ReferenceData.Current.Vaccines.Single(d=>(d.Name.ToLower().Contains("dtp")||d.Name.ToLower().Contains("penta"))).Name;
+                        }
                         else if (antigenName == "MR")
-                            antigenName = "Measles Rubella";
+                        {
+                            antigenName = ReferenceData.Current.Vaccines
+                                .Single(d => (d.Name.ToLower().Contains("mr")))
+                                .Name;
+                        }
                         else if (antigenName == "PCV")
-                            antigenName = "PCV-13";
+                        {
+                            antigenName = ReferenceData.Current.Vaccines
+                                .Single(d => d.Name.ToLower().Contains("pcv")).Name;
+                        }else if (antigenName == "OPV")
+                        {
+                            antigenName = ReferenceData.Current.Vaccines
+                                .Single(d => d.Name.ToLower().Contains("opv")).Name;
+                        }
+
+
                         var refData = ReferenceData.Current.Vaccines.FirstOrDefault(v => v.Name == antigenName);
                         if (refData != null)
                             rowData.VaccineGiven.Add(refData);

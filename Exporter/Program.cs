@@ -87,6 +87,11 @@ namespace Exporter
                 return new List<TObject>();
             }
 
+            public IEnumerable<TObject> GetRelations<TObject>(Guid? sourceKey) where TObject : IdentifiedData, ISimpleAssociation, new()
+            {
+                throw new NotImplementedException();
+            }
+
             /// <summary>
             /// Gets the specified relations
             /// </summary>
@@ -102,6 +107,11 @@ namespace Exporter
             {
                 return new List<TObject>();
 
+            }
+
+            IEnumerable<TObject> IEntitySourceProvider.GetRelations<TObject>(Guid? sourceKey, decimal? sourceVersionSequence)
+            {
+                throw new NotImplementedException();
             }
         }
 
@@ -238,10 +248,15 @@ namespace Exporter
         static OpenIZ.Core.Model.Entities.Place MapFacility(HealthFacility hf)
         {
             Guid id = Guid.NewGuid();
+            Console.WriteLine("Adding health facility id");
             facilityMap.Add(hf.Id, id);
+            Console.WriteLine("Adding health facility id successful");
             EntitySource.Current = new EntitySource(new DummyEntitySource());
 
             // Core construction of place
+            Console.WriteLine("Creating core constructions of place");
+            Console.WriteLine("cold storage capacity value is = "+hf.ColdStorageCapacity);
+            
             var retVal = new OpenIZ.Core.Model.Entities.Place()
             {
                 Key = id,
@@ -252,26 +267,28 @@ namespace Exporter
                 {
                     new OpenIZ.Core.Model.DataTypes.EntityIdentifier(new AssigningAuthority("TIIS_FACID", "TIIS Facility Identifiers", "1.3.6.1.4.1.45219.1.3.5.5"), hf.Id.ToString()),
                     new OpenIZ.Core.Model.DataTypes.EntityIdentifier(new AssigningAuthority("TZ_FRID", "Facility Register Identifiers", "1.3.6.1.4.1.45219.1.3.5.10"), hf.Code)
-                },
+                },  
                 StatusConceptKey = hf.IsActive ? StatusKeys.Active : StatusKeys.Nullfied,
                 Extensions = new List<EntityExtension>()
                 {
                     new EntityExtension() {
                         ExtensionType = new ExtensionType("http://openiz.org/extensions/contrib/tiis/isleaf", typeof(BooleanExtensionHandler)),
-                        ExtensionValue = BitConverter.GetBytes(hf.Leaf)
+                        ExtensionValue = hf.Leaf
+                  
                     },
                     new EntityExtension() {
                         ExtensionType = new ExtensionType("http://openiz.org/extensions/contrib/tiis/isVaccinationPoint", typeof(BooleanExtensionHandler)),
-                        ExtensionValue = BitConverter.GetBytes(hf.VaccinationPoint)
+                        ExtensionValue = hf.VaccinationPoint
                     },
                     new EntityExtension() {
                         ExtensionType = new ExtensionType("http://openiz.org/extensions/contrib/tiis/vaccineStore", typeof(BooleanExtensionHandler)),
-                        ExtensionValue = BitConverter.GetBytes(hf.VaccineStore)
+                        ExtensionValue = hf.VaccineStore
+                        
                     },
                     new EntityExtension()
                     {
                         ExtensionType = new ExtensionType("http://openiz.org/extensions/contrib/tiis/coldStorageCapacity", typeof(DecimalExtensionHandler)),
-                        ExtensionValue = new DecimalExtensionHandler().Serialize((Decimal)hf.ColdStorageCapacity)
+                        ExtensionValue = Decimal.Parse(hf.ColdStorageCapacity.ToString())
                     }
                 },
                 Tags = new List<EntityTag>()
@@ -279,7 +296,7 @@ namespace Exporter
                                 new EntityTag("http://openiz.org/tags/contrib/importedData", "true")
                             }
             };
-
+            Console.WriteLine("Completed successful");
             if (hf.ParentId != 0)
                 retVal.Relationships = new List<EntityRelationship>()
                 {
@@ -361,7 +378,7 @@ namespace Exporter
                 {
                     new EntityExtension() {
                         ExtensionType = new ExtensionType("http://openiz.org/extensions/contrib/tiis/isleaf", typeof(BooleanExtensionHandler)),
-                        ExtensionValue = BitConverter.GetBytes(plc.Leaf)
+                        ExtensionValue = plc.Leaf
                     }
                 },
                 Addresses = new List<EntityAddress>()

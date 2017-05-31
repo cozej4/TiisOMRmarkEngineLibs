@@ -1,0 +1,2 @@
+/Users/coze/Workspace/tiis/GIIS.BusinessLogic.Test/obj/Debug/GIIS.BusinessLogic.Test.csprojResolveAssemblyReference.cache
+/Users/coze/Workspace/tiis/GIIS.BusinessLogic.Test/obj/Debug/GIIS.BusinessLogic.Test.csproj.CoreCompileInputs.cache

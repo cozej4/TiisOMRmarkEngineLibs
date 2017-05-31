@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="RIDER_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file:///Users/Downloads/LICENSE.txt">
+      <sourceFolder url="file:///Users/Downloads/LICENSE.txt" isTestSource="false" />
+    </content>
+    <content url="file:///Users/Downloads/NOTICE.txt">
+      <sourceFolder url="file:///Users/Downloads/NOTICE.txt" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../..">
+      <sourceFolder url="file://$MODULE_DIR$/../../Exporter" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../GIIS.BusinessLogic" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../GIIS.BusinessLogic.Test" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../GIIS.DataLayer" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../GIIS.DataLayer.Contract" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../GIIS.DataLayer.Tests" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../GIIS.ScanForms.UserInterface" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../HIESync" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Exporter/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Exporter/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../GIIS.BusinessLogic.Test/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../GIIS.BusinessLogic.Test/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../GIIS.BusinessLogic/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../GIIS.BusinessLogic/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../GIIS.DataLayer.Contract/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../GIIS.DataLayer.Contract/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../GIIS.DataLayer.Tests/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../GIIS.DataLayer.Tests/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../GIIS.DataLayer/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../GIIS.DataLayer/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../GIIS.ScanForms.UserInterface/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../GIIS.ScanForms.UserInterface/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../HIESync/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../HIESync/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../packages" />
+    </content>
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

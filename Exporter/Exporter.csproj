@@ -33,11 +33,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="OpenIZ.Core">
-      <HintPath>Project Items\OpenIZ.Core.dll</HintPath>
+    <Reference Include="GIIS.DataLayer, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\GIIS.DataLayer\bin\Debug\GIIS.DataLayer.dll</HintPath>
     </Reference>
-    <Reference Include="OpenIZ.Core.Model">
-      <HintPath>Project Items\OpenIZ.Core.Model.dll</HintPath>
+    <Reference Include="OpenIZ.Core, Version=0.8.0.29761, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\..\Downloads\openiz\bin\Debug\OpenIZ.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenIZ.Core.Model, Version=0.8.1.29723, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\..\Downloads\openiz\bin\Debug\OpenIZ.Core.Model.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -55,12 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\GIIS.DataLayer\GIIS.DataLayer.csproj">
-      <Project>{241f7080-2919-4084-ad56-dacfd85dd65e}</Project>
-      <Name>GIIS.DataLayer</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
