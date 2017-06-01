@@ -88,7 +88,15 @@ namespace GIIS.ScanForms.UserInterface
 
         public void UploadData(OmrPageOutput page)
         {
-
+            if (!Connectivity.CheckForInternetConnection())
+            {
+                MessageBox.Show(
+                    "Username is empty, This is usually caused by lack of internet connectivity. Please try again later");
+                Exception e = new Exception("No internet connection");
+                Trace.TraceError("Error:{0}", e);
+                throw e;
+            }
+            
             StatusDialog dlg = new StatusDialog();
             dlg.Show();
 
@@ -98,28 +106,36 @@ namespace GIIS.ScanForms.UserInterface
                 int month = Int32.Parse(page.Parameters[1]);
                 int year = Int32.Parse(page.Parameters[2]);
                 this.Err = "";
+                
+               
 
                 Trace.TraceInformation("Reporting for facility {0} of {1}-{2}", facilityId, month, year);
 
                 RestUtil restUtil = new RestUtil(new Uri(ConfigurationManager.AppSettings["GIIS_URL"]));
+                
+               
+
                 User userInfo = null;
                 try
                 {
                     userInfo = restUtil.Get<User>("UserManagement.svc/GetUserInfo", new KeyValuePair<string, object>("username", restUtil.GetCurrentUserName));
                 }
                 catch
-                {
+                {       
                     userInfo = restUtil.Get<User>("UserManagement.svc/GetUserInfo", new KeyValuePair<string, object>("username", restUtil.GetCurrentUserName));
                 }
-                var placeInfo = restUtil.Get<Place[]>("PlaceManagement.svc/GetPlaceByHealthFacilityId", new KeyValuePair<string, object>("hf_id", facilityId));
-                
+                var placeInfo = restUtil.Get<Place[]>("PlaceManagement.svc/GetPlaceByHealthFacilityId",
+                    new KeyValuePair<string, object>("hf_id", facilityId));
+               
                 foreach (var patientRow in page.Details.OfType<OmrRowData>().Where(o=>!o.Id.Contains("-")))
                 {
                     // Master patient row processing
                     string rowNum = patientRow.Id.Substring(patientRow.Id.Length - 1, 1);
-
+                  
+                    
                     if (patientRow.Details.Count == 0)
                         continue;
+                 
 
 
                     // Create row data for the verification form

@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace GIIS.ScanForms.UserInterface
 {
@@ -22,6 +23,14 @@ namespace GIIS.ScanForms.UserInterface
         public void UploadData(OmrPageOutput page)
         {
 
+            if (!Connectivity.CheckForInternetConnection())
+            {
+                MessageBox.Show(
+                    "Username is empty, This is usually caused by lack of internet connectivity. Please try again later");
+                Exception e = new Exception("No internet connection");
+                Trace.TraceError("Error:{0}", e);
+                throw e;
+            }
             StatusDialog dlg = new StatusDialog();
             dlg.Show();
 

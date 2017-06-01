@@ -69,6 +69,7 @@
       <DependentUpon>BarcodeCorrection.cs</DependentUpon>
     </Compile>
     <Compile Include="BarcodeUtil.cs" />
+    <Compile Include="Connectivity.cs" />
     <Compile Include="FacilitySelectionContext.cs" />
     <Compile Include="FormBID01.cs" />
     <Compile Include="FormBID03.cs" />
